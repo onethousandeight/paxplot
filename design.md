@@ -31,6 +31,7 @@ plot.set_axis_label("A", "Column A")
 plot.set_axis_limits("A", lower=-1.0, upper=3.0)
 plot.set_axis_ticks("Risk", values=["low", "medium", "high"])
 plot.invert_axis("C")
+plot.set_colorbar("A", palette="viridis", label="Column A")
 
 fig = plot.render()
 fig.show()
@@ -54,6 +55,7 @@ plot.set_axis(
     categories=["low", "medium", "high"],
 )
 plot.set_axis("C", inverted=True, tick_count=5)
+plot.set_line_style("row-2", color="crimson", width=2.0)
 
 fig = plot.render(figsize=(10, 6))
 ```
@@ -78,6 +80,7 @@ class ParallelPlot:
         self,
         data,
         columns: list[str] | None = None,
+        row_ids: list[str] | None = None,
     ) -> "ParallelPlot": ...
 
     def set_axis(
@@ -107,6 +110,32 @@ class ParallelPlot:
         labels: list[str] | None = None,
     ) -> "ParallelPlot": ...
     def invert_axis(self, axis: int | str, inverted: bool = True) -> "ParallelPlot": ...
+    def set_default_line_style(
+        self,
+        *,
+        color: str | None = None,
+        alpha: float | None = None,
+        width: float | None = None,
+        linestyle: str | None = None,
+    ) -> "ParallelPlot": ...
+    def set_line_style(
+        self,
+        row_id: str,
+        *,
+        color: str | None = None,
+        alpha: float | None = None,
+        width: float | None = None,
+        linestyle: str | None = None,
+        zorder: float | None = None,
+    ) -> "ParallelPlot": ...
+    def set_colorbar(
+        self,
+        axis: int | str,
+        *,
+        palette: str | list[str] = "viridis",
+        label: str | None = None,
+        limits: tuple[float | None, float | None] | None = None,
+    ) -> "ParallelPlot": ...
 
     def render(self, **kwargs): ...
     def to_json(self, path: str) -> None: ...
@@ -137,10 +166,11 @@ so validation and JSON round trips are built into the package.
 ```python
 class PlotState(BaseModel):
     data: dict[str, list[object]]
+    row_ids: list[str]
     axes: list[AxisConfig]
-    line_color: str | None = None
-    line_alpha: float = 0.7
-    line_width: float = 1.0
+    default_line_style: LineStyle = Field(default_factory=LineStyle)
+    line_styles: dict[str, LineStyleOverride] = Field(default_factory=dict)
+    color_encoding: ColorEncoding | None = None
 ```
 
 ### AxisConfig
@@ -171,6 +201,46 @@ class TickConfig(BaseModel):
     count: int | None = None
 ```
 
+### LineStyle
+
+`LineStyle` stores serializable line appearance. `LineStyleOverride` uses the
+same fields, but all fields are optional.
+
+```python
+class LineStyle(BaseModel):
+    color: str | None = None
+    alpha: float = 0.7
+    width: float = 1.0
+    linestyle: str = "-"
+    zorder: float | None = None
+
+
+class LineStyleOverride(BaseModel):
+    color: str | None = None
+    alpha: float | None = None
+    width: float | None = None
+    linestyle: str | None = None
+    zorder: float | None = None
+```
+
+### ColorEncoding
+
+`ColorEncoding` describes line colors generated from one axis. It is plot
+intent, not a matplotlib colorbar object.
+
+```python
+class ColorEncoding(BaseModel):
+    axis: str
+    palette: str | list[str] = "viridis"
+    lower: float | None = None
+    upper: float | None = None
+    colorbar: ColorbarConfig = Field(default_factory=ColorbarConfig)
+
+
+class ColorbarConfig(BaseModel):
+    label: str | None = None
+```
+
 ### RenderData
 
 `RenderData` is produced from `PlotState` immediately before rendering. It stores
@@ -186,13 +256,25 @@ class RenderAxis(BaseModel):
     tick_labels: list[str]
 
 
+class RenderLine(BaseModel):
+    id: str
+    y: list[float | None]
+    style: LineStyle
+
+
+class RenderColorbar(BaseModel):
+    axis: str
+    palette: str | list[str]
+    label: str | None
+    lower: float
+    upper: float
+
+
 class RenderData(BaseModel):
     x: list[float]
-    y: list[list[float | None]]
+    lines: list[RenderLine]
     axes: list[RenderAxis]
-    line_color: str | None
-    line_alpha: float
-    line_width: float
+    colorbar: RenderColorbar | None = None
 ```
 
 ## Data And Axis Handling
@@ -210,7 +292,8 @@ Data is stored by column:
 
 `set_data` accepts row-oriented data because that is convenient for users, then
 converts it to column-oriented state. It should also accept mappings of columns
-and pandas DataFrames.
+and pandas DataFrames. If `row_ids` are not supplied, PaxPlot assigns ids like
+`row-0`, `row-1`, and `row-2` for the current dataset.
 
 Axis type inference is simple:
 
@@ -247,6 +330,25 @@ Ticks are resolved during render preparation:
 Missing values remain missing in `RenderData`. The matplotlib renderer should
 skip or break line segments where a row has missing coordinates.
 
+## Line Styling And Colorbars
+
+Line style is part of serializable plot state when it changes the meaning of the
+plot. Backend-only artist details stay in the renderer.
+
+Users can set a default line style, override individual lines by row id, or call
+`set_colorbar(axis)` to color lines from a numeric column. `palette` can be a
+named matplotlib colormap or an explicit list of colors.
+
+Style precedence is:
+
+1. default line style;
+2. colorbar column encoding;
+3. explicit per-line style overrides.
+
+A user-set line color overrides generated colorbar colors for that line.
+Categorical palettes can use the same model later, but the first colorbar
+implementation is numeric.
+
 ## Matplotlib Rendering
 
 `ParallelPlot.render()` prepares `RenderData` and passes it to the matplotlib
@@ -257,9 +359,10 @@ The matplotlib renderer:
 
 - creates one figure;
 - draws vertical axes at the `RenderAxis.x` positions;
-- draws each row as a line through normalized `RenderData.y` values;
+- draws each `RenderLine` through normalized y values;
 - applies each axis's resolved tick positions and labels;
-- applies axis labels and line style;
+- applies resolved line styles;
+- draws a colorbar when `RenderData.colorbar` is present;
 - returns a matplotlib `Figure`.
 
 The renderer can use a main axis for line geometry and secondary axes or custom
@@ -268,7 +371,7 @@ artists for vertical axes and ticks. That detail stays inside the renderer.
 ## Implementation Steps
 
 1. Define Pydantic models for `PlotState`, `AxisConfig`, `TickConfig`,
-   `RenderAxis`, and `RenderData`.
+   line styling, color encoding, `RenderAxis`, and `RenderData`.
 2. Implement `ParallelPlot` with data loading, axis lookup, setters,
    serialization, and `render()`.
 3. Implement render preparation from `PlotState` to `RenderData`.
@@ -277,15 +380,17 @@ artists for vertical axes and ticks. That detail stays inside the renderer.
 5. Implement the matplotlib renderer against `RenderData`.
 6. Export `ParallelPlot` from `paxplot.__init__`.
 7. Add examples that cover basic data, labels, limits, ticks, categorical axes,
-   inversion, JSON round trips, and rendering.
+   inversion, line styling, colorbars, JSON round trips, and rendering.
 
 ## Tests
 
 Schema and state:
 
 - `PlotState` validates equal column lengths.
+- `PlotState` validates row ids match data length.
 - `ParallelPlot.set_data` accepts row data and produces column data.
-- JSON round trips preserve data, axis config, ticks, and style.
+- JSON round trips preserve data, row ids, axis config, ticks, style, and
+  colorbar config.
 - axis lookup works by index and name.
 
 Axis handling:
@@ -305,10 +410,21 @@ Ticks:
 - automatic numeric ticks respect `tick_count`.
 - categorical ticks default to category labels.
 
+Line styling and colorbars:
+
+- default line style applies to every line.
+- per-line style overrides are resolved by row id.
+- `set_colorbar("A", palette="viridis")` resolves one color per row from
+  column `A`.
+- colorbar limits follow the selected axis unless explicitly provided.
+- per-line color overrides generated colorbar color.
+
 Matplotlib rendering:
 
 - `plot.render()` returns a matplotlib `Figure`.
 - rendered figures contain one line per complete row.
 - axis labels and tick labels match `RenderData`.
+- resolved line colors and widths are reflected in the rendered figure.
+- colorbar configuration creates a matplotlib colorbar.
 - limits, ticks, categorical axes, and inversion are reflected in the rendered
   figure.
