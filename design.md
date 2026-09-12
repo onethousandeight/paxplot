@@ -1,59 +1,20 @@
-# PaxPlot Schema-First Design
+# PaxPlot Design
 
-## Overview
+## Purpose
 
-PaxPlot should be a Python library for describing, transforming, and rendering
-parallel coordinate plots. The core package should not be a matplotlib extension.
-Instead, the core should define a backend-neutral plot schema that users can
-manipulate in familiar Python ways, serialize to disk, and render through one of
-several possible rendering backends.
+PaxPlot stores a serializable definition of a parallel coordinate plot and
+renders it with matplotlib. Users work with a `ParallelPlot` object that feels
+like a normal Python plotting object: set data, configure axes, adjust ticks and
+limits, then render or save the plot definition.
 
-Matplotlib should be the first renderer, but not the design center. A future
-Plotly, SVG, browser, or Rust-backed renderer should be able to consume the same
-plot description after it has been compiled into render-ready coordinates.
+The package has three concrete parts:
 
-The main data flow is:
+1. `ParallelPlot`: the public API users interact with.
+2. `PlotState`: the validated, serializable plot state.
+3. `RenderData`: normalized coordinates and resolved axis information passed to
+   matplotlib.
 
-```text
-user data + configuration
-        |
-        v
-ParallelPlotSpec  <---->  JSON / dict serialization
-        |
-        v
-compiler
-        |
-        v
-CompiledParallelPlot
-        |
-        v
-MatplotlibRenderer / future renderers
-```
-
-## Goals
-
-- Provide a clear, serializable schema for parallel coordinate plots.
-- Keep data, plot intent, scaling, and rendering responsibilities separate.
-- Support large in-memory datasets without unnecessary row/object duplication.
-- Make matplotlib rendering a backend adapter, not part of the core model.
-- Preserve a path for future renderers and a possible Rust or Arrow-backed
-  compilation layer.
-
-## Non-Goals For The First Redesign
-
-- Streaming or out-of-core data.
-- A Rust backend in v1.
-- Perfect compatibility with every direct matplotlib mutation allowed by the
-  legacy `PaxFigure` API.
-- A full grammar for every visual styling option matplotlib supports.
-
-## User-Facing Shape
-
-The user should interact with a normal Python object that feels like a plot
-definition. It should accept common Python, NumPy, and pandas-shaped inputs, but
-store the result as a validated schema.
-
-### Basic Usage
+## Example Usage
 
 ```python
 import paxplot as pax
@@ -64,380 +25,290 @@ data = [
     [3.0, "high", 0.0, 1.0],
 ]
 
-plot = pax.ParallelPlot.from_rows(
-    data,
-    columns=["A", "Risk", "C", "D"],
-)
+plot = pax.ParallelPlot()
+plot.set_data(data, columns=["A", "Risk", "C", "D"])
+plot.set_axis_label("A", "Column A")
+plot.set_axis_limits("A", lower=-1.0, upper=3.0)
+plot.set_axis_ticks("Risk", values=["low", "medium", "high"])
+plot.invert_axis("C")
 
-fig = plot.render("matplotlib")
+fig = plot.render()
 fig.show()
 ```
 
-### Axis Configuration
+The same plot can be configured more compactly with `set_axis`:
+
+```python
+plot = pax.ParallelPlot()
+plot.set_data(data, columns=["A", "Risk", "C", "D"])
+
+plot.set_axis(
+    "A",
+    label="Column A",
+    limits=(-1.0, 3.0),
+    ticks=[0.0, 1.0, 2.0, 3.0],
+)
+plot.set_axis(
+    "Risk",
+    label="Risk",
+    categories=["low", "medium", "high"],
+)
+plot.set_axis("C", inverted=True, tick_count=5)
+
+fig = plot.render(figsize=(10, 6))
+```
+
+Serialization uses the same plot object:
+
+```python
+plot.to_json("plot.json")
+
+restored = pax.ParallelPlot.from_json("plot.json")
+fig = restored.render()
+```
+
+## Public API
+
+`ParallelPlot` owns a `PlotState` and provides matplotlib-inspired methods for
+common edits.
+
+```python
+class ParallelPlot:
+    def set_data(
+        self,
+        data,
+        columns: list[str] | None = None,
+    ) -> "ParallelPlot": ...
+
+    def set_axis(
+        self,
+        axis: int | str,
+        *,
+        label: str | None = None,
+        limits: tuple[float | None, float | None] | None = None,
+        ticks: list[float | str] | None = None,
+        tick_labels: list[str] | None = None,
+        tick_count: int | None = None,
+        categories: list[str] | None = None,
+        inverted: bool | None = None,
+    ) -> "ParallelPlot": ...
+
+    def set_axis_label(self, axis: int | str, label: str) -> "ParallelPlot": ...
+    def set_axis_limits(
+        self,
+        axis: int | str,
+        lower: float | None = None,
+        upper: float | None = None,
+    ) -> "ParallelPlot": ...
+    def set_axis_ticks(
+        self,
+        axis: int | str,
+        values: list[float | str],
+        labels: list[str] | None = None,
+    ) -> "ParallelPlot": ...
+    def invert_axis(self, axis: int | str, inverted: bool = True) -> "ParallelPlot": ...
+
+    def render(self, **kwargs): ...
+    def to_json(self, path: str) -> None: ...
+
+    @classmethod
+    def from_json(cls, path: str) -> "ParallelPlot": ...
+```
+
+Methods return `self` so users can chain calls when useful:
 
 ```python
 plot = (
-    pax.ParallelPlot.from_rows(data, columns=["A", "Risk", "C", "D"])
-    .axis("A").limits(-1.0, 3.0).done()
-    .axis("Risk").categorical_order(["low", "medium", "high"]).done()
-    .axis("C").invert().ticks(count=5).done()
-)
-
-fig = plot.render("matplotlib", figsize=(10, 6))
-```
-
-### Custom Ticks
-
-```python
-plot.axis("A").ticks(
-    values=[0.0, 1.0, 2.0, 3.0],
-    labels=["zero", "one", "two", "three"],
+    pax.ParallelPlot()
+    .set_data(data, columns=["A", "Risk", "C", "D"])
+    .set_axis_label("A", "Column A")
+    .invert_axis("C")
 )
 ```
 
-### Serialization
+## Core Objects
+
+### PlotState
+
+`PlotState` is the serializable source of truth. It stores column-oriented data,
+axis configuration, and plot-level style settings. It should be a Pydantic model
+so validation and JSON round trips are built into the package.
 
 ```python
-plot = pax.ParallelPlot.from_dataframe(df)
-plot.axis("cost").invert()
-plot.axis("quality").limits(0, 100)
-
-json_text = plot.model_dump_json(indent=2)
-restored = pax.ParallelPlot.model_validate_json(json_text)
-
-fig = restored.render("matplotlib")
+class PlotState(BaseModel):
+    data: dict[str, list[object]]
+    axes: list[AxisConfig]
+    line_color: str | None = None
+    line_alpha: float = 0.7
+    line_width: float = 1.0
 ```
 
-The exact method names can evolve, but the important design point is that the
-object a user manipulates is the same object they can validate and serialize.
+### AxisConfig
 
-## Core Architecture
-
-### Schema Layer
-
-The schema layer contains only plot intent. It should not import matplotlib.
-Pydantic is a good fit because it gives the package validation, defaults,
-JSON-schema generation, and reliable round trips through `dict` and JSON.
-
-Core schema objects:
+`AxisConfig` stores what an axis means and how it should be displayed.
 
 ```python
-from typing import Literal
-from pydantic import BaseModel, Field
-
-
-class DataSpec(BaseModel):
-    orientation: Literal["columns"] = "columns"
-    columns: dict[str, list[object]]
-
-
-class TickSpec(BaseModel):
-    mode: Literal["auto", "manual"] = "auto"
-    count: int | None = None
-    values: list[float | str] | None = None
-    labels: list[str] | None = None
-
-
-class AxisSpec(BaseModel):
+class AxisConfig(BaseModel):
     name: str
     dtype: Literal["numeric", "categorical"]
     label: str | None = None
-    limits: tuple[float | None, float | None] | None = None
+    lower: float | None = None
+    upper: float | None = None
     inverted: bool = False
-    category_order: list[str] | None = None
-    ticks: TickSpec = Field(default_factory=TickSpec)
-
-
-class LineStyleSpec(BaseModel):
-    color: str | None = None
-    alpha: float = 0.7
-    width: float = 1.0
-
-
-class ParallelPlotSpec(BaseModel):
-    data: DataSpec
-    axes: list[AxisSpec]
-    line_style: LineStyleSpec = Field(default_factory=LineStyleSpec)
+    categories: list[str] | None = None
+    ticks: TickConfig = Field(default_factory=TickConfig)
 ```
 
-This is an illustrative shape, not final implementation code. The important
-contract is that raw data, axis definitions, tick policy, and style intent are
-plain schema data.
+### TickConfig
 
-### Builder Layer
-
-A small user-facing wrapper can make the schema pleasant to work with. It should
-mutate or replace the underlying `ParallelPlotSpec`, but should not become the
-authoritative model itself.
-
-Examples:
+`TickConfig` describes tick intent before scaling. It can request automatic ticks
+or store explicit tick values and labels.
 
 ```python
-plot = pax.ParallelPlot.from_dataframe(df)
-plot.axis("temperature").label("Temperature").limits(-20, 45)
-plot.axis("score").invert()
-plot.to_json("plot.json")
+class TickConfig(BaseModel):
+    values: list[float | str] | None = None
+    labels: list[str] | None = None
+    count: int | None = None
 ```
 
-The wrapper should stay thin:
+### RenderData
 
-- Build schemas from rows, columns, NumPy arrays, and pandas DataFrames.
-- Provide ergonomic methods for common edits.
-- Delegate validation and serialization to Pydantic models.
-- Delegate render preparation to the compiler.
-
-### Compiler Layer
-
-The compiler converts plot intent into immutable render-ready data. This is
-where scaling, category encoding, limit resolution, tick generation, and color
-mapping happen.
-
-The compiler should produce a backend-neutral snapshot:
+`RenderData` is produced from `PlotState` immediately before rendering. It stores
+normalized line coordinates, resolved tick positions, and labels that matplotlib
+can draw directly.
 
 ```python
-class CompiledAxis(BaseModel):
+class RenderAxis(BaseModel):
     name: str
     label: str
-    dtype: str
-    coordinate: float
-    normalized_ticks: list[float]
+    x: float
+    tick_positions: list[float]
     tick_labels: list[str]
-    raw_limits: tuple[float | str | None, float | str | None]
 
 
-class CompiledParallelPlot(BaseModel):
+class RenderData(BaseModel):
     x: list[float]
-    y: list[list[float]]
-    axes: list[CompiledAxis]
-    line_colors: list[str] | None = None
+    y: list[list[float | None]]
+    axes: list[RenderAxis]
+    line_color: str | None
     line_alpha: float
     line_width: float
 ```
 
-Responsibilities:
+## Data And Axis Handling
 
-- Infer or confirm column types.
-- Store data column-wise and avoid per-row object wrappers.
-- Normalize numeric values into `[0.0, 1.0]`.
-- Encode categorical values into stable numeric positions.
-- Apply custom limits before normalization.
-- Apply axis inversion after normalization.
-- Resolve tick policies into normalized tick positions and string labels.
-- Produce deterministic output independent of matplotlib.
-
-The compiler is the natural future boundary for acceleration. A later Rust
-backend could implement this layer while preserving the Python schema and
-renderer APIs.
-
-### Renderer Layer
-
-Renderers consume `CompiledParallelPlot`. They should not decide semantic plot
-behavior such as category ordering, numeric limits, or whether an axis is
-inverted. They are responsible for drawing.
-
-The first renderer should be matplotlib:
+Data is stored by column:
 
 ```python
-compiled = pax.compile(plot.spec)
-fig = pax.renderers.MatplotlibRenderer().render(compiled)
+{
+    "A": [0.0, 1.0, 3.0],
+    "Risk": ["low", "medium", "high"],
+    "C": [2.0, 1.0, 0.0],
+    "D": [0.5, 1.0, 1.0],
+}
 ```
 
-Renderer responsibilities:
+`set_data` accepts row-oriented data because that is convenient for users, then
+converts it to column-oriented state. It should also accept mappings of columns
+and pandas DataFrames.
 
-- Create figure and axes.
-- Draw vertical axes at compiled x positions.
-- Draw lines using compiled normalized y values.
-- Apply compiled tick positions and labels.
-- Apply labels, line styles, legends, and colorbars.
-- Return a normal matplotlib `Figure`.
+Axis type inference is simple:
 
-This keeps matplotlib-specific mechanics in one place while the plot definition
-remains portable.
+- numeric columns contain only `int`, `float`, `None`, or `NaN`;
+- categorical columns contain strings, `None`, or repeated labels;
+- mixed numeric and string columns raise a validation error.
 
-## Data Model
-
-PaxPlot should store data column-wise because parallel coordinate plots are
-axis-oriented. Most operations need column min/max, categorical levels, column
-ticks, and column normalization.
-
-Input adapters should accept:
-
-- Rows: `Sequence[Sequence[object]]`
-- Columns: `Mapping[str, Sequence[object]]`
-- pandas `DataFrame`
-- NumPy arrays with supplied or generated column names
-
-The schema may serialize data as JSON-compatible column lists. Internally, the
-builder or compiler can use NumPy arrays for efficient computation, but the
-schema itself should remain portable.
-
-### Missing Values
-
-Missing values should be represented consistently before compilation.
-
-Initial policy:
-
-- Numeric `None` and `NaN` are missing.
-- Categorical `None` is missing.
-- Missing values compile to `None` or `NaN` in normalized coordinates.
-- The matplotlib renderer should break or skip line segments with missing
-  coordinates rather than inventing a category or numeric value.
-
-## Axis And Tick Design
-
-Ticks should be declarative in the schema and concrete in compiled output.
-
-Schema examples:
-
-```python
-TickSpec(mode="auto", count=6)
-TickSpec(mode="manual", values=[0, 50, 100])
-TickSpec(mode="manual", values=[0, 1, 2], labels=["low", "mid", "high"])
-```
-
-The schema should not depend on `matplotlib.ticker.MaxNLocator`. A backend-neutral
-tick resolver can start simple:
-
-- Numeric auto ticks use a small "nice number" algorithm.
-- Numeric manual ticks preserve supplied values and labels.
-- Categorical auto ticks use category order.
-- Categorical manual ticks validate that supplied categories exist.
-
-Matplotlib renderers may later expose an optional renderer-specific locator
-mode, but that should be an extension rather than the default schema behavior.
-
-## Matplotlib Rendering Strategy
-
-Matplotlib rendering is nontrivial because a parallel coordinate plot is not a
-standard single-axis chart. The renderer should treat the compiled plot as a
-normalized coordinate system:
-
-- x positions are axis indices or evenly spaced normalized positions.
-- y positions are normalized values in `[0.0, 1.0]`.
-- every vertical axis receives its own tick labels from compiled output.
-- lines are plotted across the shared normalized coordinate space.
-
-The renderer can use one main axis for the line geometry and secondary/twin axes
-or custom artists for per-axis ticks. This decision belongs entirely inside the
-matplotlib renderer and should not leak into the schema.
-
-## Public API Sketch
-
-```python
-import paxplot as pax
-
-plot = pax.ParallelPlot.from_dataframe(df)
-
-plot.axis("cost").label("Cost").invert()
-plot.axis("region").categorical_order(["west", "central", "east"])
-plot.axis("score").ticks(count=7)
-
-plot.line_style(color="#3366cc", alpha=0.3, width=0.8)
-
-plot.to_json("plot.json")
-fig = plot.render("matplotlib")
-```
-
-Lower-level users can bypass the builder:
-
-```python
-spec = pax.ParallelPlotSpec.model_validate(payload)
-compiled = pax.compile(spec)
-fig = pax.renderers.MatplotlibRenderer().render(compiled)
-```
-
-## Package Layout
+Numeric axes use `lower` and `upper` when supplied. Missing bounds come from the
+column data. Values are scaled with min-max normalization:
 
 ```text
-src/paxplot/
-    __init__.py
-    schema/
-        __init__.py
-        plot.py
-        axis.py
-        ticks.py
-        style.py
-    builders/
-        __init__.py
-        parallel_plot.py
-    compile/
-        __init__.py
-        compiler.py
-        normalize.py
-        ticks.py
-        categorical.py
-    renderers/
-        __init__.py
-        base.py
-        matplotlib.py
-    legacy/
-        ...
+scaled = (value - lower) / (upper - lower)
 ```
 
-The existing `legacy` package can remain available during migration. New code
-should not import from legacy modules.
+Categorical axes use `categories` when supplied. Otherwise categories are ordered
+by first appearance in the data. Category positions are evenly spaced between
+`0.0` and `1.0`.
 
-## Migration Plan
+Axis inversion is applied after scaling:
 
-1. Add schema models and serialization tests.
-2. Add builders for rows, columns, NumPy arrays, and pandas DataFrames.
-3. Implement the compiler for numeric and categorical columns.
-4. Implement backend-neutral tick resolution.
-5. Build `MatplotlibRenderer` against compiled fixtures.
-6. Add compatibility examples that recreate current docs: basic plots, labels,
-   custom ticks, limits, inversion, legend, colorbar, and categorical data.
-7. Keep `pax_parallel` and `PaxFigure` as legacy exports while introducing the
-   new schema-first API as the preferred path.
-8. Deprecate direct matplotlib-coupled APIs only after the new renderer covers
-   the important existing workflows.
+```text
+scaled = 1.0 - scaled
+```
 
-## Testing Strategy
+Ticks are resolved during render preparation:
 
-Schema tests:
+- explicit tick values are scaled onto the axis;
+- explicit labels are used when provided;
+- categorical ticks default to category labels;
+- numeric ticks default to a small set of readable values between the resolved
+  lower and upper bounds;
+- `tick_count` controls the number of automatic numeric ticks.
 
-- Validate minimal numeric plot specs.
-- Validate mixed numeric and categorical plot specs.
-- Round-trip specs through JSON.
-- Reject mismatched column lengths.
-- Reject invalid axis references and duplicate axis names.
+Missing values remain missing in `RenderData`. The matplotlib renderer should
+skip or break line segments where a row has missing coordinates.
 
-Compiler tests:
+## Matplotlib Rendering
 
-- Numeric min/max normalization.
-- Custom limits.
-- Inverted axes.
-- Single-value numeric columns.
-- Categorical ordering.
-- Missing values.
-- Auto and manual tick resolution.
+`ParallelPlot.render()` prepares `RenderData` and passes it to the matplotlib
+renderer. At that point, scaling decisions are complete and the renderer
+receives ready-to-draw coordinates.
 
-Renderer tests:
+The matplotlib renderer:
 
-- Render from compiled fixtures.
-- Verify matplotlib output has expected number of axes, lines, ticks, and labels.
-- Verify custom limits, inversion, and categorical ticks appear correctly.
-- Verify large in-memory data renders without per-row schema objects.
+- creates one figure;
+- draws vertical axes at the `RenderAxis.x` positions;
+- draws each row as a line through normalized `RenderData.y` values;
+- applies each axis's resolved tick positions and labels;
+- applies axis labels and line style;
+- returns a matplotlib `Figure`.
 
-Migration tests:
+The renderer can use a main axis for line geometry and secondary axes or custom
+artists for vertical axes and ticks. That detail stays inside the renderer.
 
-- Recreate current examples from `docs/source/getting_started.rst`.
-- Recreate advanced examples for labels, limits, custom ticks, inversion,
-  legends, colorbars, and categorical axes.
+## Implementation Steps
 
-## Future Extensions
+1. Define Pydantic models for `PlotState`, `AxisConfig`, `TickConfig`,
+   `RenderAxis`, and `RenderData`.
+2. Implement `ParallelPlot` with data loading, axis lookup, setters,
+   serialization, and `render()`.
+3. Implement render preparation from `PlotState` to `RenderData`.
+4. Implement numeric scaling, categorical mapping, inversion, and tick
+   resolution.
+5. Implement the matplotlib renderer against `RenderData`.
+6. Export `ParallelPlot` from `paxplot.__init__`.
+7. Add examples that cover basic data, labels, limits, ticks, categorical axes,
+   inversion, JSON round trips, and rendering.
 
-- Plotly renderer.
-- SVG/static vector renderer.
-- Interactive browser renderer.
-- Arrow-backed column storage.
-- Rust compiler for normalization and tick preparation.
-- Streaming/downsampled rendering for very large datasets.
-- Rich selection/highlighting schema.
-- Faceting or grouped parallel coordinate plots.
+## Tests
 
-## Design Principle To Preserve
+Schema and state:
 
-PaxPlot should make the hard part explicit: a parallel coordinate plot is a
-schema plus a coordinate compilation problem. Matplotlib is one way to draw the
-result. Keeping that boundary clean is what will let the package grow without
-tying every design decision to a single rendering library.
+- `PlotState` validates equal column lengths.
+- `ParallelPlot.set_data` accepts row data and produces column data.
+- JSON round trips preserve data, axis config, ticks, and style.
+- axis lookup works by index and name.
+
+Axis handling:
+
+- numeric columns infer as numeric.
+- categorical columns infer as categorical.
+- mixed numeric/string columns raise a validation error.
+- custom limits affect normalized values.
+- inverted axes flip normalized values.
+- missing values stay missing.
+
+Ticks:
+
+- explicit numeric ticks scale to normalized positions.
+- explicit categorical ticks map to category positions.
+- labels must match tick values when provided.
+- automatic numeric ticks respect `tick_count`.
+- categorical ticks default to category labels.
+
+Matplotlib rendering:
+
+- `plot.render()` returns a matplotlib `Figure`.
+- rendered figures contain one line per complete row.
+- axis labels and tick labels match `RenderData`.
+- limits, ticks, categorical axes, and inversion are reflected in the rendered
+  figure.
