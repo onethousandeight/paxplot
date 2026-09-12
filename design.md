@@ -245,10 +245,19 @@ class ColorbarConfig(BaseModel):
 
 `RenderData` is produced from `PlotState` immediately before rendering. It stores
 normalized line coordinates, resolved tick positions, and labels that matplotlib
-can draw directly.
+can draw directly. Unlike `PlotState`, it is internal render data: it is not
+serialized and does not need Pydantic validation. Dense NumPy arrays are used
+for line coordinates so rendering thousands of rows does not require building
+one Python model per line.
 
 ```python
-class RenderAxis(BaseModel):
+from dataclasses import dataclass
+
+import numpy as np
+
+
+@dataclass
+class RenderAxis:
     name: str
     label: str
     x: float
@@ -256,13 +265,8 @@ class RenderAxis(BaseModel):
     tick_labels: list[str]
 
 
-class RenderLine(BaseModel):
-    id: str
-    y: list[float | None]
-    style: LineStyle
-
-
-class RenderColorbar(BaseModel):
+@dataclass
+class RenderColorbar:
     axis: str
     palette: str | list[str]
     label: str | None
@@ -270,10 +274,15 @@ class RenderColorbar(BaseModel):
     upper: float
 
 
-class RenderData(BaseModel):
-    x: list[float]
-    lines: list[RenderLine]
+@dataclass
+class RenderData:
+    x: np.ndarray
+    y: np.ndarray
+    row_ids: list[str]
     axes: list[RenderAxis]
+    default_line_style: LineStyle
+    line_colors: np.ndarray | None = None
+    line_widths: np.ndarray | None = None
     colorbar: RenderColorbar | None = None
 ```
 
@@ -327,8 +336,9 @@ Ticks are resolved during render preparation:
   lower and upper bounds;
 - `tick_count` controls the number of automatic numeric ticks.
 
-Missing values remain missing in `RenderData`. The matplotlib renderer should
-skip or break line segments where a row has missing coordinates.
+Missing values remain missing in `RenderData`, represented as `NaN` values in
+the coordinate matrix. The matplotlib renderer should skip or break line
+segments where a row has missing coordinates.
 
 ## Line Styling And Colorbars
 
@@ -359,7 +369,9 @@ The matplotlib renderer:
 
 - creates one figure;
 - draws vertical axes at the `RenderAxis.x` positions;
-- draws each `RenderLine` through normalized y values;
+- draws normalized line coordinates from the `RenderData.y` matrix;
+- prefers a matplotlib `LineCollection` for bulk line drawing instead of
+  creating one line artist per row;
 - applies each axis's resolved tick positions and labels;
 - applies resolved line styles;
 - draws a colorbar when `RenderData.colorbar` is present;
@@ -371,7 +383,8 @@ artists for vertical axes and ticks. That detail stays inside the renderer.
 ## Implementation Steps
 
 1. Define Pydantic models for `PlotState`, `AxisConfig`, `TickConfig`,
-   line styling, color encoding, `RenderAxis`, and `RenderData`.
+   line styling, and color encoding. Define lightweight render dataclasses for
+   `RenderAxis` and `RenderData`.
 2. Implement `ParallelPlot` with data loading, axis lookup, setters,
    serialization, and `render()`.
 3. Implement render preparation from `PlotState` to `RenderData`.
@@ -422,7 +435,7 @@ Line styling and colorbars:
 Matplotlib rendering:
 
 - `plot.render()` returns a matplotlib `Figure`.
-- rendered figures contain one line per complete row.
+- rendered figures contain one rendered path per complete row.
 - axis labels and tick labels match `RenderData`.
 - resolved line colors and widths are reflected in the rendered figure.
 - colorbar configuration creates a matplotlib colorbar.
