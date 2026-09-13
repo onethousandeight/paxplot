@@ -395,6 +395,42 @@ artists for vertical axes and ticks. That detail stays inside the renderer.
 7. Add examples that cover basic data, labels, limits, ticks, categorical axes,
    inversion, line styling, colorbars, JSON round trips, and rendering.
 
+## Tooling
+
+PaxPlot uses a small, standard Python toolchain:
+
+- `uv` manages environments, dependency groups, lockfiles, and command
+  execution.
+- `ruff` handles linting, import sorting, and formatting.
+- `pytest` runs the test suite.
+- GitHub Actions runs CI, package builds, docs, and releases.
+- Dependabot keeps Python dependencies and GitHub Actions updated.
+
+### GitHub Actions
+
+The default workflows should stay lean:
+
+- CI runs on every push and pull request, checking Ruff formatting, Ruff
+  linting, and pytest.
+- Build creates wheel and source distributions separately from release
+  publishing.
+- Docs builds Sphinx docs on pull requests and publishes docs to GitHub Pages
+  from `main`.
+- Release publishes tagged releases to PyPI using Trusted Publishing.
+- CodeQL can run as an optional scheduled security analysis for Python and
+  workflow files.
+
+Prefer Ubuntu-only CI at first. Add Windows or macOS only if rendering, fonts,
+paths, or packaging behavior require it.
+
+### Dependabot
+
+Dependabot should run weekly for `uv` dependencies and `github-actions`, with a
+low open PR limit to avoid automation noise.
+
+Delay coverage upload, benchmark workflows, OpenSSF Scorecard, pre-commit CI,
+and nox/tox until they solve a real maintenance problem.
+
 ## Tests
 
 Schema and state:
