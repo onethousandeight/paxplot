@@ -402,7 +402,7 @@ PaxPlot uses a small, standard Python toolchain:
 - `uv` manages environments, dependency groups, lockfiles, and command
   execution.
 - `ruff` handles linting, import sorting, and formatting.
-- `pytest` runs the test suite.
+- `pytest` runs the test suite, with `syrupy` for structured snapshot tests.
 - Sphinx builds package documentation with the PyData Sphinx Theme.
 - GitHub Actions runs CI, package builds, docs, and releases.
 - Dependabot keeps Python dependencies and GitHub Actions updated.
@@ -440,47 +440,24 @@ and nox/tox until they solve a real maintenance problem.
 
 ## Tests
 
-Schema and state:
+Use many focused unit tests for core behavior and a few trusted integration
+tests for typical user workflows. New tests should live in `tests/`; legacy
+compatibility tests do not constrain this redesign.
 
-- `PlotState` validates equal column lengths.
-- `PlotState` validates row ids match data length.
-- `ParallelPlot.set_data` accepts row data and produces column data.
-- JSON round trips preserve data, row ids, axis config, ticks, style, and
-  colorbar config.
-- axis lookup works by index and name.
+Unit tests should cover validation, data loading, axis lookup, dtype inference,
+normalization, categorical mapping, missing values, limits, inversion, tick
+resolution, line style precedence, colorbar resolution, JSON round trips, and
+thin matplotlib renderer behavior.
 
-Axis handling:
+Integration tests should use `syrupy` snapshots of structured `PlotState` and
+`RenderData` summaries. Do not snapshot rendered images by default; assert
+targeted matplotlib objects instead, such as returned `Figure` instances, axis
+labels, tick labels, line collections, line styles, and colorbars.
 
-- numeric columns infer as numeric.
-- categorical columns infer as categorical.
-- mixed numeric/string columns raise a validation error.
-- custom limits affect normalized values.
-- inverted axes flip normalized values.
-- missing values stay missing.
+Keep the initial integration suite to three workflows:
 
-Ticks:
-
-- explicit numeric ticks scale to normalized positions.
-- explicit categorical ticks map to category positions.
-- labels must match tick values when provided.
-- automatic numeric ticks respect `tick_count`.
-- categorical ticks default to category labels.
-
-Line styling and colorbars:
-
-- default line style applies to every line.
-- per-line style overrides are resolved by row id.
-- `set_colorbar("A", palette="viridis")` resolves one color per row from
-  column `A`.
-- colorbar limits follow the selected axis unless explicitly provided.
-- per-line color overrides generated colorbar color.
-
-Matplotlib rendering:
-
-- `plot.render()` returns a matplotlib `Figure`.
-- rendered figures contain one rendered path per complete row.
-- axis labels and tick labels match `RenderData`.
-- resolved line colors and widths are reflected in the rendered figure.
-- colorbar configuration creates a matplotlib colorbar.
-- limits, ticks, categorical axes, and inversion are reflected in the rendered
-  figure.
+- mixed numeric and categorical axes with labels, limits, ticks, inversion, and
+  missing values;
+- default line styling, numeric colorbar encoding, and one explicit row style
+  override;
+- configured plot serialized to JSON, loaded back, summarized, and rendered.
