@@ -380,6 +380,45 @@ The matplotlib renderer:
 The renderer can use a main axis for line geometry and secondary axes or custom
 artists for vertical axes and ticks. That detail stays inside the renderer.
 
+## File Organization
+
+The redesigned package should use an idiomatic structure that follows the plot,
+state, and rendering mental model:
+
+```text
+src/paxplot/
+  __init__.py
+  plot.py
+
+  state/
+    __init__.py
+    schema.py
+    serialization.py
+
+  rendering/
+    __init__.py
+    data.py
+    prepare.py
+    matplotlib.py
+    _scaling.py
+    _ticks.py
+    _styles.py
+
+  datasets.py
+  data/
+    tradeoff.csv
+    hydroclimate_model_evaluation.csv
+```
+
+`plot.py` owns `ParallelPlot`, the public user-facing object. `state/` owns
+validated, serializable plot intent: `PlotState`, axis configuration, ticks,
+styles, and color encoding. `rendering/` owns derived backend-ready data, render
+preparation, and matplotlib drawing.
+
+Private rendering helpers use leading underscores because they support the
+rendering pipeline rather than define the public architecture. Avoid broad
+buckets like `model`, `core`, `structures`, `views`, or `utils`.
+
 ## Implementation Steps
 
 1. Define Pydantic models for `PlotState`, `AxisConfig`, `TickConfig`,
