@@ -403,8 +403,15 @@ PaxPlot uses a small, standard Python toolchain:
   execution.
 - `ruff` handles linting, import sorting, and formatting.
 - `pytest` runs the test suite.
+- Sphinx builds package documentation with the PyData Sphinx Theme.
 - GitHub Actions runs CI, package builds, docs, and releases.
 - Dependabot keeps Python dependencies and GitHub Actions updated.
+
+### Documentation
+
+Sphinx remains the documentation tool because PaxPlot is a Python library with
+API reference pages, examples, and plotting tutorials. Keep the existing Sphinx
+structure, use the PyData Sphinx Theme.
 
 ### GitHub Actions
 
