@@ -419,20 +419,6 @@ Private rendering helpers use leading underscores because they support the
 rendering pipeline rather than define the public architecture. Avoid broad
 buckets like `model`, `core`, `structures`, `views`, or `utils`.
 
-## Implementation Steps
-
-1. Define Pydantic models for `PlotState`, `AxisConfig`, `TickConfig`,
-   line styling, and color encoding. Define lightweight render dataclasses for
-   `RenderAxis` and `RenderData`.
-2. Implement `ParallelPlot` with data loading, axis lookup, setters,
-   serialization, and `render()`.
-3. Implement render preparation from `PlotState` to `RenderData`.
-4. Implement numeric scaling, categorical mapping, inversion, and tick
-   resolution.
-5. Implement the matplotlib renderer against `RenderData`.
-6. Export `ParallelPlot` from `paxplot.__init__`.
-7. Add examples that cover basic data, labels, limits, ticks, categorical axes,
-   inversion, line styling, colorbars, JSON round trips, and rendering.
 
 ## Tooling
 
