@@ -2,6 +2,11 @@
 
 ## Purpose
 
+The project name is **PaxPlot**, with a capital `P` at the start and a second
+capital `P` in `Plot`. Use **PaxPlot** in prose, documentation headings,
+release notes, and user-facing text. Reserve lowercase `paxplot` for the Python
+package name, import paths, module paths, and filesystem paths.
+
 PaxPlot stores a serializable definition of a parallel coordinate plot and
 renders it with matplotlib. Users work with a `ParallelPlot` object that feels
 like a normal Python plotting object: set data, configure axes, adjust ticks and
