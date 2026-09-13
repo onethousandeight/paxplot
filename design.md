@@ -452,8 +452,7 @@ The default workflows should stay lean:
 - CodeQL can run as an optional scheduled security analysis for Python and
   workflow files.
 
-Prefer Ubuntu-only CI at first. Add Windows or macOS only if rendering, fonts,
-paths, or packaging behavior require it.
+Prefer Ubuntu-only CI at first. For this implementation just make the pipeline yamls, you don't need to actually connect to github to run the actions
 
 ### Dependabot
 
