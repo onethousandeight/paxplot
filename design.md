@@ -433,15 +433,14 @@ PaxPlot uses a small, standard Python toolchain:
   execution.
 - `ruff` handles linting, import sorting, and formatting.
 - `pytest` runs the test suite, with `syrupy` for structured snapshot tests.
-- Sphinx builds package documentation with the PyData Sphinx Theme.
+- Sphinx builds package documentation using the current docs theme.
 - GitHub Actions runs CI, package builds, docs, and releases.
-- Dependabot keeps Python dependencies and GitHub Actions updated.
 
 ### Documentation
 
 Sphinx remains the documentation tool because PaxPlot is a Python library with
 API reference pages, examples, and plotting tutorials. Keep the existing Sphinx
-structure, use the PyData Sphinx Theme.
+structure and current documentation theme.
 
 ### GitHub Actions
 
@@ -458,11 +457,6 @@ The default workflows should stay lean:
   workflow files.
 
 Prefer Ubuntu-only CI at first. For this implementation just make the pipeline yamls, you don't need to actually connect to github to run the actions
-
-### Dependabot
-
-Dependabot should run weekly for `uv` dependencies and `github-actions`, with a
-low open PR limit to avoid automation noise.
 
 Delay coverage upload, benchmark workflows, OpenSSF Scorecard, pre-commit CI,
 and nox/tox until they solve a real maintenance problem.
