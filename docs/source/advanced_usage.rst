@@ -1,141 +1,46 @@
 Advanced Usage
 ==============
 
-We run through the advanced functionality of Paxplot using the following synthetic dataset. Note, that Paxplot requires its input be a list of lists or a similar matrix-like format.
+PaxPlot keeps plot intent in serializable state, so advanced edits are still ordinary method calls on :class:`paxplot.ParallelPlot`.
 
-.. code-block:: python
-
-    data = [
-        [0.0, 0.0, 2.0, 0.5],
-        [1.0, 1.0, 1.0, 1.0],
-        [3.0, 2.0, 0.0, 1.0],
-    ]
-
-Change Number of Ticks
-----------------------
-By default, Paxplot chooses evenly-spaced ticks between the upper and lower limits of the plotted data. You can change that though!
-
-.. code-block:: python
-
-    paxfig = paxplot.pax_parallel(n_axes=4)
-    paxfig.plot(data)
-    paxfig.set_even_ticks(
-        ax_idx=0,
-        n_ticks=15,
-    )
-    paxfig.set_even_ticks(
-        ax_idx=1,
-        n_ticks=16,
-        precision=3
-    )
-    plt.show()
-
-.. image:: _static/even_ticks.svg
-
-Custom Ticks
-------------
-Paxplot also gives you the flexibility to set whatever ticks you want, and they can say `whatever you want <https://www.youtube.com/watch?v=jRHQPG1xd9o>`_!
-
-.. code-block:: python
-
-    paxfig = paxplot.pax_parallel(n_axes=4)
-    paxfig.plot(data)
-    paxfig.set_ticks(
-        ax_idx=0,
-        ticks=[0.0, 1.0, 2.0, 3.0],
-        labels=['$my_{heart}$', 'code to', '=', '1612']
-    )
-    paxfig.set_ticks(
-        ax_idx=2,
-        ticks=[0.0, 1.0, 1.5, 2.0],
-    )
-    plt.show()
-
-.. image:: _static/custom_ticks.svg
-
-Change Axis Limits
+Axis Configuration
 ------------------
-By default, Paxplot chooses the axis limits as bounds of the plotted data. You can also change that!
 
 .. code-block:: python
 
-    paxfig = paxplot.pax_parallel(n_axes=4)
-    paxfig.plot(data)
-    paxfig.set_lim(ax_idx=0, bottom=-1.0, top=3.0)
-    paxfig.set_lim(ax_idx=2, bottom=1.0, top=3.0)
-    plt.show()
+   import paxplot as pax
 
-.. image:: _static/limits.svg
+   data = [
+       [0.0, "low", 2.0, 0.5],
+       [1.0, "medium", 1.0, 1.0],
+       [3.0, "high", 0.0, 1.0],
+   ]
 
-Axis Inversion
+   plot = pax.ParallelPlot()
+   plot.set_data(data)
+   plot.set_axis(
+       0,
+       label="Column A",
+       limits=(-1.0, 3.0),
+       ticks=[-1.0, 1.0, 3.0],
+   )
+   plot.set_axis(1, label="Risk", categories=["low", "medium", "high"])
+   plot.set_axis(2, label="C", inverted=True, tick_count=5)
+
+Color Encoding
 --------------
-Sometimes it's helpful to invert (flip) an axis. This is particularly helpful when looking at high-dimensional `Pareto fronts <https://arxiv.org/pdf/1705.00368.pdf>`_.
 
 .. code-block:: python
 
-    paxfig = paxplot.pax_parallel(n_axes=4)
-    paxfig.plot(data)
-    paxfig.invert_axis(ax_idx=0)
-    paxfig.invert_axis(ax_idx=1)
-    plt.show()
+   plot.set_default_line_style(alpha=0.45, width=1.0)
+   plot.set_colorbar(0, palette="viridis", label="Column A")
+   plot.set_line_style(2, color="crimson", width=2.5, zorder=10)
 
-.. image:: _static/invert.svg
-
-Adding a Legend
----------------
-It can be nice to plot a legend to identify each line. This works well if you have a few observations.
+Serialization
+-------------
 
 .. code-block:: python
 
-    paxfig = paxplot.pax_parallel(n_axes=4)
-    paxfig.plot(data)
-    paxfig.add_legend(labels=['A', 'B', 'C'])
-    plt.show()
-
-.. image:: _static/legend.svg
-
-Adding a Colorbar
------------------
-If you have many observations, it is helpful to use a colorbar to distinguish each line. You should also reference the Pandas integration `example <examples.html#pandas>`__ for another usage of the colorbar.
-
-.. code-block:: python
-
-    paxfig = paxplot.pax_parallel(n_axes=4)
-    paxfig.plot(data)
-    paxfig.set_label(
-        ax_idx=0,
-        label='Column A'
-    )
-    paxfig.add_colorbar(
-        ax_idx=0,
-        cmap='viridis',
-        colorbar_kwargs={'label': 'Column A'}
-    )
-    plt.show()
-
-.. image:: _static/colorbar.svg
-
-Accessing Matplotlib Objects
-----------------------------
-Paxplot is an extension of Matplotlib's `subplots <https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.subplots.html>`_ wrapper. Paxplot gives you the ability to access the individual Matplotlib axes as well as all the associated functionality using :code:`.axes`. To demonstrate this, imagine you want to annotate your Paxplot with a label and arrow. That functionality has not been explicitly added to Paxplot, however it does exist for Matplotlib `axes <https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.arrow.html>`_. Paxplot still allows us to access that functionality!
-
-.. code-block:: python
-
-    paxfig = paxplot.pax_parallel(n_axes=4)
-    paxfig.plot(data)
-    paxfig.axes[0].annotate('My Label', (0.3, 0.55))
-    paxfig.axes[0].arrow(
-        x=0.5,
-        y=0.52, 
-        dx=0.0, 
-        dy=-0.05, 
-        head_width=0.03, 
-        head_length=0.02
-    ) 
-    plt.show()
-
-.. image:: _static/arrow.svg
-
-.. warning::
-    
-    Access Matplotib axes with caution. Some functions can break your Paxfig object. Using many of these functions will generate a warning from Paxplot.
+   plot.to_json("plot.json")
+   restored = pax.ParallelPlot.from_json("plot.json")
+   fig = restored.render(figsize=(10, 6))

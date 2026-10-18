@@ -1,29 +1,40 @@
 [![PyPI](https://img.shields.io/pypi/v/paxplot)](https://pypi.org/project/paxplot/)
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/kravitsjacob/paxplot/Version%20Testing)](https://github.com/kravitsjacob/paxplot/actions)
 [![GitHub license](https://img.shields.io/github/license/kravitsjacob/paxplot)](https://github.com/kravitsjacob/paxplot/blob/main/LICENSE)
 
-# Paxplot
-Paxplot is a Python visualization library for parallel coordinate plots based on matplotlib.
+# PaxPlot
 
-Check out our [homepage](https://kravitsjacob.github.io/paxplot/) for more information.
+PaxPlot stores a serializable definition of a parallel coordinate plot and renders it with matplotlib.
 
-# Installation
-The latest stable release (and required dependencies) can be installed from PyPI:
+```python
+import paxplot as pax
 
+plot = pax.ParallelPlot()
+plot.set_data([[0.0, "low", 2.0], [1.0, "medium", 1.0], [3.0, "high", 0.0]])
+plot.set_axis(0, label="A")
+plot.set_axis(1, label="Risk", categories=["low", "medium", "high"])
+plot.set_axis(2, label="C")
+plot.set_colorbar(0, label="Column A")
+
+fig = plot.render()
 ```
+
+## Installation
+
+```console
 pip install paxplot
 ```
 
-For addition installation instructions, see the [Getting Started](https://kravitsjacob.github.io/paxplot/getting_started.html) documentation.
+## Reporting Bugs
 
-# Reporting Bugs
 Please report all bugs using [issues](https://github.com/kravitsjacob/paxplot/issues).
 
-# Contributing
-Paxplot welcomes contributions! Users familiar with matplotlib should have no problem using/contributing to this project.
+## Contributing
 
-1. Ensure that you have (python installed on your machine)[https://www.python.org/downloads/].
-2. Clone the repository using `$ git clone https://github.com/kravitsjacob/paxplot.git`
-3. Change to the current working directory using `$ cd paxplot`
-4. Install an editable version of paxplot `$ pip install -e .[dev]`
-5. Paxplot uses test-driven development. All changes to Paxplot must pass the tests in the `testing` folder. All new features should have associated tests.
+PaxPlot uses `uv`, `ruff`, `pytest`, and Sphinx.
+
+```console
+uv sync --extra dev --extra docs
+uv run ruff format .
+uv run ruff check .
+uv run pytest
+```

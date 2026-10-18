@@ -1,27 +1,20 @@
-# This CITATION.cff file was generated with cffinit.
-# Visit https://bit.ly/cffinit to generate yours today!
-
 cff-version: 1.2.0
-title: Paxplot
+title: PaxPlot
 message: >-
-  Paxplot is a Python visualization library for
-  parallel coordinate plots based on matplotlib.
+  PaxPlot stores serializable parallel coordinate plot definitions and renders
+  them with Matplotlib.
 type: software
 authors:
   - given-names: Jacob
     email: kravitsjacob@gmail.com
-    orcid: 'https://orcid.org/0000-0002-9170-0496'
+    orcid: "https://orcid.org/0000-0002-9170-0496"
     family-names: Kravits
-identifiers:
-  - type: doi
-    value: 10.1008/paxplot.v0.1.4-beta
-repository-code: 'https://github.com/kravitsjacob/paxplot'
-url: 'https://kravitsjacob.github.io/paxplot/'
+repository-code: "https://github.com/kravitsjacob/paxplot"
+url: "https://kravitsjacob.github.io/paxplot/"
 keywords:
   - high-dimensional-data
   - matplotlib
   - multi-objective
   - parallel-coordinates-plot
 license: MIT
-version: v0.1.4-beta
-date-released: '2022-04-20'
+version: 0.2.0

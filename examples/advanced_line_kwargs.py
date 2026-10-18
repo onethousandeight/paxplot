@@ -1,45 +1,19 @@
-"""
-Demonstrating the use of linekwargs to represent categorical dimensions,
-using the common use case of multiobjective model evaluation.
-"""
 import matplotlib.pyplot as plt
 import pandas as pd
-import paxplot
+
+import paxplot as pax
 from paxplot import hydroclimate_model_evaluation
 
-df = pd.read_csv(hydroclimate_model_evaluation())
+df = pd.read_csv(hydroclimate_model_evaluation()).head(20)
+columns = df.select_dtypes(include="number").columns[:4].tolist()
 
-# map the values from categorical column "data" to linetypes:
-period2linestyle = {"cal": "-",
-                    "val": ":"}
+plot = pax.ParallelPlot()
+plot.set_data(df[columns].values.tolist())
+for index, column in enumerate(columns):
+    plot.set_axis_label(index, column)
+plot.set_default_line_style(alpha=0.35, width=1.0)
+plot.set_line_style(0, color="crimson", width=2.5, zorder=10)
+plot.set_colorbar(0, label=columns[0])
 
-# map the values from categorical column "model" to hues:
-models = df["model"].unique()
-n_models = models.shape[0]
-qualcmap = plt.get_cmap("tab10")
-model2hue = {m: qualcmap.colors[i] for i, m in enumerate(models)}
-
-# prepare data to plot:
-quant_cols = df.drop(["model", "data"], axis=1).columns.values
-df = df.set_index(["model", "data"])
-n_axes = len(quant_cols)
-
-# make figure and plot the metrics for each model and data combination:
-paxfig = paxplot.pax_parallel(n_axes=n_axes)
-for m in models:
-    for d in ["cal", "val"]:
-        plotdata = df[quant_cols].loc[m, d]
-        paxfig.plot(plotdata.to_numpy(),
-                    line_kwargs={"linestyle": period2linestyle[d],
-                                 "color": model2hue[m]})
-
-# adjust axis limits to meaningful values and add axis labels:
-metric2axlim = {"nse": [.7, 1], "lognse": [.7, 1],
-                "kge12": [.7, 1], "aeq5": [15, 0],
-                "spearman_r": [.8, 1], "rmse": [.25, 0],
-                "logrmse": [.15, 0]}
-for i, metric in enumerate(quant_cols):
-    paxfig.set_lim(i, *metric2axlim[metric])
-    paxfig.set_label(i, metric)
-
+fig = plot.render(figsize=(10, 5))
 plt.show()

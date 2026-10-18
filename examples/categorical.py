@@ -1,18 +1,18 @@
 import matplotlib.pyplot as plt
-import pandas as pd
-import paxplot
 
-# Data
-df = pd.DataFrame(
-    {
-        'J': ['A', 'A', 'A', 'B', 'B'],
-        'K': [0, 1, 2, 3, 4]
-    }
-)
-cols = df.columns
+import paxplot as pax
 
-# Create figure
-paxfig = paxplot.pax_parallel(n_axes=len(cols))
-paxfig.plot(df.to_numpy())
+data = [
+    [0.0, "low", "north"],
+    [0.5, "medium", "west"],
+    [1.0, "high", "north"],
+]
 
-plt.show(block=False)
+plot = pax.ParallelPlot()
+plot.set_data(data)
+plot.set_axis_label(0, "Score")
+plot.set_axis(1, label="Risk", categories=["low", "medium", "high"])
+plot.set_axis(2, label="Region", categories=["north", "west"])
+
+fig = plot.render(figsize=(8, 4))
+plt.show()

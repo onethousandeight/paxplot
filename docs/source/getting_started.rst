@@ -1,10 +1,11 @@
 Getting Started
 ===============
 
+PaxPlot centers on :class:`paxplot.ParallelPlot`. Create a plot object, set data,
+configure axes, then render a Matplotlib figure.
+
 Installation
 ------------
-
-To use Paxplot, first install it using PyPI:
 
 .. code-block:: console
 
@@ -12,50 +13,35 @@ To use Paxplot, first install it using PyPI:
 
 Basic Usage
 -----------
-We run through the basic functionality of Paxplot using the following synthetic dataset. Note that Paxplot requires its input be in a list of lists or a similar matrix-like format. For usage with Pandas, click `here <examples.html#pandas>`__.
 
 .. code-block:: python
+
+   import paxplot as pax
 
    data = [
-      [0.0, 0.0, 2.0, 0.5],
-      [1.0, 1.0, 1.0, 1.0],
-      [3.0, 2.0, 0.0, 1.0],
+       [0.0, "low", 2.0, 0.5],
+       [1.0, "medium", 1.0, 1.0],
+       [3.0, "high", 0.0, 1.0],
    ]
 
-Creating a Simple Plot
-^^^^^^^^^^^^^^^^^^^^^^
-First, we will create a simple plot of our :code:`data`.
+   plot = pax.ParallelPlot()
+   plot.set_data(data)
+   plot.set_axis_label(0, "Column A")
+   plot.set_axis_limits(0, lower=-1.0, upper=3.0)
+   plot.set_axis_ticks(1, values=["low", "medium", "high"])
+   plot.invert_axis(2)
+   plot.set_colorbar(0, palette="viridis", label="Column A")
+
+   fig = plot.render(figsize=(10, 6))
+
+Saving Plot Definitions
+-----------------------
+
+PaxPlot serializes the plot definition, not a Matplotlib figure. Save the
+definition to JSON and render it again later.
 
 .. code-block:: python
 
-   import paxplot
-   import matplotlib.pyplot as plt
-
-   paxfig = paxplot.pax_parallel(n_axes=4)
-   paxfig.plot(data)
-   plt.show()
-
-.. image:: _static/basic.svg
-
-Adding Labels
-^^^^^^^^^^^^^
-Let's say these columns in :code:`data` correspond to the labels A, B, and C. We can add those labels!
-
-.. code-block:: python
-
-   paxfig = paxplot.pax_parallel(n_axes=4)
-   paxfig.plot(data)
-   paxfig.set_labels(['A', 'B', 'C', 'D'])
-   plt.show()
-
-.. image:: _static/labels.svg
-
-Saving Your Plot
-^^^^^^^^^^^^^^^^
-You can easily export your plot in many standard vector and raster formats.
-
-.. code-block:: python
-
-   paxfig.savefig('my_plot.png')
-
-Paxplot has lots of additional functionality. Continue onto the next section to see additional examples.
+   plot.to_json("plot.json")
+   restored = pax.ParallelPlot.from_json("plot.json")
+   fig = restored.render()

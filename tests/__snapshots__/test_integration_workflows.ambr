@@ -1,0 +1,1208 @@
+# serializer version: 1
+# name: test_axis_interaction_workflow_snapshot_and_roundtrip
+  dict({
+    'render': dict({
+      'alphas': list([
+        0.7,
+        0.7,
+        0.7,
+      ]),
+      'axes': list([
+        dict({
+          'label': 'Axis 1',
+          'ticks': list([
+            tuple(
+              0.0,
+              '0',
+            ),
+            tuple(
+              0.25,
+              '1',
+            ),
+            tuple(
+              0.5,
+              '2',
+            ),
+            tuple(
+              0.75,
+              '3',
+            ),
+            tuple(
+              1.0,
+              '4',
+            ),
+          ]),
+        }),
+        dict({
+          'label': 'Axis 2',
+          'ticks': list([
+            tuple(
+              1.0,
+              'Minimum',
+            ),
+            tuple(
+              0.625,
+              'Target',
+            ),
+            tuple(
+              0.0,
+              'Maximum',
+            ),
+          ]),
+        }),
+      ]),
+      'colorbar': None,
+      'colors': list([
+        list([
+          0.1216,
+          0.4667,
+          0.7059,
+          0.7,
+        ]),
+        list([
+          0.1216,
+          0.4667,
+          0.7059,
+          0.7,
+        ]),
+        list([
+          0.1216,
+          0.4667,
+          0.7059,
+          0.7,
+        ]),
+      ]),
+      'linestyles': list([
+        '-',
+        '-',
+        '-',
+      ]),
+      'widths': list([
+        1.0,
+        1.0,
+        1.0,
+      ]),
+      'x': list([
+        0.0,
+        1.0,
+      ]),
+      'y': list([
+        list([
+          0.0,
+          0.75,
+        ]),
+        list([
+          0.25,
+          0.625,
+        ]),
+        list([
+          1.0,
+          0.25,
+        ]),
+      ]),
+      'zorders': list([
+        None,
+        None,
+        None,
+      ]),
+    }),
+    'state': dict({
+      'axes': list([
+        dict({
+          'categories': None,
+          'dtype': 'numeric',
+          'inverted': False,
+          'label': None,
+          'lower': None,
+          'ticks': dict({
+            'count': None,
+            'labels': None,
+            'values': None,
+          }),
+          'upper': None,
+        }),
+        dict({
+          'categories': None,
+          'dtype': 'numeric',
+          'inverted': True,
+          'label': None,
+          'lower': -2.0,
+          'ticks': dict({
+            'count': None,
+            'labels': list([
+              'Minimum',
+              'Target',
+              'Maximum',
+            ]),
+            'values': list([
+              -2.0,
+              1.0,
+              6.0,
+            ]),
+          }),
+          'upper': 6.0,
+        }),
+      ]),
+      'color_encoding': None,
+      'data': list([
+        list([
+          0.0,
+          0.0,
+        ]),
+        list([
+          1.0,
+          1.0,
+        ]),
+        list([
+          4.0,
+          4.0,
+        ]),
+      ]),
+      'default_line_style': dict({
+        'alpha': 0.7,
+        'color': None,
+        'linestyle': '-',
+        'width': 1.0,
+        'zorder': None,
+      }),
+      'line_styles': dict({
+      }),
+    }),
+  })
+# ---
+# name: test_colorbar_workflow_snapshot_and_roundtrip
+  dict({
+    'render': dict({
+      'alphas': list([
+        0.7,
+        0.7,
+        0.7,
+      ]),
+      'axes': list([
+        dict({
+          'label': 'A',
+          'ticks': list([
+            tuple(
+              0.0,
+              '0',
+            ),
+            tuple(
+              0.25,
+              '0.5',
+            ),
+            tuple(
+              0.5,
+              '1',
+            ),
+            tuple(
+              0.75,
+              '1.5',
+            ),
+            tuple(
+              1.0,
+              '2',
+            ),
+          ]),
+        }),
+      ]),
+      'colorbar': dict({
+        'axis': 0,
+        'label': 'A scale',
+        'lower': 0.0,
+        'upper': 2.0,
+      }),
+      'colors': list([
+        list([
+          0.267,
+          0.0049,
+          0.3294,
+          0.7,
+        ]),
+        list([
+          0.1276,
+          0.5669,
+          0.5506,
+          0.7,
+        ]),
+        list([
+          0.8627,
+          0.0784,
+          0.2353,
+          0.7,
+        ]),
+      ]),
+      'linestyles': list([
+        '--',
+        '--',
+        '-',
+      ]),
+      'widths': list([
+        1.25,
+        1.25,
+        2.5,
+      ]),
+      'x': list([
+        0.0,
+      ]),
+      'y': list([
+        list([
+          0.0,
+        ]),
+        list([
+          0.5,
+        ]),
+        list([
+          1.0,
+        ]),
+      ]),
+      'zorders': list([
+        None,
+        None,
+        None,
+      ]),
+    }),
+    'state': dict({
+      'axes': list([
+        dict({
+          'categories': None,
+          'dtype': 'numeric',
+          'inverted': False,
+          'label': 'A',
+          'lower': None,
+          'ticks': dict({
+            'count': None,
+            'labels': None,
+            'values': None,
+          }),
+          'upper': None,
+        }),
+      ]),
+      'color_encoding': dict({
+        'axis': 0,
+        'colorbar': dict({
+          'label': 'A scale',
+        }),
+        'lower': None,
+        'palette': 'viridis',
+        'upper': None,
+      }),
+      'data': list([
+        list([
+          0.0,
+        ]),
+        list([
+          1.0,
+        ]),
+        list([
+          2.0,
+        ]),
+      ]),
+      'default_line_style': dict({
+        'alpha': 0.7,
+        'color': 'black',
+        'linestyle': '--',
+        'width': 1.25,
+        'zorder': None,
+      }),
+      'line_styles': dict({
+        '2': dict({
+          'alpha': None,
+          'color': 'crimson',
+          'linestyle': '-',
+          'width': 2.5,
+          'zorder': None,
+        }),
+      }),
+    }),
+  })
+# ---
+# name: test_line_style_workflow_snapshot_and_roundtrip
+  dict({
+    'render': dict({
+      'alphas': list([
+        0.6,
+        0.6,
+        0.6,
+        0.25,
+        0.6,
+        0.6,
+      ]),
+      'axes': list([
+        dict({
+          'label': 'Axis 1',
+          'ticks': list([
+            tuple(
+              0.0,
+              '0',
+            ),
+            tuple(
+              0.25,
+              '1.25',
+            ),
+            tuple(
+              0.5,
+              '2.5',
+            ),
+            tuple(
+              0.75,
+              '3.75',
+            ),
+            tuple(
+              1.0,
+              '5',
+            ),
+          ]),
+        }),
+        dict({
+          'label': 'Axis 2',
+          'ticks': list([
+            tuple(
+              0.0,
+              '0',
+            ),
+            tuple(
+              0.25,
+              '1.25',
+            ),
+            tuple(
+              0.5,
+              '2.5',
+            ),
+            tuple(
+              0.75,
+              '3.75',
+            ),
+            tuple(
+              1.0,
+              '5',
+            ),
+          ]),
+        }),
+      ]),
+      'colorbar': None,
+      'colors': list([
+        list([
+          0.2745,
+          0.5098,
+          0.7059,
+          0.6,
+        ]),
+        list([
+          0.8627,
+          0.0784,
+          0.2353,
+          0.6,
+        ]),
+        list([
+          0.2745,
+          0.5098,
+          0.7059,
+          0.6,
+        ]),
+        list([
+          0.2745,
+          0.5098,
+          0.7059,
+          0.25,
+        ]),
+        list([
+          0.2745,
+          0.5098,
+          0.7059,
+          0.6,
+        ]),
+        list([
+          0.2745,
+          0.5098,
+          0.7059,
+          0.6,
+        ]),
+      ]),
+      'linestyles': list([
+        '--',
+        '--',
+        '--',
+        '--',
+        ':',
+        '--',
+      ]),
+      'widths': list([
+        1.2,
+        1.2,
+        2.5,
+        1.2,
+        1.2,
+        1.2,
+      ]),
+      'x': list([
+        0.0,
+        1.0,
+      ]),
+      'y': list([
+        list([
+          0.0,
+          1.0,
+        ]),
+        list([
+          0.2,
+          0.8,
+        ]),
+        list([
+          0.4,
+          0.6,
+        ]),
+        list([
+          0.6,
+          0.4,
+        ]),
+        list([
+          0.8,
+          0.2,
+        ]),
+        list([
+          1.0,
+          0.0,
+        ]),
+      ]),
+      'zorders': list([
+        None,
+        None,
+        None,
+        None,
+        None,
+        10.0,
+      ]),
+    }),
+    'state': dict({
+      'axes': list([
+        dict({
+          'categories': None,
+          'dtype': 'numeric',
+          'inverted': False,
+          'label': None,
+          'lower': None,
+          'ticks': dict({
+            'count': None,
+            'labels': None,
+            'values': None,
+          }),
+          'upper': None,
+        }),
+        dict({
+          'categories': None,
+          'dtype': 'numeric',
+          'inverted': False,
+          'label': None,
+          'lower': None,
+          'ticks': dict({
+            'count': None,
+            'labels': None,
+            'values': None,
+          }),
+          'upper': None,
+        }),
+      ]),
+      'color_encoding': None,
+      'data': list([
+        list([
+          0,
+          5.0,
+        ]),
+        list([
+          1,
+          4.0,
+        ]),
+        list([
+          2,
+          3.0,
+        ]),
+        list([
+          3,
+          2.0,
+        ]),
+        list([
+          4,
+          1.0,
+        ]),
+        list([
+          5,
+          0.0,
+        ]),
+      ]),
+      'default_line_style': dict({
+        'alpha': 0.6,
+        'color': 'steelblue',
+        'linestyle': '--',
+        'width': 1.2,
+        'zorder': None,
+      }),
+      'line_styles': dict({
+        '1': dict({
+          'alpha': None,
+          'color': 'crimson',
+          'linestyle': None,
+          'width': None,
+          'zorder': None,
+        }),
+        '2': dict({
+          'alpha': None,
+          'color': None,
+          'linestyle': None,
+          'width': 2.5,
+          'zorder': None,
+        }),
+        '3': dict({
+          'alpha': 0.25,
+          'color': None,
+          'linestyle': None,
+          'width': None,
+          'zorder': None,
+        }),
+        '4': dict({
+          'alpha': None,
+          'color': None,
+          'linestyle': ':',
+          'width': None,
+          'zorder': None,
+        }),
+        '5': dict({
+          'alpha': None,
+          'color': None,
+          'linestyle': None,
+          'width': None,
+          'zorder': 10.0,
+        }),
+      }),
+    }),
+  })
+# ---
+# name: test_standard_workflow_snapshot_and_roundtrip
+  dict({
+    'render': dict({
+      'alphas': list([
+        0.7,
+        0.7,
+        0.7,
+      ]),
+      'axes': list([
+        dict({
+          'label': 'Axis 1',
+          'ticks': list([
+            tuple(
+              0.0,
+              '0',
+            ),
+            tuple(
+              0.25,
+              '1',
+            ),
+            tuple(
+              0.5,
+              '2',
+            ),
+            tuple(
+              0.75,
+              '3',
+            ),
+            tuple(
+              1.0,
+              '4',
+            ),
+          ]),
+        }),
+        dict({
+          'label': 'Label only',
+          'ticks': list([
+            tuple(
+              0.0,
+              '0',
+            ),
+            tuple(
+              0.25,
+              '1',
+            ),
+            tuple(
+              0.5,
+              '2',
+            ),
+            tuple(
+              0.75,
+              '3',
+            ),
+            tuple(
+              1.0,
+              '4',
+            ),
+          ]),
+        }),
+        dict({
+          'label': 'Axis 3',
+          'ticks': list([
+            tuple(
+              0.0,
+              '-2',
+            ),
+            tuple(
+              0.25,
+              '0',
+            ),
+            tuple(
+              0.5,
+              '2',
+            ),
+            tuple(
+              0.75,
+              '4',
+            ),
+            tuple(
+              1.0,
+              '6',
+            ),
+          ]),
+        }),
+        dict({
+          'label': 'Axis 4',
+          'ticks': list([
+            tuple(
+              0.0,
+              '0.0',
+            ),
+            tuple(
+              0.25,
+              '1.0',
+            ),
+            tuple(
+              1.0,
+              '4.0',
+            ),
+          ]),
+        }),
+        dict({
+          'label': 'Axis 5',
+          'ticks': list([
+            tuple(
+              0.0,
+              'Minimum',
+            ),
+            tuple(
+              0.25,
+              'Target',
+            ),
+            tuple(
+              1.0,
+              'Maximum',
+            ),
+          ]),
+        }),
+        dict({
+          'label': 'Axis 6',
+          'ticks': list([
+            tuple(
+              0.0,
+              '0',
+            ),
+            tuple(
+              0.5,
+              '2',
+            ),
+            tuple(
+              1.0,
+              '4',
+            ),
+          ]),
+        }),
+        dict({
+          'label': 'Axis 7',
+          'ticks': list([
+            tuple(
+              1.0,
+              '0',
+            ),
+            tuple(
+              0.75,
+              '1',
+            ),
+            tuple(
+              0.5,
+              '2',
+            ),
+            tuple(
+              0.25,
+              '3',
+            ),
+            tuple(
+              0.0,
+              '4',
+            ),
+          ]),
+        }),
+        dict({
+          'label': 'Axis 8',
+          'ticks': list([
+            tuple(
+              0.0,
+              'medium',
+            ),
+            tuple(
+              0.5,
+              'low',
+            ),
+            tuple(
+              1.0,
+              'high',
+            ),
+          ]),
+        }),
+        dict({
+          'label': 'Axis 9',
+          'ticks': list([
+            tuple(
+              0.0,
+              'low',
+            ),
+            tuple(
+              0.5,
+              'medium',
+            ),
+            tuple(
+              1.0,
+              'high',
+            ),
+          ]),
+        }),
+        dict({
+          'label': 'Axis 10',
+          'ticks': list([
+            tuple(
+              0.0,
+              'medium',
+            ),
+            tuple(
+              1.0,
+              'high',
+            ),
+          ]),
+        }),
+        dict({
+          'label': 'Axis 11',
+          'ticks': list([
+            tuple(
+              0.0,
+              'Medium',
+            ),
+            tuple(
+              1.0,
+              'High',
+            ),
+          ]),
+        }),
+        dict({
+          'label': 'Axis 12',
+          'ticks': list([
+            tuple(
+              0.0,
+              '0',
+            ),
+            tuple(
+              0.25,
+              '1',
+            ),
+            tuple(
+              0.5,
+              '2',
+            ),
+            tuple(
+              0.75,
+              '3',
+            ),
+            tuple(
+              1.0,
+              '4',
+            ),
+          ]),
+        }),
+        dict({
+          'label': 'Axis 13',
+          'ticks': list([
+            tuple(
+              0.0,
+              'medium',
+            ),
+            tuple(
+              1.0,
+              'high',
+            ),
+          ]),
+        }),
+      ]),
+      'colorbar': None,
+      'colors': list([
+        list([
+          0.1216,
+          0.4667,
+          0.7059,
+          0.7,
+        ]),
+        list([
+          0.1216,
+          0.4667,
+          0.7059,
+          0.7,
+        ]),
+        list([
+          0.1216,
+          0.4667,
+          0.7059,
+          0.7,
+        ]),
+      ]),
+      'linestyles': list([
+        '-',
+        '-',
+        '-',
+      ]),
+      'widths': list([
+        1.0,
+        1.0,
+        1.0,
+      ]),
+      'x': list([
+        0.0,
+        1.0,
+        2.0,
+        3.0,
+        4.0,
+        5.0,
+        6.0,
+        7.0,
+        8.0,
+        9.0,
+        10.0,
+        11.0,
+        12.0,
+      ]),
+      'y': list([
+        list([
+          0.0,
+          0.0,
+          0.25,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.5,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+        ]),
+        list([
+          0.25,
+          0.25,
+          0.375,
+          0.25,
+          0.25,
+          0.25,
+          0.75,
+          0.5,
+          0.0,
+          0.5,
+          0.5,
+          -999.0,
+          -999.0,
+        ]),
+        list([
+          1.0,
+          1.0,
+          0.75,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+        ]),
+      ]),
+      'zorders': list([
+        None,
+        None,
+        None,
+      ]),
+    }),
+    'state': dict({
+      'axes': list([
+        dict({
+          'categories': None,
+          'dtype': 'numeric',
+          'inverted': False,
+          'label': None,
+          'lower': None,
+          'ticks': dict({
+            'count': None,
+            'labels': None,
+            'values': None,
+          }),
+          'upper': None,
+        }),
+        dict({
+          'categories': None,
+          'dtype': 'numeric',
+          'inverted': False,
+          'label': 'Label only',
+          'lower': None,
+          'ticks': dict({
+            'count': None,
+            'labels': None,
+            'values': None,
+          }),
+          'upper': None,
+        }),
+        dict({
+          'categories': None,
+          'dtype': 'numeric',
+          'inverted': False,
+          'label': None,
+          'lower': -2.0,
+          'ticks': dict({
+            'count': None,
+            'labels': None,
+            'values': None,
+          }),
+          'upper': 6.0,
+        }),
+        dict({
+          'categories': None,
+          'dtype': 'numeric',
+          'inverted': False,
+          'label': None,
+          'lower': None,
+          'ticks': dict({
+            'count': None,
+            'labels': None,
+            'values': list([
+              0.0,
+              1.0,
+              4.0,
+            ]),
+          }),
+          'upper': None,
+        }),
+        dict({
+          'categories': None,
+          'dtype': 'numeric',
+          'inverted': False,
+          'label': None,
+          'lower': None,
+          'ticks': dict({
+            'count': None,
+            'labels': list([
+              'Minimum',
+              'Target',
+              'Maximum',
+            ]),
+            'values': list([
+              0.0,
+              1.0,
+              4.0,
+            ]),
+          }),
+          'upper': None,
+        }),
+        dict({
+          'categories': None,
+          'dtype': 'numeric',
+          'inverted': False,
+          'label': None,
+          'lower': None,
+          'ticks': dict({
+            'count': 3,
+            'labels': None,
+            'values': None,
+          }),
+          'upper': None,
+        }),
+        dict({
+          'categories': None,
+          'dtype': 'numeric',
+          'inverted': True,
+          'label': None,
+          'lower': None,
+          'ticks': dict({
+            'count': None,
+            'labels': None,
+            'values': None,
+          }),
+          'upper': None,
+        }),
+        dict({
+          'categories': list([
+            'medium',
+            'low',
+            'high',
+          ]),
+          'dtype': 'categorical',
+          'inverted': False,
+          'label': None,
+          'lower': None,
+          'ticks': dict({
+            'count': None,
+            'labels': None,
+            'values': None,
+          }),
+          'upper': None,
+        }),
+        dict({
+          'categories': list([
+            'low',
+            'medium',
+            'high',
+          ]),
+          'dtype': 'categorical',
+          'inverted': False,
+          'label': None,
+          'lower': None,
+          'ticks': dict({
+            'count': None,
+            'labels': None,
+            'values': None,
+          }),
+          'upper': None,
+        }),
+        dict({
+          'categories': list([
+            'medium',
+            'low',
+            'high',
+          ]),
+          'dtype': 'categorical',
+          'inverted': False,
+          'label': None,
+          'lower': None,
+          'ticks': dict({
+            'count': None,
+            'labels': None,
+            'values': list([
+              'medium',
+              'high',
+            ]),
+          }),
+          'upper': None,
+        }),
+        dict({
+          'categories': list([
+            'medium',
+            'low',
+            'high',
+          ]),
+          'dtype': 'categorical',
+          'inverted': False,
+          'label': None,
+          'lower': None,
+          'ticks': dict({
+            'count': None,
+            'labels': list([
+              'Medium',
+              'High',
+            ]),
+            'values': list([
+              'medium',
+              'high',
+            ]),
+          }),
+          'upper': None,
+        }),
+        dict({
+          'categories': None,
+          'dtype': 'numeric',
+          'inverted': False,
+          'label': None,
+          'lower': None,
+          'ticks': dict({
+            'count': None,
+            'labels': None,
+            'values': None,
+          }),
+          'upper': None,
+        }),
+        dict({
+          'categories': list([
+            'medium',
+            'high',
+          ]),
+          'dtype': 'categorical',
+          'inverted': False,
+          'label': None,
+          'lower': None,
+          'ticks': dict({
+            'count': None,
+            'labels': None,
+            'values': None,
+          }),
+          'upper': None,
+        }),
+      ]),
+      'color_encoding': None,
+      'data': list([
+        list([
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          'medium',
+          'medium',
+          'medium',
+          'medium',
+          0.0,
+          'medium',
+        ]),
+        list([
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          'low',
+          'low',
+          'low',
+          'low',
+          None,
+          None,
+        ]),
+        list([
+          4.0,
+          4.0,
+          4.0,
+          4.0,
+          4.0,
+          4.0,
+          4.0,
+          'high',
+          'high',
+          'high',
+          'high',
+          4.0,
+          'high',
+        ]),
+      ]),
+      'default_line_style': dict({
+        'alpha': 0.7,
+        'color': None,
+        'linestyle': '-',
+        'width': 1.0,
+        'zorder': None,
+      }),
+      'line_styles': dict({
+      }),
+    }),
+  })
+# ---

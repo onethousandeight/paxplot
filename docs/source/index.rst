@@ -1,11 +1,7 @@
-Paxplot
+PaxPlot
 ===================================
 
-Paxplot is a Python visualization library for parallel coordinate plots based on Matplotlib. Parallel coordinate, or parallel axis, plots are `common way <https://en.wikipedia.org/wiki/Parallel_coordinates>`_ of visualizing high-dimensional datasets. Here is an example!
-
-.. image:: _static/pandas.svg
-
-Want to see how this plot is made? Check out the `Usage with Pandas <examples.html#pandas>`__ tutorial.
+PaxPlot stores a serializable definition of a parallel coordinate plot and renders it with Matplotlib. Users configure a :class:`paxplot.ParallelPlot`, save its validated state, and render when they need a figure.
 
 To install:
 

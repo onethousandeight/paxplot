@@ -1,12 +1,26 @@
-"""Paxplot modules"""
-from .legacy.core import pax_parallel, PaxFigure
-from .legacy.controller import PaxController
-from .datasets import *
-from .legacy import data_managers
+"""PaxPlot public API."""
 
-# Main interface - users should use PaxController
+from paxplot.datasets import hydroclimate_model_evaluation, tradeoff
+from paxplot.plot import ParallelPlot
+from paxplot.state import (
+    AxisConfig,
+    ColorbarConfig,
+    ColorEncoding,
+    LineStyle,
+    LineStyleOverride,
+    PlotState,
+    TickConfig,
+)
+
 __all__ = [
-    'PaxController',  # Main interface
-    'pax_parallel',   # Legacy interface
-    'PaxFigure',      # Legacy interface
+    "AxisConfig",
+    "ColorbarConfig",
+    "ColorEncoding",
+    "LineStyle",
+    "LineStyleOverride",
+    "ParallelPlot",
+    "PlotState",
+    "TickConfig",
+    "hydroclimate_model_evaluation",
+    "tradeoff",
 ]

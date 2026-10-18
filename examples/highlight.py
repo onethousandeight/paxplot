@@ -1,35 +1,18 @@
-import pandas as pd
 import matplotlib.pyplot as plt
-import paxplot
+import pandas as pd
 
-# Import data
-path_to_data = paxplot.datasets.tradeoff()
-df = pd.read_csv(path_to_data)
-cols = df.columns
+import paxplot as pax
+from paxplot import tradeoff
 
-# Split data
-df_highlight = df[df['A'] < 20]
-df_grey = df[df['A'] >= 20]
+df = pd.read_csv(tradeoff()).head(12)
+columns = df.select_dtypes(include="number").columns[:4].tolist()
 
-# Create figure
-paxfig = paxplot.pax_parallel(n_axes=len(cols))
-paxfig.plot(df_highlight.to_numpy())
+plot = pax.ParallelPlot()
+plot.set_data(df[columns].values.tolist())
+for index, column in enumerate(columns):
+    plot.set_axis_label(index, column)
+plot.set_default_line_style(color="0.35", alpha=0.25, width=1.0)
+plot.set_line_style(3, color="crimson", alpha=1.0, width=2.5, zorder=10)
 
-# Add colorbar for highlighted
-color_col = 0
-paxfig.add_colorbar(
-    ax_idx=color_col,
-    cmap='viridis',
-    colorbar_kwargs={'label': cols[color_col]}
-)
-
-# Add grey data
-paxfig.plot(
-    df_grey.to_numpy(),
-    line_kwargs={'alpha': 0.5, 'color': 'grey', 'zorder': 0}
-)
-
-# Add labels
-paxfig.set_labels(cols)
-
-plt.show(block=False)
+fig = plot.render(figsize=(10, 5))
+plt.show()

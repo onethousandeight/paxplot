@@ -1,25 +1,24 @@
 [build-system]
-requires = ["setuptools>=61"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "paxplot"
-version = "0.1.4b2"
-description = "Paxplot is a Python visualization library for parallel coordinate plots based on Matplotlib."
+version = "0.2.0"
+description = "PaxPlot stores and renders serializable parallel coordinate plots."
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.12"
-license = { text = "MIT" }
+license = "MIT"
 authors = [
     { name = "Jacob Kravits", email = "kravitsjacob@gmail.com" }
 ]
 dependencies = [
     "matplotlib>=3.10",
     "pandas>=2.2.3",
-    "pydantic"
+    "pydantic>=2.7"
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent"
 ]
 
@@ -28,8 +27,17 @@ Homepage = "https://github.com/kravitsjacob/paxplot"
 
 [project.optional-dependencies]
 dev = [
-    "black>=24.0.0",
-    "pytest"
+    "build>=1.2",
+    "pytest>=8",
+    "ruff>=0.6",
+    "setuptools>=77",
+    "sphinx>=8",
+    "syrupy>=4.7"
+]
+docs = [
+    "pydata-sphinx-theme",
+    "sphinx>=8",
+    "sphinx-sitemap"
 ]
 
 [tool.setuptools]
@@ -41,14 +49,14 @@ where = ["src"]
 [tool.setuptools.package-data]
 "paxplot" = ["data/tradeoff.csv", "data/hydroclimate_model_evaluation.csv"]
 
-[tool.black]
+[tool.ruff]
 line-length = 88
-target-version = ["py312"]
+target-version = "py312"
 
-[tool.pylint]
-max-line-length = 88
+[tool.ruff.lint]
+select = ["B", "E", "F", "I", "UP", "W"]
 
 [tool.pytest.ini_options]
-markers = [
-    "legacy: marks tests as covering legacy behavior (deselect with '-m \"not legacy\"')"
-]
+testpaths = ["tests"]
+addopts = "-ra"
+markers = ["integration: marks end-to-end plotting workflows"]

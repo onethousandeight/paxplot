@@ -1,29 +1,29 @@
 API Reference
 =============
 
-Functions
----------
-.. automodule:: paxplot
-    :members: pax_parallel
+Plot Object
+-----------
 
-Classes
--------
-.. autoclass:: PaxFigure
-    :members: plot, set_label, set_labels, set_even_ticks, set_ticks, set_lim, invert_axis, add_legend, add_colorbar, savefig
+.. autoclass:: paxplot.ParallelPlot
+   :members:
 
-Contents
---------
-.. autosummary::
-    :toctree: generated
+State Models
+------------
 
-    pax_parallel
-    PaxFigure.plot
-    PaxFigure.set_label
-    PaxFigure.set_labels
-    PaxFigure.set_even_ticks
-    PaxFigure.set_ticks
-    PaxFigure.set_lim
-    PaxFigure.invert_axis
-    PaxFigure.add_legend
-    PaxFigure.add_colorbar
-    PaxFigure.savefig
+.. autoclass:: paxplot.PlotState
+   :members:
+
+.. autoclass:: paxplot.AxisConfig
+   :members:
+
+.. autoclass:: paxplot.TickConfig
+   :members:
+
+.. autoclass:: paxplot.LineStyle
+   :members:
+
+.. autoclass:: paxplot.LineStyleOverride
+   :members:
+
+.. autoclass:: paxplot.ColorEncoding
+   :members:

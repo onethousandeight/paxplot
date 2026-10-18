@@ -31,12 +31,12 @@ data = [
 ]
 
 plot = pax.ParallelPlot()
-plot.set_data(data, columns=["A", "Risk", "C", "D"])
-plot.set_axis_label("A", "Column A")
-plot.set_axis_limits("A", lower=-1.0, upper=3.0)
-plot.set_axis_ticks("Risk", values=["low", "medium", "high"])
-plot.invert_axis("C")
-plot.set_colorbar("A", palette="viridis", label="Column A")
+plot.set_data(data)
+plot.set_axis_label(0, "Column A")
+plot.set_axis_limits(0, lower=-1.0, upper=3.0)
+plot.set_axis_ticks(1, values=["low", "medium", "high"])
+plot.invert_axis(2)
+plot.set_colorbar(0, palette="viridis", label="Column A")
 
 fig = plot.render()
 fig.show()
@@ -46,21 +46,21 @@ The same plot can be configured more compactly with `set_axis`:
 
 ```python
 plot = pax.ParallelPlot()
-plot.set_data(data, columns=["A", "Risk", "C", "D"])
+plot.set_data(data)
 
 plot.set_axis(
-    "A",
+    0,
     label="Column A",
     limits=(-1.0, 3.0),
     ticks=[0.0, 1.0, 2.0, 3.0],
 )
 plot.set_axis(
-    "Risk",
+    1,
     label="Risk",
     categories=["low", "medium", "high"],
 )
-plot.set_axis("C", inverted=True, tick_count=5)
-plot.set_line_style("row-2", color="crimson", width=2.0)
+plot.set_axis(2, label="C", inverted=True, tick_count=5)
+plot.set_line_style(2, color="crimson", width=2.0)
 
 fig = plot.render(figsize=(10, 6))
 ```
@@ -81,16 +81,11 @@ common edits.
 
 ```python
 class ParallelPlot:
-    def set_data(
-        self,
-        data,
-        columns: list[str] | None = None,
-        row_ids: list[str] | None = None,
-    ) -> "ParallelPlot": ...
+    def set_data(self, data) -> "ParallelPlot": ...
 
     def set_axis(
         self,
-        axis: int | str,
+        axis: int,
         *,
         label: str | None = None,
         limits: tuple[float | None, float | None] | None = None,
@@ -101,20 +96,20 @@ class ParallelPlot:
         inverted: bool | None = None,
     ) -> "ParallelPlot": ...
 
-    def set_axis_label(self, axis: int | str, label: str) -> "ParallelPlot": ...
+    def set_axis_label(self, axis: int, label: str) -> "ParallelPlot": ...
     def set_axis_limits(
         self,
-        axis: int | str,
+        axis: int,
         lower: float | None = None,
         upper: float | None = None,
     ) -> "ParallelPlot": ...
     def set_axis_ticks(
         self,
-        axis: int | str,
+        axis: int,
         values: list[float | str],
         labels: list[str] | None = None,
     ) -> "ParallelPlot": ...
-    def invert_axis(self, axis: int | str, inverted: bool = True) -> "ParallelPlot": ...
+    def invert_axis(self, axis: int, inverted: bool = True) -> "ParallelPlot": ...
     def set_default_line_style(
         self,
         *,
@@ -125,7 +120,7 @@ class ParallelPlot:
     ) -> "ParallelPlot": ...
     def set_line_style(
         self,
-        row_id: str,
+        row: int,
         *,
         color: str | None = None,
         alpha: float | None = None,
@@ -135,7 +130,7 @@ class ParallelPlot:
     ) -> "ParallelPlot": ...
     def set_colorbar(
         self,
-        axis: int | str,
+        axis: int,
         *,
         palette: str | list[str] = "viridis",
         label: str | None = None,
@@ -152,29 +147,23 @@ class ParallelPlot:
 Methods return `self` so users can chain calls when useful:
 
 ```python
-plot = (
-    pax.ParallelPlot()
-    .set_data(data, columns=["A", "Risk", "C", "D"])
-    .set_axis_label("A", "Column A")
-    .invert_axis("C")
-)
+plot = pax.ParallelPlot().set_data(data).set_axis_label(0, "Column A").invert_axis(2)
 ```
 
 ## Core Objects
 
 ### PlotState
 
-`PlotState` is the serializable source of truth. It stores column-oriented data,
+`PlotState` is the serializable source of truth. It stores row-oriented data,
 axis configuration, and plot-level style settings. It should be a Pydantic model
 so validation and JSON round trips are built into the package.
 
 ```python
 class PlotState(BaseModel):
-    data: dict[str, list[object]]
-    row_ids: list[str]
+    data: list[list[object]]
     axes: list[AxisConfig]
     default_line_style: LineStyle = Field(default_factory=LineStyle)
-    line_styles: dict[str, LineStyleOverride] = Field(default_factory=dict)
+    line_styles: dict[int, LineStyleOverride] = Field(default_factory=dict)
     color_encoding: ColorEncoding | None = None
 ```
 
@@ -184,7 +173,6 @@ class PlotState(BaseModel):
 
 ```python
 class AxisConfig(BaseModel):
-    name: str
     dtype: Literal["numeric", "categorical"]
     label: str | None = None
     lower: float | None = None
@@ -235,7 +223,7 @@ intent, not a matplotlib colorbar object.
 
 ```python
 class ColorEncoding(BaseModel):
-    axis: str
+    axis: int
     palette: str | list[str] = "viridis"
     lower: float | None = None
     upper: float | None = None
@@ -263,7 +251,6 @@ import numpy as np
 
 @dataclass
 class RenderAxis:
-    name: str
     label: str
     x: float
     tick_positions: list[float]
@@ -272,7 +259,7 @@ class RenderAxis:
 
 @dataclass
 class RenderColorbar:
-    axis: str
+    axis: int
     palette: str | list[str]
     label: str | None
     lower: float
@@ -283,7 +270,6 @@ class RenderColorbar:
 class RenderData:
     x: np.ndarray
     y: np.ndarray
-    row_ids: list[str]
     axes: list[RenderAxis]
     default_line_style: LineStyle
     line_colors: np.ndarray | None = None
@@ -293,30 +279,28 @@ class RenderData:
 
 ## Data And Axis Handling
 
-Data is stored by column:
+Data is stored by row:
 
 ```python
-{
-    "A": [0.0, 1.0, 3.0],
-    "Risk": ["low", "medium", "high"],
-    "C": [2.0, 1.0, 0.0],
-    "D": [0.5, 1.0, 1.0],
-}
+[
+    [0.0, "low", 2.0, 0.5],
+    [1.0, "medium", 1.0, 1.0],
+    [3.0, "high", 0.0, 1.0],
+]
 ```
 
-`set_data` accepts row-oriented data because that is convenient for users, then
-converts it to column-oriented state. It should also accept mappings of columns
-and pandas DataFrames. If `row_ids` are not supplied, PaxPlot assigns ids like
-`row-0`, `row-1`, and `row-2` for the current dataset.
+`set_data` accepts only non-empty rectangular row-oriented data. Users address
+axes and rows by integer position. Axis labels are display metadata, not lookup
+keys.
 
 Axis type inference is simple:
 
-- numeric columns contain only `int`, `float`, `None`, or `NaN`;
-- categorical columns contain strings, `None`, or repeated labels;
-- mixed numeric and string columns raise a validation error.
+- numeric axes contain only `int`, `float`, `None`, or `NaN`;
+- categorical axes contain strings, `None`, or repeated labels;
+- mixed numeric and string axes raise a validation error.
 
 Numeric axes use `lower` and `upper` when supplied. Missing bounds come from the
-column data. Values are scaled with min-max normalization:
+axis data. Values are scaled with min-max normalization:
 
 ```text
 scaled = (value - lower) / (upper - lower)
@@ -350,14 +334,14 @@ segments where a row has missing coordinates.
 Line style is part of serializable plot state when it changes the meaning of the
 plot. Backend-only artist details stay in the renderer.
 
-Users can set a default line style, override individual lines by row id, or call
-`set_colorbar(axis)` to color lines from a numeric column. `palette` can be a
+Users can set a default line style, override individual lines by row index, or call
+`set_colorbar(axis)` to color lines from a numeric axis. `palette` can be a
 named matplotlib colormap or an explicit list of colors.
 
 Style precedence is:
 
 1. default line style;
-2. colorbar column encoding;
+2. colorbar axis encoding;
 3. explicit per-line style overrides.
 
 A user-set line color overrides generated colorbar colors for that line.
@@ -467,7 +451,7 @@ Use many focused unit tests for core behavior and a few trusted integration
 tests for typical user workflows. New tests should live in `tests/`; legacy
 compatibility tests do not constrain this redesign.
 
-Unit tests should cover validation, data loading, axis lookup, dtype inference,
+Unit tests should cover validation, data loading, axis configuration, dtype inference,
 normalization, categorical mapping, missing values, limits, inversion, tick
 resolution, line style precedence, colorbar resolution, JSON round trips, and
 thin matplotlib renderer behavior.

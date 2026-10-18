@@ -1,4 +1,4 @@
-"""Default datasets included with Paxplot"""
+"""Default datasets included with PaxPlot."""
 
 from importlib import resources
 
@@ -24,4 +24,6 @@ def hydroclimate_model_evaluation():
     stream : io.BufferedReader
         Stream of hydroclimate model evaluation dataset
     """
-    return (resources.files(__package__) / "data" / "hydroclimate_model_evaluation.csv").open("rb")
+    return (
+        resources.files(__package__) / "data" / "hydroclimate_model_evaluation.csv"
+    ).open("rb")

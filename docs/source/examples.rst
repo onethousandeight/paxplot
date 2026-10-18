@@ -1,86 +1,49 @@
 Examples
 ========
 
-.. _pandas:
-
 Usage with Pandas
 -----------------
 
-The `Pandas <https://pandas.pydata.org/>`_ library offers many tools for importing and processing data. Here is an example of using Paxplot to plot data in a Pandas `DataFrame <https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html>`_. We will use the :code:`tradeoff` dataset included in Paxplot, but the workflow is fairly generic.
+.. code-block:: python
+
+   import matplotlib.pyplot as plt
+   import pandas as pd
+
+   import paxplot as pax
+   from paxplot import tradeoff
+
+   df = pd.read_csv(tradeoff()).head(25)
+   columns = df.select_dtypes(include="number").columns[:5].tolist()
+
+   plot = pax.ParallelPlot()
+   plot.set_data(df[columns].values.tolist())
+   for index, column in enumerate(columns):
+       plot.set_axis_label(index, column)
+   plot.set_colorbar(0, label=columns[0])
+
+   fig = plot.render(figsize=(11, 5))
+   plt.show()
+
+Highlight One Row
+-----------------
 
 .. code-block:: python
 
-    import pandas as pd
-    import matplotlib.pyplot as plt
-    import paxplot
+   import matplotlib.pyplot as plt
+   import pandas as pd
 
-    # Import data
-    path_to_data = paxplot.datasets.tradeoff()
-    df = pd.read_csv(path_to_data)
-    cols = df.columns
+   import paxplot as pax
+   from paxplot import tradeoff
 
-    # Create figure
-    paxfig = paxplot.pax_parallel(n_axes=len(cols))
-    paxfig.plot(df.to_numpy())
+   df = pd.read_csv(tradeoff()).head(12)
+   columns = df.select_dtypes(include="number").columns[:4].tolist()
 
-    # Add labels
-    paxfig.set_labels(cols)
+   plot = pax.ParallelPlot()
+   plot.set_data(df[columns].values.tolist())
+   for index, column in enumerate(columns):
+       plot.set_axis_label(index, column)
+   plot.set_default_line_style(color="0.35", alpha=0.25, width=1.0)
+   plot.set_line_style(3, color="crimson", alpha=1.0, width=2.5, zorder=10)
 
-    # Add colorbar
-    color_col = 0
-    paxfig.add_colorbar(
-        ax_idx=color_col,
-        cmap='viridis',
-        colorbar_kwargs={'label': cols[color_col]}
-    )
-
-    plt.show()
-
-
-.. image:: _static/pandas.svg
-
-.. _highlight-solutions:
-
-Highlight Solutions
--------------------
-Another common workflow with parallel plots is to add a colorbar to a subset of data. This is particularly common when showing `nondominated <https://en.wikipedia.org/wiki/Maxima_of_a_point_set>`_ subsets of a dataset in multi-objective optimization problems. 
-
-.. code-block:: python
-
-    import pandas as pd
-    import matplotlib.pyplot as plt
-    import paxplot
-
-    # Import data
-    path_to_data = paxplot.datasets.tradeoff()
-    df = pd.read_csv(path_to_data)
-    cols = df.columns
-
-    # Split data
-    df_highlight = df[df['A'] < 20]
-    df_grey = df[df['A'] >= 20]
-
-    # Create figure
-    paxfig = paxplot.pax_parallel(n_axes=len(cols))
-    paxfig.plot(df_highlight.to_numpy())
-
-    # Add colorbar for highlighted
-    color_col = 0
-    paxfig.add_colorbar(
-        ax_idx=color_col,
-        cmap='viridis',
-        colorbar_kwargs={'label': cols[color_col]}
-    )
-
-    # Add grey data
-    paxfig.plot(
-        df_grey.to_numpy(),
-        line_kwargs={'alpha': 0.5, 'color': 'grey', 'zorder': 0}
-    )
-
-    # Add labels
-    paxfig.set_labels(cols)
-
-    plt.show()
-
-.. image:: _static/highlight.svg
+   fig = plot.render(figsize=(10, 5))
+   plt.show()

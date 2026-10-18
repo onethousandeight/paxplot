@@ -1,1 +1,0 @@
-"""Data managers for paxplot"""
