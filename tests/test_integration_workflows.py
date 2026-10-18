@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+from dataclasses import dataclass
 from pathlib import Path
 
 import numpy as np
@@ -46,30 +48,59 @@ def summarize(plot: pax.ParallelPlot) -> dict[str, object]:
     }
 
 
+@dataclass
+class WorkflowResult:
+    plot: pax.ParallelPlot
+    png_path: Path
+    json_path: Path
+    summary: dict[str, object]
+
+
+def run_workflow(
+    plot: pax.ParallelPlot, output_prefix: Path, figsize: tuple[float, float]
+) -> WorkflowResult:
+    png_path = output_prefix.with_suffix(".png")
+    json_path = output_prefix.with_suffix(".json")
+
+    fig = plot.render(figsize=figsize)
+    try:
+        fig.savefig(png_path)
+    finally:
+        plt.close(fig)
+
+    plot.to_json(json_path)
+    summary = summarize(plot)
+
+    return WorkflowResult(plot, png_path, json_path, summary)
+
+
+def assert_workflow_results(
+    original: WorkflowResult, restored: WorkflowResult, snapshot
+) -> None:
+    assert original.summary == snapshot
+    assert restored.plot.state == original.plot.state
+    assert restored.summary == original.summary
+
+    for result in (original, restored):
+        for path in (result.png_path, result.json_path):
+            assert path.is_file()
+            assert path.stat().st_size > 0
+
+    assert json.loads(original.json_path.read_text(encoding="utf-8")) == json.loads(
+        restored.json_path.read_text(encoding="utf-8")
+    )
+
+
 def assert_snapshot_and_roundtrip(
     plot: pax.ParallelPlot, tmp_path: Path, snapshot
 ) -> None:
-    summary = summarize(plot)
-
-    assert summary == snapshot
-
-    path = tmp_path / "plot.json"
-    plot.to_json(path)
-    restored = pax.ParallelPlot.from_json(path)
-
-    assert restored.state == plot.state
-    assert summarize(restored) == summary
-
     figsize = (max(6.0, 1.5 * len(plot.state.axes)), 4.0)
-    for name, candidate in [("plot", plot), ("restored", restored)]:
-        png_path = tmp_path / f"{name}.png"
-        fig = candidate.render(figsize=figsize)
-        try:
-            fig.savefig(png_path)
-            assert png_path.is_file()
-            assert png_path.stat().st_size > 0
-        finally:
-            plt.close(fig)
+    original = run_workflow(plot, tmp_path / "plot", figsize)
+
+    restored_plot = pax.ParallelPlot.from_json(original.json_path)
+    restored = run_workflow(restored_plot, tmp_path / "restored", figsize)
+
+    assert_workflow_results(original, restored, snapshot)
 
 
 @pytest.mark.integration
