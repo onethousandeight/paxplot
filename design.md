@@ -94,6 +94,10 @@ class ParallelPlot:
         tick_count: int | None = None,
         categories: list[str] | None = None,
         inverted: bool | None = None,
+        spine_visible: bool | None = None,
+        label_visible: bool | None = None,
+        tick_marks_visible: bool | None = None,
+        tick_labels_visible: bool | None = None,
     ) -> "ParallelPlot": ...
 
     def set_axis_label(self, axis: int, label: str) -> "ParallelPlot": ...
@@ -179,6 +183,8 @@ class AxisConfig(BaseModel):
     upper: float | None = None
     inverted: bool = False
     categories: list[str] | None = None
+    spine_style: AxisSpineStyle = Field(default_factory=AxisSpineStyle)
+    label_style: TextStyle = Field(default_factory=TextStyle)
     ticks: TickConfig = Field(default_factory=TickConfig)
 ```
 
@@ -192,7 +198,55 @@ class TickConfig(BaseModel):
     values: list[float | str] | None = None
     labels: list[str] | None = None
     count: int | None = None
+    mark_style: TickMarkStyle = Field(default_factory=TickMarkStyle)
+    label_style: TextStyle = Field(default_factory=TextStyle)
 ```
+
+### Axis Appearance
+
+An axis defines a data dimension independently of its visible decorations.
+Its **spine** is the vertical stroke connecting its tick marks.
+Each component owns a serializable appearance object:
+
+```python
+class AxisSpineStyle(BaseModel):
+    visible: bool = True
+
+
+class TickMarkStyle(BaseModel):
+    visible: bool = True
+
+
+class TextStyle(BaseModel):
+    visible: bool = True
+```
+
+`AxisConfig.spine_style` controls the axis spine, `AxisConfig.label_style`
+controls the axis title, and `TickConfig.mark_style` and `TickConfig.label_style`
+control tick marks and tick value labels. Each component is independent and
+visible by default; there is no parent visibility switch. These appearance
+objects can later gain properties such as font size, color, or line width on
+the relevant component. Fonts and sizes are not implemented yet.
+
+The public API provides convenience keywords for common edits:
+
+```python
+plot.set_axis(0, spine_visible=False)  # Hide only the axis spine.
+plot.set_axis(1, tick_marks_visible=False)  # Keep the tick value labels.
+plot.set_axis(2, tick_labels_visible=False)  # Keep the tick marks.
+plot.set_axis(3, label_visible=False)  # Hide only the axis title.
+```
+
+Set both tick visibility flags to `False` to hide marks and value labels.
+Set all four flags to `False` to hide every decoration of an axis. Neither
+operation removes its data dimension or changes its position, scaling,
+inversion, category order, missing values, or color encoding.
+
+Omitted visibility keywords preserve the existing settings. Hidden components
+retain their configuration, including edits made while hidden. Both
+`set_axis` and `set_axis_ticks` preserve appearance settings when updating tick
+values. Showing components again restores them using the retained configuration.
+All appearance settings survive JSON round trips.
 
 ### LineStyle
 
@@ -255,6 +309,10 @@ class RenderAxis:
     x: float
     tick_positions: list[float]
     tick_labels: list[str]
+    spine_visible: bool
+    label_visible: bool
+    tick_marks_visible: bool
+    tick_labels_visible: bool
 
 
 @dataclass
@@ -325,6 +383,12 @@ Ticks are resolved during render preparation:
   lower and upper bounds;
 - `tick_count` controls the number of automatic numeric ticks.
 
+An explicit empty tick list configures zero ticks on either numeric or
+categorical axes; `None` in `TickConfig.values` requests automatic ticks.
+Visibility suppresses drawing without clearing tick configuration. Hidden ticks
+are still resolved and validated during preparation, so display settings never
+change the meaning or validity of their configured values.
+
 Missing values remain missing in `RenderData`, represented as `NaN` values in
 the coordinate matrix. The matplotlib renderer should skip or break line
 segments where a row has missing coordinates.
@@ -357,11 +421,12 @@ receives ready-to-draw coordinates.
 The matplotlib renderer:
 
 - creates one figure;
-- draws vertical axes at the `RenderAxis.x` positions;
+- draws visible axis spines at the `RenderAxis.x` positions;
 - draws normalized line coordinates from the `RenderData.y` matrix;
 - prefers a matplotlib `LineCollection` for bulk line drawing instead of
   creating one line artist per row;
-- applies each axis's resolved tick positions and labels;
+- independently draws axis titles, tick marks, and tick value labels according
+  to the visibility flags on each `RenderAxis`;
 - applies resolved line styles;
 - draws a colorbar when `RenderData.colorbar` is present;
 - returns a matplotlib `Figure`.
@@ -464,7 +529,7 @@ labels, tick labels, line collections, line styles, and colorbars.
 Keep the initial integration suite to three workflows:
 
 - mixed numeric and categorical axes with labels, limits, ticks, inversion, and
-  missing values;
+  missing values, including independent decoration visibility and empty ticks;
 - default line styling, numeric colorbar encoding, and one explicit row style
   override;
 - configured plot serialized to JSON, loaded back, summarized, and rendered.

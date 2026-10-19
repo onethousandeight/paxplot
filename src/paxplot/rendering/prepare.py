@@ -54,6 +54,10 @@ def prepare_render_data(state: PlotState) -> RenderData:
                 x=float(x[axis_index]),
                 tick_positions=tick_positions,
                 tick_labels=tick_labels,
+                spine_visible=axis.spine_style.visible,
+                label_visible=axis.label_style.visible,
+                tick_marks_visible=axis.ticks.mark_style.visible,
+                tick_labels_visible=axis.ticks.label_style.visible,
             )
         )
 

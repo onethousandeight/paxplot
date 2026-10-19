@@ -51,6 +51,66 @@ def test_explicit_numeric_ticks_are_scaled() -> None:
     assert render_data.axes[0].tick_labels == ["zero", "five", "ten"]
 
 
+@pytest.mark.parametrize("values", [[0.0, 4.0], ["low", "high"]])
+def test_empty_tick_values_configure_zero_ticks(values) -> None:
+    plot = pax.ParallelPlot().set_data([[value] for value in values])
+    baseline = prepare_render_data(plot.state)
+    plot.set_axis_ticks(0, values=[])
+
+    prepared = prepare_render_data(plot.state)
+
+    assert prepared.axes[0].tick_positions == []
+    assert prepared.axes[0].tick_labels == []
+    assert prepared.axes[0].tick_marks_visible
+    assert prepared.axes[0].tick_labels_visible
+    np.testing.assert_array_equal(prepared.y, baseline.y)
+
+
+@pytest.mark.parametrize("values", [[0.0, 4.0, None], ["low", "high", None]])
+def test_hidden_decorations_preserve_geometry_and_tick_configuration(values) -> None:
+    plot = (
+        pax.ParallelPlot()
+        .set_data([[value, value] for value in values])
+        .set_axis(0, ticks=values[:2], tick_labels=["Bottom", "Top"], inverted=True)
+    )
+    if isinstance(values[0], float):
+        plot.set_axis_limits(0, lower=-2.0, upper=6.0)
+        plot.set_colorbar(0, label="Hidden axis scale")
+    else:
+        plot.set_axis(0, categories=["high", "low"])
+    baseline = prepare_render_data(plot.state)
+
+    plot.set_axis(
+        0,
+        spine_visible=False,
+        label_visible=False,
+        tick_marks_visible=False,
+        tick_labels_visible=False,
+    )
+    prepared = prepare_render_data(plot.state)
+
+    np.testing.assert_array_equal(prepared.x, baseline.x)
+    np.testing.assert_array_equal(prepared.y, baseline.y)
+    np.testing.assert_array_equal(prepared.line_colors, baseline.line_colors)
+    assert prepared.colorbar == baseline.colorbar
+    assert len(prepared.axes) == 2
+    assert prepared.axes[0].tick_positions == baseline.axes[0].tick_positions
+    assert prepared.axes[0].tick_labels == ["Bottom", "Top"]
+    assert not prepared.axes[0].spine_visible
+    assert not prepared.axes[0].label_visible
+    assert not prepared.axes[0].tick_marks_visible
+    assert not prepared.axes[0].tick_labels_visible
+    assert prepared.axes[1] == baseline.axes[1]
+
+
+def test_hiding_tick_labels_does_not_bypass_validation() -> None:
+    plot = pax.ParallelPlot().set_data([[0.0], [1.0]])
+    plot.set_axis(0, tick_marks_visible=False, tick_labels_visible=False)
+
+    with pytest.raises(ValueError, match="same length"):
+        plot.set_axis_ticks(0, values=[0.0, 1.0], labels=["Only one"])
+
+
 def test_line_style_precedence_with_colorbar_and_override() -> None:
     plot = (
         pax.ParallelPlot()

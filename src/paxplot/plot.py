@@ -147,8 +147,19 @@ class ParallelPlot:
         tick_count: int | None = None,
         categories: list[str] | None = None,
         inverted: bool | None = None,
+        spine_visible: bool | None = None,
+        label_visible: bool | None = None,
+        tick_marks_visible: bool | None = None,
+        tick_labels_visible: bool | None = None,
     ) -> ParallelPlot:
-        """Configure an axis in one call."""
+        """Configure an axis in one call.
+
+        Visibility independently controls the axis spine, axis title, tick
+        marks, and tick value labels. Hidden elements retain their configuration;
+        axis coordinates and plotted data are unchanged. Omitted settings keep
+        their current values. A spine is the vertical stroke connecting an
+        axis's tick marks. Explicit empty ``ticks`` configure zero ticks.
+        """
 
         axis_config = self._axis(axis)
         update = axis_config.model_dump()
@@ -160,11 +171,20 @@ class ParallelPlot:
             update["categories"] = categories
         if inverted is not None:
             update["inverted"] = inverted
-        update["ticks"] = TickConfig(
-            values=ticks if ticks is not None else axis_config.ticks.values,
-            labels=tick_labels if tick_labels is not None else axis_config.ticks.labels,
-            count=tick_count if tick_count is not None else axis_config.ticks.count,
-        )
+        if spine_visible is not None:
+            update["spine_style"]["visible"] = spine_visible
+        if label_visible is not None:
+            update["label_style"]["visible"] = label_visible
+        if ticks is not None:
+            update["ticks"]["values"] = ticks
+        if tick_labels is not None:
+            update["ticks"]["labels"] = tick_labels
+        if tick_count is not None:
+            update["ticks"]["count"] = tick_count
+        if tick_marks_visible is not None:
+            update["ticks"]["mark_style"]["visible"] = tick_marks_visible
+        if tick_labels_visible is not None:
+            update["ticks"]["label_style"]["visible"] = tick_labels_visible
         self._replace_axis(axis, AxisConfig(**update))
         return self
 
@@ -192,8 +212,15 @@ class ParallelPlot:
         values: list[float | str],
         labels: list[str] | None = None,
     ) -> ParallelPlot:
+        """Replace tick values and labels, preserving their appearance settings."""
+
         axis_config = self._axis(axis)
-        tick_config = TickConfig(values=values, labels=labels)
+        tick_config = TickConfig(
+            values=values,
+            labels=labels,
+            mark_style=axis_config.ticks.mark_style,
+            label_style=axis_config.ticks.label_style,
+        )
         self._replace_axis(axis, axis_config.model_copy(update={"ticks": tick_config}))
         return self
 

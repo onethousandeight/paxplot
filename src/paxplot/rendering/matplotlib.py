@@ -60,32 +60,36 @@ def render_matplotlib(render_data: RenderData, **kwargs):
     tick_color = "0.35"
     tick_half_width = 0.035
     for axis in render_data.axes:
-        ax.vlines(axis.x, 0.0, 1.0, color=axis_color, linewidth=1.0, zorder=3)
-        ax.text(
-            axis.x,
-            1.04,
-            axis.label,
-            ha="center",
-            va="bottom",
-            fontsize="medium",
-        )
-        for position, label in zip(axis.tick_positions, axis.tick_labels, strict=True):
-            ax.hlines(
-                position,
-                axis.x - tick_half_width,
-                axis.x + tick_half_width,
-                color=tick_color,
-                linewidth=0.8,
-                zorder=4,
-            )
+        if axis.spine_visible:
+            ax.vlines(axis.x, 0.0, 1.0, color=axis_color, linewidth=1.0, zorder=3)
+        if axis.label_visible:
             ax.text(
-                axis.x - tick_half_width * 1.8,
-                position,
-                label,
-                ha="right",
-                va="center",
-                fontsize="small",
+                axis.x,
+                1.04,
+                axis.label,
+                ha="center",
+                va="bottom",
+                fontsize="medium",
             )
+        for position, label in zip(axis.tick_positions, axis.tick_labels, strict=True):
+            if axis.tick_marks_visible:
+                ax.hlines(
+                    position,
+                    axis.x - tick_half_width,
+                    axis.x + tick_half_width,
+                    color=tick_color,
+                    linewidth=0.8,
+                    zorder=4,
+                )
+            if axis.tick_labels_visible:
+                ax.text(
+                    axis.x - tick_half_width * 1.8,
+                    position,
+                    label,
+                    ha="right",
+                    va="center",
+                    fontsize="small",
+                )
 
     ax.set_xlim(float(render_data.x.min()) - 0.2, float(render_data.x.max()) + 0.2)
     ax.set_ylim(-0.05, 1.08)

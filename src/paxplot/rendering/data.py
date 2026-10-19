@@ -15,6 +15,10 @@ class RenderAxis:
     x: float
     tick_positions: list[float]
     tick_labels: list[str]
+    spine_visible: bool
+    label_visible: bool
+    tick_marks_visible: bool
+    tick_labels_visible: bool
 
 
 @dataclass

@@ -90,6 +90,76 @@ def test_state_validation_rejects_bad_lengths_and_tick_labels() -> None:
         )
 
 
+@pytest.mark.parametrize("setter", ["set_axis", "set_axis_ticks"])
+@pytest.mark.parametrize("values", [[0.0, 1.0], ["low", "high"]])
+def test_visibility_survives_tick_edits_roundtrip_and_showing(
+    setter, values, tmp_path
+) -> None:
+    plot = (
+        pax.ParallelPlot()
+        .set_data([[value] for value in values])
+        .set_axis(
+            0,
+            spine_visible=False,
+            label_visible=False,
+            tick_marks_visible=False,
+            tick_labels_visible=False,
+        )
+        .set_axis_label(0, "Retained title")
+    )
+    labels = ["Bottom", "Top"]
+    if setter == "set_axis":
+        plot.set_axis(0, ticks=values, tick_labels=labels)
+    else:
+        plot.set_axis_ticks(0, values=values, labels=labels)
+
+    axis = plot.state.axes[0]
+    assert not axis.spine_style.visible
+    assert not axis.label_style.visible
+    assert not axis.ticks.mark_style.visible
+    assert not axis.ticks.label_style.visible
+    path = tmp_path / "hidden.json"
+    plot.to_json(path)
+    restored = pax.ParallelPlot.from_json(path)
+    assert restored.state == plot.state
+
+    restored.set_axis(
+        0,
+        spine_visible=True,
+        label_visible=True,
+        tick_marks_visible=True,
+        tick_labels_visible=True,
+    )
+    shown = restored.state.axes[0]
+    assert shown.spine_style.visible
+    assert shown.label_style.visible
+    assert shown.ticks.mark_style.visible
+    assert shown.ticks.label_style.visible
+    assert shown.label == "Retained title"
+    assert shown.ticks.values == values
+    assert shown.ticks.labels == labels
+    assert prepare_render_data(restored.state).axes[0].tick_labels == labels
+
+
+def test_component_styles_can_be_configured_in_state() -> None:
+    axis = pax.AxisConfig(
+        dtype="numeric",
+        spine_style=pax.AxisSpineStyle(visible=False),
+        label_style=pax.TextStyle(visible=False),
+        ticks=pax.TickConfig(
+            mark_style=pax.TickMarkStyle(visible=False),
+            label_style=pax.TextStyle(visible=False),
+        ),
+    )
+    plot = pax.ParallelPlot(pax.PlotState(data=[[0.0], [1.0]], axes=[axis]))
+
+    # An unrelated public edit retains the styles supplied through state.
+    plot.set_axis(0, inverted=True)
+    assert plot.state.axes[0].spine_style == axis.spine_style
+    assert plot.state.axes[0].label_style == axis.label_style
+    assert plot.state.axes[0].ticks == axis.ticks
+
+
 def test_json_round_trip(tmp_path) -> None:
     path = tmp_path / "plot.json"
     plot = (

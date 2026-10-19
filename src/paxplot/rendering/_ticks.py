@@ -48,7 +48,7 @@ def resolve_categorical_ticks(
 ) -> tuple[list[float], list[str]]:
     """Resolve categorical tick positions and labels."""
 
-    values = axis.ticks.values or list(categories)
+    values = axis.ticks.values if axis.ticks.values is not None else list(categories)
     positions = [scale_categorical_value(value, categories) for value in values]
     labels = axis.ticks.labels or [str(value) for value in values]
     scaled = apply_inversion(np.asarray(positions, dtype=float), axis.inverted)

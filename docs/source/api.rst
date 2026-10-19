@@ -19,6 +19,15 @@ State Models
 .. autoclass:: paxplot.TickConfig
    :members:
 
+.. autoclass:: paxplot.AxisSpineStyle
+   :members:
+
+.. autoclass:: paxplot.TickMarkStyle
+   :members:
+
+.. autoclass:: paxplot.TextStyle
+   :members:
+
 .. autoclass:: paxplot.LineStyle
    :members:
 

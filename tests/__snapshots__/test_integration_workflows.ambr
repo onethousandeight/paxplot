@@ -10,6 +10,10 @@
       'axes': list([
         dict({
           'label': 'Axis 1',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
           'ticks': list([
             tuple(
               0.0,
@@ -35,6 +39,10 @@
         }),
         dict({
           'label': 'Axis 2',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
           'ticks': list([
             tuple(
               1.0,
@@ -113,10 +121,22 @@
           'dtype': 'numeric',
           'inverted': False,
           'label': None,
+          'label_style': dict({
+            'visible': True,
+          }),
           'lower': None,
+          'spine_style': dict({
+            'visible': True,
+          }),
           'ticks': dict({
             'count': None,
+            'label_style': dict({
+              'visible': True,
+            }),
             'labels': None,
+            'mark_style': dict({
+              'visible': True,
+            }),
             'values': None,
           }),
           'upper': None,
@@ -126,14 +146,26 @@
           'dtype': 'numeric',
           'inverted': True,
           'label': None,
+          'label_style': dict({
+            'visible': True,
+          }),
           'lower': -2.0,
+          'spine_style': dict({
+            'visible': True,
+          }),
           'ticks': dict({
             'count': None,
+            'label_style': dict({
+              'visible': True,
+            }),
             'labels': list([
               'Minimum',
               'Target',
               'Maximum',
             ]),
+            'mark_style': dict({
+              'visible': True,
+            }),
             'values': list([
               -2.0,
               1.0,
@@ -181,6 +213,10 @@
       'axes': list([
         dict({
           'label': 'A',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
           'ticks': list([
             tuple(
               0.0,
@@ -268,10 +304,22 @@
           'dtype': 'numeric',
           'inverted': False,
           'label': 'A',
+          'label_style': dict({
+            'visible': True,
+          }),
           'lower': None,
+          'spine_style': dict({
+            'visible': True,
+          }),
           'ticks': dict({
             'count': None,
+            'label_style': dict({
+              'visible': True,
+            }),
             'labels': None,
+            'mark_style': dict({
+              'visible': True,
+            }),
             'values': None,
           }),
           'upper': None,
@@ -330,6 +378,10 @@
       'axes': list([
         dict({
           'label': 'Axis 1',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
           'ticks': list([
             tuple(
               0.0,
@@ -355,6 +407,10 @@
         }),
         dict({
           'label': 'Axis 2',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
           'ticks': list([
             tuple(
               0.0,
@@ -480,10 +536,22 @@
           'dtype': 'numeric',
           'inverted': False,
           'label': None,
+          'label_style': dict({
+            'visible': True,
+          }),
           'lower': None,
+          'spine_style': dict({
+            'visible': True,
+          }),
           'ticks': dict({
             'count': None,
+            'label_style': dict({
+              'visible': True,
+            }),
             'labels': None,
+            'mark_style': dict({
+              'visible': True,
+            }),
             'values': None,
           }),
           'upper': None,
@@ -493,10 +561,22 @@
           'dtype': 'numeric',
           'inverted': False,
           'label': None,
+          'label_style': dict({
+            'visible': True,
+          }),
           'lower': None,
+          'spine_style': dict({
+            'visible': True,
+          }),
           'ticks': dict({
             'count': None,
+            'label_style': dict({
+              'visible': True,
+            }),
             'labels': None,
+            'mark_style': dict({
+              'visible': True,
+            }),
             'values': None,
           }),
           'upper': None,
@@ -587,6 +667,10 @@
       'axes': list([
         dict({
           'label': 'Axis 1',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
           'ticks': list([
             tuple(
               0.0,
@@ -612,6 +696,10 @@
         }),
         dict({
           'label': 'Label only',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
           'ticks': list([
             tuple(
               0.0,
@@ -637,6 +725,10 @@
         }),
         dict({
           'label': 'Axis 3',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
           'ticks': list([
             tuple(
               0.0,
@@ -662,6 +754,10 @@
         }),
         dict({
           'label': 'Axis 4',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
           'ticks': list([
             tuple(
               0.0,
@@ -679,6 +775,10 @@
         }),
         dict({
           'label': 'Axis 5',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
           'ticks': list([
             tuple(
               0.0,
@@ -696,6 +796,10 @@
         }),
         dict({
           'label': 'Axis 6',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
           'ticks': list([
             tuple(
               0.0,
@@ -713,6 +817,10 @@
         }),
         dict({
           'label': 'Axis 7',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
           'ticks': list([
             tuple(
               1.0,
@@ -738,6 +846,10 @@
         }),
         dict({
           'label': 'Axis 8',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
           'ticks': list([
             tuple(
               0.0,
@@ -755,6 +867,10 @@
         }),
         dict({
           'label': 'Axis 9',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
           'ticks': list([
             tuple(
               0.0,
@@ -772,6 +888,10 @@
         }),
         dict({
           'label': 'Axis 10',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
           'ticks': list([
             tuple(
               0.0,
@@ -785,6 +905,10 @@
         }),
         dict({
           'label': 'Axis 11',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
           'ticks': list([
             tuple(
               0.0,
@@ -798,6 +922,10 @@
         }),
         dict({
           'label': 'Axis 12',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
           'ticks': list([
             tuple(
               0.0,
@@ -823,6 +951,10 @@
         }),
         dict({
           'label': 'Axis 13',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
           'ticks': list([
             tuple(
               0.0,
@@ -832,6 +964,203 @@
               1.0,
               'high',
             ),
+          ]),
+        }),
+        dict({
+          'label': 'No numeric spine',
+          'label_visible': True,
+          'spine_visible': False,
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
+          'ticks': list([
+            tuple(
+              0.0,
+              '0',
+            ),
+            tuple(
+              0.25,
+              '1',
+            ),
+            tuple(
+              0.5,
+              '2',
+            ),
+            tuple(
+              0.75,
+              '3',
+            ),
+            tuple(
+              1.0,
+              '4',
+            ),
+          ]),
+        }),
+        dict({
+          'label': 'No category spine',
+          'label_visible': True,
+          'spine_visible': False,
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
+          'ticks': list([
+            tuple(
+              0.0,
+              'medium',
+            ),
+            tuple(
+              0.5,
+              'low',
+            ),
+            tuple(
+              1.0,
+              'high',
+            ),
+          ]),
+        }),
+        dict({
+          'label': 'Hidden title',
+          'label_visible': False,
+          'spine_visible': True,
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
+          'ticks': list([
+            tuple(
+              0.0,
+              '0',
+            ),
+            tuple(
+              0.25,
+              '1',
+            ),
+            tuple(
+              0.5,
+              '2',
+            ),
+            tuple(
+              0.75,
+              '3',
+            ),
+            tuple(
+              1.0,
+              '4',
+            ),
+          ]),
+        }),
+        dict({
+          'label': 'Values only',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_visible': True,
+          'tick_marks_visible': False,
+          'ticks': list([
+            tuple(
+              0.0,
+              '0',
+            ),
+            tuple(
+              0.25,
+              '1',
+            ),
+            tuple(
+              0.5,
+              '2',
+            ),
+            tuple(
+              0.75,
+              '3',
+            ),
+            tuple(
+              1.0,
+              '4',
+            ),
+          ]),
+        }),
+        dict({
+          'label': 'Marks only',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_visible': False,
+          'tick_marks_visible': True,
+          'ticks': list([
+            tuple(
+              0.0,
+              'medium',
+            ),
+            tuple(
+              0.5,
+              'low',
+            ),
+            tuple(
+              1.0,
+              'high',
+            ),
+          ]),
+        }),
+        dict({
+          'label': 'No ticks',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_visible': False,
+          'tick_marks_visible': False,
+          'ticks': list([
+            tuple(
+              0.0,
+              '0',
+            ),
+            tuple(
+              0.25,
+              '1',
+            ),
+            tuple(
+              0.5,
+              '2',
+            ),
+            tuple(
+              0.75,
+              '3',
+            ),
+            tuple(
+              1.0,
+              '4',
+            ),
+          ]),
+        }),
+        dict({
+          'label': 'Axis 20',
+          'label_visible': False,
+          'spine_visible': False,
+          'tick_labels_visible': False,
+          'tick_marks_visible': False,
+          'ticks': list([
+            tuple(
+              0.0,
+              'medium',
+            ),
+            tuple(
+              0.5,
+              'low',
+            ),
+            tuple(
+              1.0,
+              'high',
+            ),
+          ]),
+        }),
+        dict({
+          'label': 'Zero numeric ticks',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
+          'ticks': list([
+          ]),
+        }),
+        dict({
+          'label': 'Zero category ticks',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
+          'ticks': list([
           ]),
         }),
       ]),
@@ -880,6 +1209,15 @@
         10.0,
         11.0,
         12.0,
+        13.0,
+        14.0,
+        15.0,
+        16.0,
+        17.0,
+        18.0,
+        19.0,
+        20.0,
+        21.0,
       ]),
       'y': list([
         list([
@@ -892,6 +1230,15 @@
           1.0,
           0.0,
           0.5,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
           0.0,
           0.0,
           0.0,
@@ -911,6 +1258,15 @@
           0.5,
           -999.0,
           -999.0,
+          0.25,
+          0.5,
+          0.25,
+          0.25,
+          0.5,
+          0.25,
+          0.5,
+          0.25,
+          0.5,
         ]),
         list([
           1.0,
@@ -920,6 +1276,15 @@
           1.0,
           1.0,
           0.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
           1.0,
           1.0,
           1.0,
@@ -941,10 +1306,22 @@
           'dtype': 'numeric',
           'inverted': False,
           'label': None,
+          'label_style': dict({
+            'visible': True,
+          }),
           'lower': None,
+          'spine_style': dict({
+            'visible': True,
+          }),
           'ticks': dict({
             'count': None,
+            'label_style': dict({
+              'visible': True,
+            }),
             'labels': None,
+            'mark_style': dict({
+              'visible': True,
+            }),
             'values': None,
           }),
           'upper': None,
@@ -954,10 +1331,22 @@
           'dtype': 'numeric',
           'inverted': False,
           'label': 'Label only',
+          'label_style': dict({
+            'visible': True,
+          }),
           'lower': None,
+          'spine_style': dict({
+            'visible': True,
+          }),
           'ticks': dict({
             'count': None,
+            'label_style': dict({
+              'visible': True,
+            }),
             'labels': None,
+            'mark_style': dict({
+              'visible': True,
+            }),
             'values': None,
           }),
           'upper': None,
@@ -967,10 +1356,22 @@
           'dtype': 'numeric',
           'inverted': False,
           'label': None,
+          'label_style': dict({
+            'visible': True,
+          }),
           'lower': -2.0,
+          'spine_style': dict({
+            'visible': True,
+          }),
           'ticks': dict({
             'count': None,
+            'label_style': dict({
+              'visible': True,
+            }),
             'labels': None,
+            'mark_style': dict({
+              'visible': True,
+            }),
             'values': None,
           }),
           'upper': 6.0,
@@ -980,10 +1381,22 @@
           'dtype': 'numeric',
           'inverted': False,
           'label': None,
+          'label_style': dict({
+            'visible': True,
+          }),
           'lower': None,
+          'spine_style': dict({
+            'visible': True,
+          }),
           'ticks': dict({
             'count': None,
+            'label_style': dict({
+              'visible': True,
+            }),
             'labels': None,
+            'mark_style': dict({
+              'visible': True,
+            }),
             'values': list([
               0.0,
               1.0,
@@ -997,14 +1410,26 @@
           'dtype': 'numeric',
           'inverted': False,
           'label': None,
+          'label_style': dict({
+            'visible': True,
+          }),
           'lower': None,
+          'spine_style': dict({
+            'visible': True,
+          }),
           'ticks': dict({
             'count': None,
+            'label_style': dict({
+              'visible': True,
+            }),
             'labels': list([
               'Minimum',
               'Target',
               'Maximum',
             ]),
+            'mark_style': dict({
+              'visible': True,
+            }),
             'values': list([
               0.0,
               1.0,
@@ -1018,10 +1443,22 @@
           'dtype': 'numeric',
           'inverted': False,
           'label': None,
+          'label_style': dict({
+            'visible': True,
+          }),
           'lower': None,
+          'spine_style': dict({
+            'visible': True,
+          }),
           'ticks': dict({
             'count': 3,
+            'label_style': dict({
+              'visible': True,
+            }),
             'labels': None,
+            'mark_style': dict({
+              'visible': True,
+            }),
             'values': None,
           }),
           'upper': None,
@@ -1031,10 +1468,22 @@
           'dtype': 'numeric',
           'inverted': True,
           'label': None,
+          'label_style': dict({
+            'visible': True,
+          }),
           'lower': None,
+          'spine_style': dict({
+            'visible': True,
+          }),
           'ticks': dict({
             'count': None,
+            'label_style': dict({
+              'visible': True,
+            }),
             'labels': None,
+            'mark_style': dict({
+              'visible': True,
+            }),
             'values': None,
           }),
           'upper': None,
@@ -1048,10 +1497,22 @@
           'dtype': 'categorical',
           'inverted': False,
           'label': None,
+          'label_style': dict({
+            'visible': True,
+          }),
           'lower': None,
+          'spine_style': dict({
+            'visible': True,
+          }),
           'ticks': dict({
             'count': None,
+            'label_style': dict({
+              'visible': True,
+            }),
             'labels': None,
+            'mark_style': dict({
+              'visible': True,
+            }),
             'values': None,
           }),
           'upper': None,
@@ -1065,10 +1526,22 @@
           'dtype': 'categorical',
           'inverted': False,
           'label': None,
+          'label_style': dict({
+            'visible': True,
+          }),
           'lower': None,
+          'spine_style': dict({
+            'visible': True,
+          }),
           'ticks': dict({
             'count': None,
+            'label_style': dict({
+              'visible': True,
+            }),
             'labels': None,
+            'mark_style': dict({
+              'visible': True,
+            }),
             'values': None,
           }),
           'upper': None,
@@ -1082,10 +1555,22 @@
           'dtype': 'categorical',
           'inverted': False,
           'label': None,
+          'label_style': dict({
+            'visible': True,
+          }),
           'lower': None,
+          'spine_style': dict({
+            'visible': True,
+          }),
           'ticks': dict({
             'count': None,
+            'label_style': dict({
+              'visible': True,
+            }),
             'labels': None,
+            'mark_style': dict({
+              'visible': True,
+            }),
             'values': list([
               'medium',
               'high',
@@ -1102,13 +1587,25 @@
           'dtype': 'categorical',
           'inverted': False,
           'label': None,
+          'label_style': dict({
+            'visible': True,
+          }),
           'lower': None,
+          'spine_style': dict({
+            'visible': True,
+          }),
           'ticks': dict({
             'count': None,
+            'label_style': dict({
+              'visible': True,
+            }),
             'labels': list([
               'Medium',
               'High',
             ]),
+            'mark_style': dict({
+              'visible': True,
+            }),
             'values': list([
               'medium',
               'high',
@@ -1121,10 +1618,22 @@
           'dtype': 'numeric',
           'inverted': False,
           'label': None,
+          'label_style': dict({
+            'visible': True,
+          }),
           'lower': None,
+          'spine_style': dict({
+            'visible': True,
+          }),
           'ticks': dict({
             'count': None,
+            'label_style': dict({
+              'visible': True,
+            }),
             'labels': None,
+            'mark_style': dict({
+              'visible': True,
+            }),
             'values': None,
           }),
           'upper': None,
@@ -1137,11 +1646,266 @@
           'dtype': 'categorical',
           'inverted': False,
           'label': None,
+          'label_style': dict({
+            'visible': True,
+          }),
           'lower': None,
+          'spine_style': dict({
+            'visible': True,
+          }),
           'ticks': dict({
             'count': None,
+            'label_style': dict({
+              'visible': True,
+            }),
             'labels': None,
+            'mark_style': dict({
+              'visible': True,
+            }),
             'values': None,
+          }),
+          'upper': None,
+        }),
+        dict({
+          'categories': None,
+          'dtype': 'numeric',
+          'inverted': False,
+          'label': 'No numeric spine',
+          'label_style': dict({
+            'visible': True,
+          }),
+          'lower': None,
+          'spine_style': dict({
+            'visible': False,
+          }),
+          'ticks': dict({
+            'count': None,
+            'label_style': dict({
+              'visible': True,
+            }),
+            'labels': None,
+            'mark_style': dict({
+              'visible': True,
+            }),
+            'values': None,
+          }),
+          'upper': None,
+        }),
+        dict({
+          'categories': list([
+            'medium',
+            'low',
+            'high',
+          ]),
+          'dtype': 'categorical',
+          'inverted': False,
+          'label': 'No category spine',
+          'label_style': dict({
+            'visible': True,
+          }),
+          'lower': None,
+          'spine_style': dict({
+            'visible': False,
+          }),
+          'ticks': dict({
+            'count': None,
+            'label_style': dict({
+              'visible': True,
+            }),
+            'labels': None,
+            'mark_style': dict({
+              'visible': True,
+            }),
+            'values': None,
+          }),
+          'upper': None,
+        }),
+        dict({
+          'categories': None,
+          'dtype': 'numeric',
+          'inverted': False,
+          'label': 'Hidden title',
+          'label_style': dict({
+            'visible': False,
+          }),
+          'lower': None,
+          'spine_style': dict({
+            'visible': True,
+          }),
+          'ticks': dict({
+            'count': None,
+            'label_style': dict({
+              'visible': True,
+            }),
+            'labels': None,
+            'mark_style': dict({
+              'visible': True,
+            }),
+            'values': None,
+          }),
+          'upper': None,
+        }),
+        dict({
+          'categories': None,
+          'dtype': 'numeric',
+          'inverted': False,
+          'label': 'Values only',
+          'label_style': dict({
+            'visible': True,
+          }),
+          'lower': None,
+          'spine_style': dict({
+            'visible': True,
+          }),
+          'ticks': dict({
+            'count': None,
+            'label_style': dict({
+              'visible': True,
+            }),
+            'labels': None,
+            'mark_style': dict({
+              'visible': False,
+            }),
+            'values': None,
+          }),
+          'upper': None,
+        }),
+        dict({
+          'categories': list([
+            'medium',
+            'low',
+            'high',
+          ]),
+          'dtype': 'categorical',
+          'inverted': False,
+          'label': 'Marks only',
+          'label_style': dict({
+            'visible': True,
+          }),
+          'lower': None,
+          'spine_style': dict({
+            'visible': True,
+          }),
+          'ticks': dict({
+            'count': None,
+            'label_style': dict({
+              'visible': False,
+            }),
+            'labels': None,
+            'mark_style': dict({
+              'visible': True,
+            }),
+            'values': None,
+          }),
+          'upper': None,
+        }),
+        dict({
+          'categories': None,
+          'dtype': 'numeric',
+          'inverted': False,
+          'label': 'No ticks',
+          'label_style': dict({
+            'visible': True,
+          }),
+          'lower': None,
+          'spine_style': dict({
+            'visible': True,
+          }),
+          'ticks': dict({
+            'count': None,
+            'label_style': dict({
+              'visible': False,
+            }),
+            'labels': None,
+            'mark_style': dict({
+              'visible': False,
+            }),
+            'values': None,
+          }),
+          'upper': None,
+        }),
+        dict({
+          'categories': list([
+            'medium',
+            'low',
+            'high',
+          ]),
+          'dtype': 'categorical',
+          'inverted': False,
+          'label': None,
+          'label_style': dict({
+            'visible': False,
+          }),
+          'lower': None,
+          'spine_style': dict({
+            'visible': False,
+          }),
+          'ticks': dict({
+            'count': None,
+            'label_style': dict({
+              'visible': False,
+            }),
+            'labels': None,
+            'mark_style': dict({
+              'visible': False,
+            }),
+            'values': None,
+          }),
+          'upper': None,
+        }),
+        dict({
+          'categories': None,
+          'dtype': 'numeric',
+          'inverted': False,
+          'label': 'Zero numeric ticks',
+          'label_style': dict({
+            'visible': True,
+          }),
+          'lower': None,
+          'spine_style': dict({
+            'visible': True,
+          }),
+          'ticks': dict({
+            'count': None,
+            'label_style': dict({
+              'visible': True,
+            }),
+            'labels': None,
+            'mark_style': dict({
+              'visible': True,
+            }),
+            'values': list([
+            ]),
+          }),
+          'upper': None,
+        }),
+        dict({
+          'categories': list([
+            'medium',
+            'low',
+            'high',
+          ]),
+          'dtype': 'categorical',
+          'inverted': False,
+          'label': 'Zero category ticks',
+          'label_style': dict({
+            'visible': True,
+          }),
+          'lower': None,
+          'spine_style': dict({
+            'visible': True,
+          }),
+          'ticks': dict({
+            'count': None,
+            'label_style': dict({
+              'visible': True,
+            }),
+            'labels': None,
+            'mark_style': dict({
+              'visible': True,
+            }),
+            'values': list([
+            ]),
           }),
           'upper': None,
         }),
@@ -1162,6 +1926,15 @@
           'medium',
           0.0,
           'medium',
+          0.0,
+          'medium',
+          0.0,
+          0.0,
+          'medium',
+          0.0,
+          'medium',
+          0.0,
+          'medium',
         ]),
         list([
           1.0,
@@ -1177,6 +1950,15 @@
           'low',
           None,
           None,
+          1.0,
+          'low',
+          1.0,
+          1.0,
+          'low',
+          1.0,
+          'low',
+          1.0,
+          'low',
         ]),
         list([
           4.0,
@@ -1189,6 +1971,15 @@
           'high',
           'high',
           'high',
+          'high',
+          4.0,
+          'high',
+          4.0,
+          'high',
+          4.0,
+          4.0,
+          'high',
+          4.0,
           'high',
           4.0,
           'high',

@@ -7,12 +7,32 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 
+class AxisSpineStyle(BaseModel):
+    """Appearance of the vertical stroke connecting an axis's tick marks."""
+
+    visible: bool = True
+
+
+class TextStyle(BaseModel):
+    """Appearance of an axis title or tick value label."""
+
+    visible: bool = True
+
+
+class TickMarkStyle(BaseModel):
+    """Appearance of tick marks independently of their value labels."""
+
+    visible: bool = True
+
+
 class TickConfig(BaseModel):
     """Tick intent before render-time scaling."""
 
     values: list[float | str] | None = None
     labels: list[str] | None = None
     count: int | None = None
+    mark_style: TickMarkStyle = Field(default_factory=TickMarkStyle)
+    label_style: TextStyle = Field(default_factory=TextStyle)
 
     @field_validator("count")
     @classmethod
@@ -43,6 +63,8 @@ class AxisConfig(BaseModel):
     upper: float | None = None
     inverted: bool = False
     categories: list[str] | None = None
+    spine_style: AxisSpineStyle = Field(default_factory=AxisSpineStyle)
+    label_style: TextStyle = Field(default_factory=TextStyle)
     ticks: TickConfig = Field(default_factory=TickConfig)
 
     @model_validator(mode="after")

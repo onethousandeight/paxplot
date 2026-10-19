@@ -22,6 +22,10 @@ def summarize(plot: pax.ParallelPlot) -> dict[str, object]:
             "axes": [
                 {
                     "label": axis.label,
+                    "spine_visible": axis.spine_visible,
+                    "label_visible": axis.label_visible,
+                    "tick_marks_visible": axis.tick_marks_visible,
+                    "tick_labels_visible": axis.tick_labels_visible,
                     "ticks": list(
                         zip(axis.tick_positions, axis.tick_labels, strict=True)
                     ),
@@ -122,6 +126,15 @@ def test_standard_workflow_snapshot_and_roundtrip(tmp_path, snapshot) -> None:
         categorical,  # 11: same selected ticks with custom labels
         [0.0, None, 4.0],  # 12: missing numeric value
         ["medium", None, "high"],  # 13: missing categorical value
+        numeric,  # 14: hide only the numeric axis spine
+        categorical,  # 15: hide only the categorical axis spine
+        numeric,  # 16: hide only the axis title
+        numeric,  # 17: tick value labels without tick marks
+        categorical,  # 18: tick marks without tick value labels
+        numeric,  # 19: hide both tick marks and value labels
+        categorical,  # 20: hide all decorations; keep the data dimension
+        numeric,  # 21: explicitly configure zero numeric ticks
+        categorical,  # 22: explicitly configure zero categorical ticks
     ]
     plot = (
         pax.ParallelPlot()
@@ -137,6 +150,23 @@ def test_standard_workflow_snapshot_and_roundtrip(tmp_path, snapshot) -> None:
         .set_axis(8, categories=["low", "medium", "high"])
         .set_axis_ticks(9, values=["medium", "high"])
         .set_axis_ticks(10, values=["medium", "high"], labels=["Medium", "High"])
+        .set_axis(13, label="No numeric spine", spine_visible=False)
+        .set_axis(14, label="No category spine", spine_visible=False)
+        .set_axis(15, label="Hidden title", label_visible=False)
+        .set_axis(16, label="Values only", tick_marks_visible=False)
+        .set_axis(17, label="Marks only", tick_labels_visible=False)
+        .set_axis(
+            18, label="No ticks", tick_marks_visible=False, tick_labels_visible=False
+        )
+        .set_axis(
+            19,
+            spine_visible=False,
+            label_visible=False,
+            tick_marks_visible=False,
+            tick_labels_visible=False,
+        )
+        .set_axis(20, label="Zero numeric ticks", ticks=[])
+        .set_axis(21, label="Zero category ticks", ticks=[])
     )
 
     assert_snapshot_and_roundtrip(plot, tmp_path, snapshot)
