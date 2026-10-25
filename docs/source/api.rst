@@ -10,22 +10,46 @@ Plot Object
 State Models
 ------------
 
+Data owns observations and their types. Presentation owns scales and visual
+components. Each component owns its configuration and appearance directly.
+
 .. autoclass:: paxplot.PlotState
    :members:
 
-.. autoclass:: paxplot.AxisConfig
+.. autoclass:: paxplot.PlotData
    :members:
 
-.. autoclass:: paxplot.TickConfig
+.. autoclass:: paxplot.ColumnSpec
    :members:
 
-.. autoclass:: paxplot.AxisSpineStyle
+.. autoclass:: paxplot.PlotPresentation
    :members:
 
-.. autoclass:: paxplot.TickMarkStyle
+.. autoclass:: paxplot.AxisPresentation
    :members:
 
-.. autoclass:: paxplot.TextStyle
+.. autoclass:: paxplot.AxisScale
+   :members:
+
+.. autoclass:: paxplot.AxisTitle
+   :members:
+
+.. autoclass:: paxplot.AxisTicks
+   :members:
+
+.. autoclass:: paxplot.AxisTickMarks
+   :members:
+
+.. autoclass:: paxplot.AxisTickLabels
+   :members:
+
+.. autoclass:: paxplot.AxisSpine
+   :members:
+
+.. autoclass:: paxplot.TextAppearance
+   :members:
+
+.. autoclass:: paxplot.LinePresentation
    :members:
 
 .. autoclass:: paxplot.LineStyle
@@ -35,4 +59,10 @@ State Models
    :members:
 
 .. autoclass:: paxplot.ColorEncoding
+   :members:
+
+.. autoclass:: paxplot.ColorbarPresentation
+   :members:
+
+.. autoclass:: paxplot.ColorbarTitle
    :members:

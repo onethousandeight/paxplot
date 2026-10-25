@@ -98,7 +98,7 @@ def assert_workflow_results(
 def assert_snapshot_and_roundtrip(
     plot: pax.ParallelPlot, tmp_path: Path, snapshot
 ) -> None:
-    figsize = (max(6.0, 1.5 * len(plot.state.axes)), 4.0)
+    figsize = (max(6.0, 1.5 * len(plot.state.presentation.axes)), 4.0)
     original = run_workflow(plot, tmp_path / "plot", figsize)
 
     restored_plot = pax.ParallelPlot.from_json(original.json_path)
@@ -145,28 +145,59 @@ def test_standard_workflow_snapshot_and_roundtrip(tmp_path, snapshot) -> None:
         .set_axis_ticks(
             4, values=[0.0, 1.0, 4.0], labels=["Minimum", "Target", "Maximum"]
         )
-        .set_axis(5, tick_count=3)
+        .set_axis(5, ticks=pax.AxisTicks(count=3))
         .invert_axis(6)
-        .set_axis(8, categories=["low", "medium", "high"])
+        .set_axis(8, scale=pax.AxisScale(categories=["low", "medium", "high"]))
         .set_axis_ticks(9, values=["medium", "high"])
         .set_axis_ticks(10, values=["medium", "high"], labels=["Medium", "High"])
-        .set_axis(13, label="No numeric spine", spine_visible=False)
-        .set_axis(14, label="No category spine", spine_visible=False)
-        .set_axis(15, label="Hidden title", label_visible=False)
-        .set_axis(16, label="Values only", tick_marks_visible=False)
-        .set_axis(17, label="Marks only", tick_labels_visible=False)
         .set_axis(
-            18, label="No ticks", tick_marks_visible=False, tick_labels_visible=False
+            13,
+            title=pax.AxisTitle(text="No numeric spine"),
+            spine=pax.AxisSpine(visible=False),
+        )
+        .set_axis(
+            14,
+            title=pax.AxisTitle(text="No category spine"),
+            spine=pax.AxisSpine(visible=False),
+        )
+        .set_axis(15, title=pax.AxisTitle(text="Hidden title", visible=False))
+        .set_axis(
+            16,
+            title=pax.AxisTitle(text="Values only"),
+            ticks=pax.AxisTicks(marks=pax.AxisTickMarks(visible=False)),
+        )
+        .set_axis(
+            17,
+            title=pax.AxisTitle(text="Marks only"),
+            ticks=pax.AxisTicks(labels=pax.AxisTickLabels(visible=False)),
+        )
+        .set_axis(
+            18,
+            title=pax.AxisTitle(text="No ticks"),
+            ticks=pax.AxisTicks(
+                marks=pax.AxisTickMarks(visible=False),
+                labels=pax.AxisTickLabels(visible=False),
+            ),
         )
         .set_axis(
             19,
-            spine_visible=False,
-            label_visible=False,
-            tick_marks_visible=False,
-            tick_labels_visible=False,
+            title=pax.AxisTitle(visible=False),
+            ticks=pax.AxisTicks(
+                marks=pax.AxisTickMarks(visible=False),
+                labels=pax.AxisTickLabels(visible=False),
+            ),
+            spine=pax.AxisSpine(visible=False),
         )
-        .set_axis(20, label="Zero numeric ticks", ticks=[])
-        .set_axis(21, label="Zero category ticks", ticks=[])
+        .set_axis(
+            20,
+            title=pax.AxisTitle(text="Zero numeric ticks"),
+            ticks=pax.AxisTicks(values=[]),
+        )
+        .set_axis(
+            21,
+            title=pax.AxisTitle(text="Zero category ticks"),
+            ticks=pax.AxisTicks(values=[]),
+        )
     )
 
     assert_snapshot_and_roundtrip(plot, tmp_path, snapshot)
@@ -210,9 +241,11 @@ def test_axis_interaction_workflow_snapshot_and_roundtrip(tmp_path, snapshot) ->
         .set_data([[0.0, 0.0], [1.0, 1.0], [4.0, 4.0]])
         .set_axis(
             1,
-            limits=(-2.0, 6.0),
-            ticks=[-2.0, 1.0, 6.0],
-            tick_labels=["Minimum", "Target", "Maximum"],
+            scale=pax.AxisScale(limits=(-2.0, 6.0)),
+            ticks=pax.AxisTicks(
+                values=[-2.0, 1.0, 6.0],
+                labels=pax.AxisTickLabels(text=["Minimum", "Target", "Maximum"]),
+            ),
         )
         .invert_axis(1)
     )

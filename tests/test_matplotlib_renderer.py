@@ -41,10 +41,30 @@ def test_axis_elements_are_independent_and_preserve_data(values, visibility) -> 
         pax.ParallelPlot()
         .set_data([[value, value] for value in values])
         .set_axis(
-            0, label="Configured axis", ticks=values, tick_labels=["Bottom", "Top"]
+            0,
+            title=pax.AxisTitle(text="Configured axis"),
+            ticks=pax.AxisTicks(
+                values=values, labels=pax.AxisTickLabels(text=["Bottom", "Top"])
+            ),
         )
-        .set_axis(1, ticks=[])
-        .set_axis(0, **visibility)
+        .set_axis(1, ticks=pax.AxisTicks(values=[]))
+        .set_axis(
+            0,
+            title=pax.AxisTitle(
+                text="Configured axis", visible=visibility.get("label_visible", True)
+            ),
+            spine=pax.AxisSpine(visible=visibility.get("spine_visible", True)),
+            ticks=pax.AxisTicks(
+                values=values,
+                marks=pax.AxisTickMarks(
+                    visible=visibility.get("tick_marks_visible", True)
+                ),
+                labels=pax.AxisTickLabels(
+                    text=["Bottom", "Top"],
+                    visible=visibility.get("tick_labels_visible", True),
+                ),
+            ),
+        )
     )
 
     fig = plot.render()
@@ -75,7 +95,7 @@ def test_render_returns_figure_with_line_collection_and_axis_text() -> None:
         pax.ParallelPlot()
         .set_data([[0.0, "low"], [1.0, "high"]])
         .set_axis_label(0, "Column A")
-        .set_axis(1, categories=["low", "high"])
+        .set_axis(1, scale=pax.AxisScale(categories=["low", "high"]))
         .set_default_line_style(width=2.0)
     )
 
@@ -99,3 +119,23 @@ def test_render_adds_colorbar_with_label() -> None:
 
     assert len(fig.axes) == 2
     assert fig.axes[1].get_ylabel() == "B scale"
+
+
+def test_colorbar_title_visibility_preserves_text_and_encoding(tmp_path) -> None:
+    plot = pax.ParallelPlot().set_data([[0], [1]]).set_colorbar(0, label="Retained")
+    state = plot.state.model_dump()
+    state["presentation"]["lines"]["color_encoding"]["colorbar"]["title"]["visible"] = (
+        False
+    )
+    hidden = pax.ParallelPlot(pax.PlotState.model_validate(state))
+    path = tmp_path / "colorbar.json"
+    hidden.to_json(path)
+    hidden = pax.ParallelPlot.from_json(path)
+    fig = hidden.render()
+    try:
+        assert len(fig.axes) == 2
+        assert fig.axes[1].get_ylabel() == ""
+        title = hidden.state.presentation.lines.color_encoding.colorbar.title
+        assert title.text == "Retained" and not title.visible
+    finally:
+        plt.close(fig)

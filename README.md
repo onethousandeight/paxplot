@@ -10,9 +10,13 @@ import paxplot as pax
 
 plot = pax.ParallelPlot()
 plot.set_data([[0.0, "low", 2.0], [1.0, "medium", 1.0], [3.0, "high", 0.0]])
-plot.set_axis(0, label="A")
-plot.set_axis(1, label="Risk", categories=["low", "medium", "high"])
-plot.set_axis(2, label="C")
+plot.set_axis_label(0, "A")
+plot.set_axis(
+    1,
+    title=pax.AxisTitle(text="Risk"),
+    scale=pax.AxisScale(categories=["low", "medium", "high"]),
+)
+plot.set_axis_label(2, "C")
 plot.set_colorbar(0, label="Column A")
 
 fig = plot.render()

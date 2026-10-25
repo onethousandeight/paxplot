@@ -11,8 +11,16 @@ data = [
 plot = pax.ParallelPlot()
 plot.set_data(data)
 plot.set_axis_label(0, "Score")
-plot.set_axis(1, label="Risk", categories=["low", "medium", "high"])
-plot.set_axis(2, label="Region", categories=["north", "west"])
+plot.set_axis(
+    1,
+    scale=pax.AxisScale(categories=["low", "medium", "high"]),
+    title=pax.AxisTitle(text="Risk"),
+)
+plot.set_axis(
+    2,
+    scale=pax.AxisScale(categories=["north", "west"]),
+    title=pax.AxisTitle(text="Region"),
+)
 
 fig = plot.render(figsize=(8, 4))
 plt.show()

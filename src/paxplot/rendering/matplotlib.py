@@ -106,7 +106,10 @@ def render_matplotlib(render_data: RenderData, **kwargs):
         mappable = plt.cm.ScalarMappable(norm=norm, cmap=cmap)
         mappable.set_array([])
         colorbar = fig.colorbar(mappable, ax=ax)
-        if render_data.colorbar.label is not None:
+        if (
+            render_data.colorbar.title_visible
+            and render_data.colorbar.label is not None
+        ):
             colorbar.set_label(render_data.colorbar.label)
 
     return fig

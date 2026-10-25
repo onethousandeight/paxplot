@@ -8,7 +8,7 @@ from typing import Any
 
 import numpy as np
 
-from paxplot.state import AxisConfig
+from paxplot.state import AxisScale
 
 
 def is_missing(value: Any) -> bool:
@@ -22,14 +22,14 @@ def is_missing(value: Any) -> bool:
         return False
 
 
-def numeric_bounds(values: Sequence[object], axis: AxisConfig) -> tuple[float, float]:
+def numeric_bounds(values: Sequence[object], scale: AxisScale) -> tuple[float, float]:
     """Resolve numeric bounds from configured limits and data."""
 
     finite = [float(value) for value in values if not is_missing(value)]
     data_lower = min(finite) if finite else 0.0
     data_upper = max(finite) if finite else 1.0
-    lower = data_lower if axis.lower is None else axis.lower
-    upper = data_upper if axis.upper is None else axis.upper
+    lower = data_lower if scale.limits[0] is None else scale.limits[0]
+    upper = data_upper if scale.limits[1] is None else scale.limits[1]
     if lower == upper:
         padding = abs(lower) * 0.05 or 0.5
         return lower - padding, upper + padding
@@ -44,11 +44,11 @@ def scale_numeric_value(value: object, lower: float, upper: float) -> float:
     return (float(value) - lower) / (upper - lower)
 
 
-def resolve_categories(values: Sequence[object], axis: AxisConfig) -> list[str]:
+def resolve_categories(values: Sequence[object], scale: AxisScale) -> list[str]:
     """Resolve categorical order from config or first appearance."""
 
-    if axis.categories is not None:
-        return axis.categories
+    if scale.categories is not None:
+        return scale.categories
 
     categories: list[str] = []
     for value in values:

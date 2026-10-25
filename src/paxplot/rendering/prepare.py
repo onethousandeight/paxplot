@@ -20,73 +20,78 @@ from paxplot.state import PlotState
 def prepare_render_data(state: PlotState) -> RenderData:
     """Prepare normalized coordinates and resolved drawing metadata."""
 
-    if not state.axes:
+    axes = state.presentation.axes
+    lines = state.presentation.lines
+    rows = state.data.rows
+    if not axes:
         msg = "cannot render a plot without data"
         raise ValueError(msg)
 
-    row_count = len(state.data)
-    axis_count = len(state.axes)
+    row_count = len(rows)
+    axis_count = len(axes)
     y = np.full((row_count, axis_count), np.nan, dtype=float)
     x = np.arange(axis_count, dtype=float)
     render_axes: list[RenderAxis] = []
 
-    for axis_index, axis in enumerate(state.axes):
-        column = [row[axis_index] for row in state.data]
-        if axis.dtype == "numeric":
-            lower, upper = numeric_bounds(column, axis)
+    for axis_index, axis in enumerate(axes):
+        column = [row[axis_index] for row in rows]
+        if state.data.columns[axis_index].dtype == "numeric":
+            lower, upper = numeric_bounds(column, axis.scale)
             scaled = np.asarray(
                 [scale_numeric_value(value, lower, upper) for value in column],
                 dtype=float,
             )
             tick_positions, tick_labels = resolve_numeric_ticks(axis, lower, upper)
         else:
-            categories = resolve_categories(column, axis)
+            categories = resolve_categories(column, axis.scale)
             scaled = np.asarray(
                 [scale_categorical_value(value, categories) for value in column],
                 dtype=float,
             )
             tick_positions, tick_labels = resolve_categorical_ticks(axis, categories)
 
-        y[:, axis_index] = apply_inversion(scaled, axis.inverted)
+        y[:, axis_index] = apply_inversion(scaled, axis.scale.inverted)
         render_axes.append(
             RenderAxis(
-                label=axis.label or f"Axis {axis_index + 1}",
+                label=axis.title.text or f"Axis {axis_index + 1}",
                 x=float(x[axis_index]),
                 tick_positions=tick_positions,
                 tick_labels=tick_labels,
-                spine_visible=axis.spine_style.visible,
-                label_visible=axis.label_style.visible,
-                tick_marks_visible=axis.ticks.mark_style.visible,
-                tick_labels_visible=axis.ticks.label_style.visible,
+                spine_visible=axis.spine.visible,
+                label_visible=axis.title.visible,
+                tick_marks_visible=axis.ticks.marks.visible,
+                tick_labels_visible=axis.ticks.labels.visible,
             )
         )
 
+    encoding = lines.color_encoding
     color_values = None
     colorbar = None
-    if state.color_encoding is not None:
-        color_values = [row[state.color_encoding.axis] for row in state.data]
-        lower, upper = resolve_color_bounds(color_values, state.color_encoding)
+    if encoding is not None:
+        color_values = [row[encoding.axis] for row in rows]
+        lower, upper = resolve_color_bounds(color_values, encoding)
         colorbar = RenderColorbar(
-            axis=state.color_encoding.axis,
-            palette=state.color_encoding.palette,
-            label=state.color_encoding.colorbar.label,
+            axis=encoding.axis,
+            palette=encoding.palette,
+            label=encoding.colorbar.title.text,
+            title_visible=encoding.colorbar.title.visible,
             lower=lower,
             upper=upper,
         )
 
     colors, widths, alphas, linestyles, zorders = resolve_line_styles(
         row_count,
-        state.default_line_style,
-        state.line_styles,
+        lines.default,
+        lines.overrides,
         color_values=color_values,
-        encoding=state.color_encoding,
+        encoding=encoding,
     )
 
     return RenderData(
         x=x,
         y=y,
         axes=render_axes,
-        default_line_style=state.default_line_style,
+        default_line_style=lines.default,
         line_colors=colors,
         line_widths=widths,
         line_alphas=alphas,

@@ -9,16 +9,25 @@ from typing import Any
 
 from paxplot.rendering import prepare_render_data, render_matplotlib
 from paxplot.state import (
-    AxisConfig,
-    ColorbarConfig,
+    AxisPresentation,
+    AxisScale,
+    AxisSpine,
+    AxisTicks,
+    AxisTitle,
+    ColorbarPresentation,
+    ColorbarTitle,
     ColorEncoding,
+    ColumnSpec,
+    LinePresentation,
     LineStyle,
     LineStyleOverride,
+    PlotData,
+    PlotPresentation,
     PlotState,
-    TickConfig,
     load_state,
     save_state,
 )
+from paxplot.state.schema import infer_dtype
 
 
 def _is_missing(value: Any) -> bool:
@@ -41,30 +50,8 @@ def _plain_value(value: Any) -> object:
     return value
 
 
-def _infer_dtype(values: Sequence[object]) -> str:
-    has_number = False
-    has_string = False
-    for value in values:
-        if _is_missing(value):
-            continue
-        if isinstance(value, bool):
-            has_number = True
-        elif isinstance(value, (int, float)):
-            has_number = True
-        elif isinstance(value, str):
-            has_string = True
-        else:
-            msg = f"unsupported value {value!r}; expected numbers, strings, or missing"
-            raise ValueError(msg)
-
-    if has_number and has_string:
-        msg = "mixed numeric and string axes are not supported"
-        raise ValueError(msg)
-    return "categorical" if has_string else "numeric"
-
-
 def _categories(values: Sequence[object]) -> list[str] | None:
-    if _infer_dtype(values) != "categorical":
+    if infer_dtype(list(values)) != "categorical":
         return None
     categories: list[str] = []
     for value in values:
@@ -115,24 +102,26 @@ class ParallelPlot:
     """User-facing object for configuring, rendering, and saving a PaxPlot."""
 
     def __init__(self, state: PlotState | None = None) -> None:
-        self.state = state or PlotState()
+        self.state = PlotState.model_validate(state or PlotState())
 
     def set_data(self, data) -> ParallelPlot:
         """Set plot data from rectangular row-oriented values."""
 
         rows = _coerce_rows(data)
         axis_count = len(rows[0])
-        axes = [
-            AxisConfig(
-                dtype=_infer_dtype(values),  # type: ignore[arg-type]
-                categories=_categories(values),
-            )
-            for values in (_column_values(rows, axis) for axis in range(axis_count))
-        ]
-        self.state = PlotState(
-            data=rows,
-            axes=axes,
-            default_line_style=self.state.default_line_style,
+        columns = [_column_values(rows, axis) for axis in range(axis_count)]
+        self._replace_state(
+            data=PlotData(
+                rows=rows,
+                columns=[ColumnSpec(dtype=infer_dtype(values)) for values in columns],
+            ),
+            presentation=PlotPresentation(
+                axes=[
+                    AxisPresentation(scale=AxisScale(categories=_categories(values)))
+                    for values in columns
+                ],
+                lines=LinePresentation(default=self.state.presentation.lines.default),
+            ),
         )
         return self
 
@@ -140,57 +129,36 @@ class ParallelPlot:
         self,
         axis: int,
         *,
-        label: str | None = None,
-        limits: tuple[float | None, float | None] | None = None,
-        ticks: list[float | str] | None = None,
-        tick_labels: list[str] | None = None,
-        tick_count: int | None = None,
-        categories: list[str] | None = None,
-        inverted: bool | None = None,
-        spine_visible: bool | None = None,
-        label_visible: bool | None = None,
-        tick_marks_visible: bool | None = None,
-        tick_labels_visible: bool | None = None,
+        scale: AxisScale | None = None,
+        title: AxisTitle | None = None,
+        ticks: AxisTicks | None = None,
+        spine: AxisSpine | None = None,
     ) -> ParallelPlot:
-        """Configure an axis in one call.
+        """Replace supplied components, preserving omitted components.
 
-        Visibility independently controls the axis spine, axis title, tick
-        marks, and tick value labels. Hidden elements retain their configuration;
-        axis coordinates and plotted data are unchanged. Omitted settings keep
-        their current values. A spine is the vertical stroke connecting an
-        axis's tick marks. Explicit empty ``ticks`` configure zero ticks.
+        Each component owns both configuration and appearance. To change only
+        part of a component while retaining its settings, use a focused method
+        or construct a replacement from its current ``model_dump()``.
         """
 
-        axis_config = self._axis(axis)
-        update = axis_config.model_dump()
-        if label is not None:
-            update["label"] = label
-        if limits is not None:
-            update["lower"], update["upper"] = limits
-        if categories is not None:
-            update["categories"] = categories
-        if inverted is not None:
-            update["inverted"] = inverted
-        if spine_visible is not None:
-            update["spine_style"]["visible"] = spine_visible
-        if label_visible is not None:
-            update["label_style"]["visible"] = label_visible
-        if ticks is not None:
-            update["ticks"]["values"] = ticks
-        if tick_labels is not None:
-            update["ticks"]["labels"] = tick_labels
-        if tick_count is not None:
-            update["ticks"]["count"] = tick_count
-        if tick_marks_visible is not None:
-            update["ticks"]["mark_style"]["visible"] = tick_marks_visible
-        if tick_labels_visible is not None:
-            update["ticks"]["label_style"]["visible"] = tick_labels_visible
-        self._replace_axis(axis, AxisConfig(**update))
+        update = self._axis(axis).model_dump()
+        for name, component in (
+            ("scale", scale),
+            ("title", title),
+            ("ticks", ticks),
+            ("spine", spine),
+        ):
+            if component is not None:
+                update[name] = component
+        self._replace_axis(axis, update)
         return self
 
     def set_axis_label(self, axis: int, label: str) -> ParallelPlot:
-        axis_config = self._axis(axis)
-        self._replace_axis(axis, axis_config.model_copy(update={"label": label}))
+        """Update title text, preserving its appearance."""
+
+        update = self._axis(axis).model_dump()
+        update["title"]["text"] = label
+        self._replace_axis(axis, update)
         return self
 
     def set_axis_limits(
@@ -199,11 +167,11 @@ class ParallelPlot:
         lower: float | None = None,
         upper: float | None = None,
     ) -> ParallelPlot:
-        axis_config = self._axis(axis)
-        self._replace_axis(
-            axis,
-            axis_config.model_copy(update={"lower": lower, "upper": upper}),
-        )
+        """Update numeric limits, preserving inversion and category order."""
+
+        update = self._axis(axis).model_dump()
+        update["scale"]["limits"] = (lower, upper)
+        self._replace_axis(axis, update)
         return self
 
     def set_axis_ticks(
@@ -212,24 +180,20 @@ class ParallelPlot:
         values: list[float | str],
         labels: list[str] | None = None,
     ) -> ParallelPlot:
-        """Replace tick values and labels, preserving their appearance settings."""
+        """Update reference values and text, preserving appearance and count."""
 
-        axis_config = self._axis(axis)
-        tick_config = TickConfig(
-            values=values,
-            labels=labels,
-            mark_style=axis_config.ticks.mark_style,
-            label_style=axis_config.ticks.label_style,
-        )
-        self._replace_axis(axis, axis_config.model_copy(update={"ticks": tick_config}))
+        update = self._axis(axis).model_dump()
+        update["ticks"]["values"] = values
+        update["ticks"]["labels"]["text"] = labels
+        self._replace_axis(axis, update)
         return self
 
     def invert_axis(self, axis: int, inverted: bool = True) -> ParallelPlot:
-        axis_config = self._axis(axis)
-        self._replace_axis(
-            axis,
-            axis_config.model_copy(update={"inverted": inverted}),
-        )
+        """Update inversion, preserving the other scale settings."""
+
+        update = self._axis(axis).model_dump()
+        update["scale"]["inverted"] = inverted
+        self._replace_axis(axis, update)
         return self
 
     def set_default_line_style(
@@ -240,7 +204,7 @@ class ParallelPlot:
         width: float | None = None,
         linestyle: str | None = None,
     ) -> ParallelPlot:
-        update = self.state.default_line_style.model_dump()
+        update = self.state.presentation.lines.default.model_dump()
         if color is not None:
             update["color"] = color
         if alpha is not None:
@@ -249,7 +213,7 @@ class ParallelPlot:
             update["width"] = width
         if linestyle is not None:
             update["linestyle"] = linestyle
-        self._replace_state(default_line_style=LineStyle(**update))
+        self._replace_lines(default=LineStyle(**update))
         return self
 
     def set_line_style(
@@ -265,10 +229,10 @@ class ParallelPlot:
         if not isinstance(row, int):
             msg = "row must be an integer index"
             raise TypeError(msg)
-        if row < 0 or row >= len(self.state.data):
+        if row < 0 or row >= len(self.state.data.rows):
             msg = f"unknown row index {row}"
             raise ValueError(msg)
-        styles = dict(self.state.line_styles)
+        styles = dict(self.state.presentation.lines.overrides)
         styles[row] = LineStyleOverride(
             color=color,
             alpha=alpha,
@@ -276,7 +240,7 @@ class ParallelPlot:
             linestyle=linestyle,
             zorder=zorder,
         )
-        self._replace_state(line_styles=styles)
+        self._replace_lines(overrides=styles)
         return self
 
     def set_colorbar(
@@ -287,18 +251,15 @@ class ParallelPlot:
         label: str | None = None,
         limits: tuple[float | None, float | None] | None = None,
     ) -> ParallelPlot:
-        axis_config = self._axis(axis)
-        if axis_config.dtype != "numeric":
-            msg = "colorbar encoding only supports numeric axes"
-            raise ValueError(msg)
+        self._axis(axis)
         lower, upper = limits or (None, None)
-        self._replace_state(
+        self._replace_lines(
             color_encoding=ColorEncoding(
                 axis=axis,
                 palette=palette,
                 lower=lower,
                 upper=upper,
-                colorbar=ColorbarConfig(label=label),
+                colorbar=ColorbarPresentation(title=ColorbarTitle(text=label)),
             )
         )
         return self
@@ -319,7 +280,7 @@ class ParallelPlot:
 
         return cls(load_state(path))
 
-    def _axis(self, axis: int) -> AxisConfig:
+    def _axis(self, axis: int) -> AxisPresentation:
         if not isinstance(axis, int):
             msg = "axis must be an integer index"
             raise TypeError(msg)
@@ -327,17 +288,24 @@ class ParallelPlot:
             msg = f"unknown axis index {axis}"
             raise ValueError(msg)
         try:
-            return self.state.axes[axis]
+            return self.state.presentation.axes[axis]
         except IndexError as exc:
             msg = f"unknown axis index {axis}"
             raise ValueError(msg) from exc
 
-    def _replace_axis(self, index: int, axis: AxisConfig) -> None:
-        axes = list(self.state.axes)
-        axes[index] = axis
-        self._replace_state(axes=axes)
+    def _replace_axis(self, index: int, axis: dict) -> None:
+        presentation = self.state.presentation.model_dump()
+        presentation["axes"][index] = axis
+        self._replace_state(presentation=presentation)
+
+    def _replace_lines(self, **updates) -> None:
+        presentation = self.state.presentation.model_dump()
+        presentation["lines"].update(updates)
+        self._replace_state(presentation=presentation)
 
     def _replace_state(self, **updates) -> None:
-        data = self.state.model_dump()
-        data.update(updates)
-        self.state = PlotState(**data)
+        """Validate an entire candidate before committing any edit."""
+
+        candidate = self.state.model_dump()
+        candidate.update(updates)
+        self.state = PlotState.model_validate(candidate)

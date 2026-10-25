@@ -20,12 +20,25 @@ Axis Configuration
    plot.set_data(data)
    plot.set_axis(
        0,
-       label="Column A",
-       limits=(-1.0, 3.0),
-       ticks=[-1.0, 1.0, 3.0],
+       title=pax.AxisTitle(text="Column A"),
+       scale=pax.AxisScale(limits=(-1.0, 3.0)),
+       ticks=pax.AxisTicks(values=[-1.0, 1.0, 3.0]),
    )
-   plot.set_axis(1, label="Risk", categories=["low", "medium", "high"])
-   plot.set_axis(2, label="C", inverted=True, tick_count=5)
+   plot.set_axis(
+       1,
+       title=pax.AxisTitle(text="Risk"),
+       scale=pax.AxisScale(categories=["low", "medium", "high"]),
+   )
+   plot.set_axis(
+       2,
+       title=pax.AxisTitle(text="C"),
+       scale=pax.AxisScale(inverted=True),
+       ticks=pax.AxisTicks(count=5),
+   )
+
+Omitted components remain unchanged, while supplied components replace their
+previous configuration. For example, supplying ``AxisScale(inverted=True)``
+also restores automatic limits. To retain limits, call ``invert_axis()`` instead.
 
 Color Encoding
 --------------
@@ -35,6 +48,12 @@ Color Encoding
    plot.set_default_line_style(alpha=0.45, width=1.0)
    plot.set_colorbar(0, palette="viridis", label="Column A")
    plot.set_line_style(2, color="crimson", width=2.5, zorder=10)
+
+Line configuration lives in ``state.presentation.lines``: ``default`` stores
+the default appearance, ``overrides`` maps row indices to overrides, and
+``color_encoding`` owns its palette and normalization bounds. A colorbar owns
+its title as ``color_encoding.colorbar.title`` with ``text`` and ``visible``.
+Row overrides take precedence over color encoding and the default style.
 
 Serialization
 -------------

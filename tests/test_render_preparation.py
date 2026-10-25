@@ -28,7 +28,7 @@ def test_categorical_mapping_and_ticks() -> None:
     plot = (
         pax.ParallelPlot()
         .set_data([["medium"], ["low"], ["high"]])
-        .set_axis(0, categories=["low", "medium", "high"])
+        .set_axis(0, scale=pax.AxisScale(categories=["low", "medium", "high"]))
     )
 
     render_data = prepare_render_data(plot.state)
@@ -71,21 +71,30 @@ def test_hidden_decorations_preserve_geometry_and_tick_configuration(values) -> 
     plot = (
         pax.ParallelPlot()
         .set_data([[value, value] for value in values])
-        .set_axis(0, ticks=values[:2], tick_labels=["Bottom", "Top"], inverted=True)
+        .set_axis(
+            0,
+            scale=pax.AxisScale(inverted=True),
+            ticks=pax.AxisTicks(
+                values=values[:2], labels=pax.AxisTickLabels(text=["Bottom", "Top"])
+            ),
+        )
     )
     if isinstance(values[0], float):
         plot.set_axis_limits(0, lower=-2.0, upper=6.0)
         plot.set_colorbar(0, label="Hidden axis scale")
     else:
-        plot.set_axis(0, categories=["high", "low"])
+        plot.set_axis(0, scale=pax.AxisScale(categories=["high", "low"], inverted=True))
     baseline = prepare_render_data(plot.state)
 
     plot.set_axis(
         0,
-        spine_visible=False,
-        label_visible=False,
-        tick_marks_visible=False,
-        tick_labels_visible=False,
+        title=pax.AxisTitle(visible=False),
+        ticks=pax.AxisTicks(
+            values=values[:2],
+            marks=pax.AxisTickMarks(visible=False),
+            labels=pax.AxisTickLabels(text=["Bottom", "Top"], visible=False),
+        ),
+        spine=pax.AxisSpine(visible=False),
     )
     prepared = prepare_render_data(plot.state)
 
@@ -105,7 +114,13 @@ def test_hidden_decorations_preserve_geometry_and_tick_configuration(values) -> 
 
 def test_hiding_tick_labels_does_not_bypass_validation() -> None:
     plot = pax.ParallelPlot().set_data([[0.0], [1.0]])
-    plot.set_axis(0, tick_marks_visible=False, tick_labels_visible=False)
+    plot.set_axis(
+        0,
+        ticks=pax.AxisTicks(
+            marks=pax.AxisTickMarks(visible=False),
+            labels=pax.AxisTickLabels(visible=False),
+        ),
+    )
 
     with pytest.raises(ValueError, match="same length"):
         plot.set_axis_ticks(0, values=[0.0, 1.0], labels=["Only one"])
@@ -135,3 +150,39 @@ def test_colorbar_requires_numeric_axis() -> None:
 
     with pytest.raises(ValueError, match="numeric axes"):
         plot.set_colorbar(0)
+
+
+@pytest.mark.parametrize("values", [[0, 0], [None, None], ["only", "only"]])
+def test_constant_and_missing_columns_have_usable_positions(values) -> None:
+    plot = pax.ParallelPlot().set_data([[value] for value in values])
+    prepared = prepare_render_data(plot.state)
+    if values[0] is None:
+        assert np.isnan(prepared.y).all()
+        assert prepared.axes[0].tick_positions == [0, 0.25, 0.5, 0.75, 1]
+    else:
+        assert prepared.y[:, 0].tolist() == [0.5, 0.5]
+
+
+def test_color_mapping_preserves_missing_fallback_and_explicit_bounds() -> None:
+    plot = (
+        pax.ParallelPlot()
+        .set_data([[0], [None], [10]])
+        .set_default_line_style(color="black", alpha=0.5)
+        .set_colorbar(0, palette=["blue", "red"], limits=(0, 5))
+    )
+    prepared = prepare_render_data(plot.state)
+    assert prepared.colorbar.lower == 0 and prepared.colorbar.upper == 5
+    np.testing.assert_allclose(
+        prepared.line_colors, [[0, 0, 1, 0.5], [0, 0, 0, 0.5], [1, 0, 0, 0.5]]
+    )
+
+
+def test_tick_count_and_explicit_values_precedence() -> None:
+    plot = pax.ParallelPlot().set_data([[0], [10]])
+    plot.set_axis(0, ticks=pax.AxisTicks(count=3))
+    assert prepare_render_data(plot.state).axes[0].tick_positions == [0, 0.5, 1]
+    plot.set_axis_ticks(0, [0, 10])
+    assert plot.state.presentation.axes[0].ticks.count == 3
+    assert prepare_render_data(plot.state).axes[0].tick_positions == [0, 1]
+    with pytest.raises(ValueError):
+        plot.set_axis(0, ticks=pax.AxisTicks(count=1))

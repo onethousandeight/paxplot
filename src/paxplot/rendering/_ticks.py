@@ -11,7 +11,7 @@ from paxplot.rendering._scaling import (
     scale_categorical_value,
     scale_numeric_value,
 )
-from paxplot.state import AxisConfig
+from paxplot.state import AxisPresentation
 
 
 def format_tick(value: float) -> str:
@@ -21,7 +21,7 @@ def format_tick(value: float) -> str:
 
 
 def resolve_numeric_ticks(
-    axis: AxisConfig,
+    axis: AxisPresentation,
     lower: float,
     upper: float,
 ) -> tuple[list[float], list[str]]:
@@ -31,25 +31,25 @@ def resolve_numeric_ticks(
         positions = [
             scale_numeric_value(value, lower, upper) for value in axis.ticks.values
         ]
-        labels = axis.ticks.labels or [str(value) for value in axis.ticks.values]
+        labels = axis.ticks.labels.text or [str(value) for value in axis.ticks.values]
     else:
         count = axis.ticks.count or 5
         values = np.linspace(lower, upper, count).tolist()
         positions = [scale_numeric_value(value, lower, upper) for value in values]
         labels = [format_tick(value) for value in values]
 
-    scaled = apply_inversion(np.asarray(positions, dtype=float), axis.inverted)
+    scaled = apply_inversion(np.asarray(positions, dtype=float), axis.scale.inverted)
     return scaled.tolist(), labels
 
 
 def resolve_categorical_ticks(
-    axis: AxisConfig,
+    axis: AxisPresentation,
     categories: Sequence[str],
 ) -> tuple[list[float], list[str]]:
     """Resolve categorical tick positions and labels."""
 
     values = axis.ticks.values if axis.ticks.values is not None else list(categories)
     positions = [scale_categorical_value(value, categories) for value in values]
-    labels = axis.ticks.labels or [str(value) for value in values]
-    scaled = apply_inversion(np.asarray(positions, dtype=float), axis.inverted)
+    labels = axis.ticks.labels.text or [str(value) for value in values]
+    scaled = apply_inversion(np.asarray(positions, dtype=float), axis.scale.inverted)
     return scaled.tolist(), labels

@@ -1,68 +1,41 @@
-"""JSON serialization helpers for PaxPlot state."""
+"""Version 2 JSON envelopes containing the canonical plot state."""
 
 from __future__ import annotations
 
-import json
-from collections.abc import Mapping
 from pathlib import Path
-from typing import Any
+from typing import Literal
 
-from paxplot.state.schema import PlotState
+from pydantic import field_validator
 
-PLOT_STATE_SCHEMA_VERSION = 1
-SUPPORTED_PLOT_STATE_SCHEMA_VERSIONS = (PLOT_STATE_SCHEMA_VERSION,)
+from paxplot.state.schema import PlotState, StateModel
+
+PLOT_STATE_SCHEMA_VERSION = 2
+
+
+class _StateDocument(StateModel):
+    schema_version: Literal[2]
+    state: PlotState
+
+    @field_validator("schema_version", mode="before")
+    @classmethod
+    def validate_version(cls, value: object) -> object:
+        if type(value) is not int or value != PLOT_STATE_SCHEMA_VERSION:
+            raise ValueError(
+                f"plot state requires schema version {value!r}; supported versions: 2"
+            )
+        return value
 
 
 def save_state(state: PlotState, path: str | Path) -> None:
-    """Write a plot state to JSON."""
+    """Write validated canonical state, including defaults, in a v2 envelope."""
 
-    output = Path(path)
-    document = {
-        "schema_version": PLOT_STATE_SCHEMA_VERSION,
-        "state": state.model_dump(mode="json"),
-    }
-    output.write_text(json.dumps(document, indent=2), encoding="utf-8")
+    document = _StateDocument(schema_version=PLOT_STATE_SCHEMA_VERSION, state=state)
+    Path(path).write_text(document.model_dump_json(indent=2), encoding="utf-8")
 
 
 def load_state(path: str | Path) -> PlotState:
-    """Read a plot state from JSON."""
+    """Read a strict v2 envelope; obsolete formats and fields are rejected."""
 
-    source = Path(path)
-    return _state_from_json(source.read_text(encoding="utf-8"))
-
-
-def _state_from_json(source: str) -> PlotState:
-    """Parse a plot-state JSON document into the current state model."""
-
-    return _state_from_document(json.loads(source))
-
-
-def _state_from_document(document: Any) -> PlotState:
-    """Normalize supported plot-state JSON documents before validation."""
-
-    if not isinstance(document, Mapping):
-        return PlotState.model_validate(document)
-
-    if "schema_version" not in document:
-        return PlotState.model_validate(document)
-
-    schema_version = document["schema_version"]
-    if (
-        not isinstance(schema_version, int)
-        or isinstance(schema_version, bool)
-        or schema_version not in SUPPORTED_PLOT_STATE_SCHEMA_VERSIONS
-    ):
-        supported = ", ".join(
-            str(version) for version in SUPPORTED_PLOT_STATE_SCHEMA_VERSIONS
-        )
-        msg = (
-            f"plot state requires schema version {schema_version!r}; "
-            f"supported versions: {supported}"
-        )
-        raise ValueError(msg)
-
-    state = document.get("state")
-    if state is None:
-        msg = "plot state schema version 1 requires a 'state' payload"
-        raise ValueError(msg)
-    return PlotState.model_validate(state)
+    return _StateDocument.model_validate_json(
+        Path(path).read_text(encoding="utf-8")
+    ).state

@@ -28,6 +28,7 @@ class RenderColorbar:
     label: str | None
     lower: float
     upper: float
+    title_visible: bool
 
 
 @dataclass
