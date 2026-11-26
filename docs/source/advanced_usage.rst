@@ -130,3 +130,6 @@ Serialization
    plot.to_json("plot.json")
    restored = pax.ParallelPlot.from_json("plot.json")
    fig = restored.render(figsize=(10, 6))
+
+Saved documents indent nested structure, but each data row is written on a
+single line, so observations stay readable and diffs stay small.

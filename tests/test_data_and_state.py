@@ -297,6 +297,53 @@ def test_json_round_trip_includes_defaults_and_integer_override_keys(tmp_path) -
     assert prepare_render_data(restored.state).colorbar.label == "A scale"
 
 
+def test_json_writes_one_line_per_data_row(tmp_path) -> None:
+    path = tmp_path / "plot.json"
+    plot = pax.ParallelPlot().set_data([[0.0, 10.0, "low"], [1.0, 20.0, "high"]])
+    plot.to_json(path)
+
+    text = path.read_text(encoding="utf-8")
+    lines = [line.strip() for line in text.splitlines()]
+    assert '[0.0, 10.0, "low"],' in lines
+    assert '[1.0, 20.0, "high"]' in lines
+    assert text.endswith("\n")
+    assert json.loads(text) == {
+        "schema_version": 2,
+        "state": plot.state.model_dump(mode="json"),
+    }
+
+
+def test_json_row_escaping_keeps_one_line_per_row(tmp_path) -> None:
+    path = tmp_path / "plot.json"
+    values = ['a, "quoted", café', "line\nbreak", "tab\there"]
+    plot = pax.ParallelPlot().set_data([[value] for value in values])
+    plot.to_json(path)
+
+    text = path.read_text(encoding="utf-8")
+    document = json.loads(text)
+    assert document["state"]["data"]["rows"] == [[value] for value in values]
+    row_lines = [line for line in text.splitlines() if line.lstrip().startswith("[")]
+    assert len(row_lines) == len(values)
+
+
+def test_json_non_finite_values_serialize_as_null(tmp_path) -> None:
+    path = tmp_path / "plot.json"
+    state = pax.PlotState(
+        data=pax.PlotData(
+            rows=[[float("nan"), float("inf")]],
+            columns=[pax.ColumnSpec(dtype="numeric")] * 2,
+        ),
+        presentation=pax.PlotPresentation(
+            axes=[pax.AxisPresentation(), pax.AxisPresentation()]
+        ),
+    )
+    pax.ParallelPlot(state).to_json(path)
+
+    text = path.read_text(encoding="utf-8")
+    assert "[null, null]" in text
+    assert pax.ParallelPlot.from_json(path).state.data.rows == [[None, None]]
+
+
 @pytest.mark.parametrize("version", [1, 3, True, 2.0, "2", None])
 def test_obsolete_and_invalid_json_versions_rejected(version, tmp_path) -> None:
     path = tmp_path / "plot.json"
