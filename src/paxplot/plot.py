@@ -15,6 +15,7 @@ from paxplot.state import (
     AxisTicks,
     AxisTitle,
     ColorbarPresentation,
+    ColorbarTicks,
     ColorbarTitle,
     ColorEncoding,
     ColumnSpec,
@@ -248,18 +249,35 @@ class ParallelPlot:
         axis: int,
         *,
         palette: str | list[str] = "viridis",
-        label: str | None = None,
+        title: ColorbarTitle | None = None,
+        ticks: ColorbarTicks | None = None,
         limits: tuple[float | None, float | None] | None = None,
     ) -> ParallelPlot:
+        """Configure color encoding, replacing supplied colorbar components.
+
+        Omitted title and tick components retain their existing settings.
+        Palette and limits use the supplied values or their defaults each call.
+        """
+
         self._axis(axis)
         lower, upper = limits or (None, None)
+        encoding = self.state.presentation.lines.color_encoding
+        colorbar = (
+            encoding.colorbar.model_dump()
+            if encoding is not None
+            else ColorbarPresentation().model_dump()
+        )
+        if title is not None:
+            colorbar["title"] = title
+        if ticks is not None:
+            colorbar["ticks"] = ticks
         self._replace_lines(
             color_encoding=ColorEncoding(
                 axis=axis,
                 palette=palette,
                 lower=lower,
                 upper=upper,
-                colorbar=ColorbarPresentation(title=ColorbarTitle(text=label)),
+                colorbar=ColorbarPresentation.model_validate(colorbar),
             )
         )
         return self

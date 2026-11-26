@@ -17,7 +17,7 @@ plot.set_axis(
     scale=pax.AxisScale(categories=["low", "medium", "high"]),
 )
 plot.set_axis_label(2, "C")
-plot.set_colorbar(0, label="Column A")
+plot.set_colorbar(0, title=pax.ColorbarTitle(text="Column A"))
 
 fig = plot.render()
 ```

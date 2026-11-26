@@ -3,8 +3,10 @@ from __future__ import annotations
 import numpy as np
 import pytest
 from matplotlib import pyplot as plt
+from matplotlib import rc_context, rcParams
 from matplotlib.collections import LineCollection
 from matplotlib.figure import Figure
+from matplotlib.font_manager import FontProperties
 
 import paxplot as pax
 
@@ -112,7 +114,7 @@ def test_render_adds_colorbar_with_label() -> None:
     plot = (
         pax.ParallelPlot()
         .set_data([[0.0, 10.0], [1.0, 20.0]])
-        .set_colorbar(1, label="B scale")
+        .set_colorbar(1, title=pax.ColorbarTitle(text="B scale"))
     )
 
     fig = plot.render()
@@ -122,7 +124,11 @@ def test_render_adds_colorbar_with_label() -> None:
 
 
 def test_colorbar_title_visibility_preserves_text_and_encoding(tmp_path) -> None:
-    plot = pax.ParallelPlot().set_data([[0], [1]]).set_colorbar(0, label="Retained")
+    plot = (
+        pax.ParallelPlot()
+        .set_data([[0], [1]])
+        .set_colorbar(0, title=pax.ColorbarTitle(text="Retained"))
+    )
     state = plot.state.model_dump()
     state["presentation"]["lines"]["color_encoding"]["colorbar"]["title"]["visible"] = (
         False
@@ -139,3 +145,171 @@ def test_colorbar_title_visibility_preserves_text_and_encoding(tmp_path) -> None
         assert title.text == "Retained" and not title.visible
     finally:
         plt.close(fig)
+
+
+@pytest.mark.parametrize("values", [[0, 1], ["Low", "High"]])
+def test_axis_fonts_apply_independently_to_titles_and_tick_labels(values) -> None:
+    plot = (
+        pax.ParallelPlot()
+        .set_data([[value] for value in values])
+        .set_axis(
+            0,
+            title=pax.AxisTitle(
+                text="Heading",
+                font=pax.FontSpec(
+                    family=["DejaVu Serif", "serif"],
+                    size=15,
+                    weight="bold",
+                    style="italic",
+                ),
+            ),
+            ticks=pax.AxisTicks(
+                labels=pax.AxisTickLabels(
+                    font=pax.FontSpec(
+                        family="DejaVu Sans Mono",
+                        size=9,
+                        weight="semibold",
+                        style="oblique",
+                    ),
+                )
+            ),
+        )
+    )
+    fig = plot.render()
+    try:
+        fig.canvas.draw()
+        title, *labels = fig.axes[0].texts
+        assert title.get_family() == ["DejaVu Serif", "serif"]
+        assert title.get_fontsize() == 15
+        assert title.get_fontweight() == "bold"
+        assert title.get_fontstyle() == "italic"
+        assert labels
+        for label in labels:
+            assert label.get_family() == ["DejaVu Sans Mono"]
+            assert label.get_fontsize() == 9
+            assert label.get_fontweight() == "semibold"
+            assert label.get_fontstyle() == "oblique"
+    finally:
+        plt.close(fig)
+
+
+@pytest.mark.parametrize("visible", [True, False])
+def test_colorbar_fonts_and_label_visibility_include_offset_and_minor_ticks(
+    visible,
+) -> None:
+    with rc_context({"ytick.minor.visible": True}):
+        plot = (
+            pax.ParallelPlot()
+            .set_data([[1_000_000], [1_000_002]])
+            .set_colorbar(
+                0,
+                title=pax.ColorbarTitle(
+                    text="Scale",
+                    font=pax.FontSpec(family="DejaVu Serif", size=15, weight="bold"),
+                ),
+                ticks=pax.ColorbarTicks(
+                    labels=pax.ColorbarTickLabels(
+                        visible=visible,
+                        font=pax.FontSpec(
+                            family="DejaVu Sans Mono", size=9, style="italic"
+                        ),
+                    )
+                ),
+            )
+        )
+        fig = plot.render()
+        try:
+            fig.canvas.draw()
+            axis = fig.axes[1].yaxis
+            assert axis.label.get_family() == ["DejaVu Serif"]
+            assert axis.label.get_fontsize() == 15
+            assert axis.label.get_fontweight() == "bold"
+            assert axis.get_minor_ticks()
+            offset = axis.get_offset_text()
+            assert offset.get_text()
+            assert offset.get_visible() == visible
+            for tick in (*axis.get_major_ticks(), *axis.get_minor_ticks()):
+                assert tick.tick2line.get_visible()
+                assert tick.label2.get_visible() == visible
+                for label in (tick.label1, tick.label2):
+                    assert label.get_family() == ["DejaVu Sans Mono"]
+                    assert label.get_fontsize() == 9
+                    assert label.get_fontstyle() == "italic"
+            assert offset.get_family() == ["DejaVu Sans Mono"]
+            assert offset.get_fontsize() == 9
+            assert offset.get_fontstyle() == "italic"
+            # A second draw at a different size can create more automatic ticks.
+            fig.set_size_inches(8, 7)
+            fig.canvas.draw()
+            for tick in axis.get_major_ticks():
+                assert tick.label2.get_fontsize() == 9
+                assert tick.label2.get_fontstyle() == "italic"
+                assert tick.label2.get_visible() == visible
+        finally:
+            plt.close(fig)
+
+
+def test_partial_fonts_preserve_role_defaults_and_do_not_modify_rcparams() -> None:
+    settings = {
+        "font.family": ["DejaVu Serif"],
+        "font.size": 17,
+        "font.weight": "light",
+        "font.style": "oblique",
+        "axes.labelsize": 19,
+        "axes.labelweight": "semibold",
+        "ytick.labelsize": 9,
+    }
+    with rc_context(settings):
+        original = {key: rcParams[key] for key in settings}
+        plot = (
+            pax.ParallelPlot()
+            .set_data([[0], [1]])
+            .set_axis(
+                0,
+                title=pax.AxisTitle(font=pax.FontSpec(weight="bold")),
+                ticks=pax.AxisTicks(
+                    labels=pax.AxisTickLabels(
+                        font=pax.FontSpec(weight="bold"),
+                    )
+                ),
+            )
+            .set_colorbar(
+                0,
+                title=pax.ColorbarTitle(
+                    text="Scale", font=pax.FontSpec(style="italic")
+                ),
+                ticks=pax.ColorbarTicks(
+                    labels=pax.ColorbarTickLabels(
+                        font=pax.FontSpec(weight="bold"),
+                    )
+                ),
+            )
+        )
+        fig = plot.render()
+        try:
+            fig.canvas.draw()
+            title, *labels = fig.axes[0].texts
+            assert (
+                title.get_fontsize()
+                == FontProperties(size="medium").get_size_in_points()
+            )
+            for label in labels:
+                assert (
+                    label.get_fontsize()
+                    == FontProperties(size="small").get_size_in_points()
+                )
+            for label in (title, *labels):
+                assert label.get_family() == ["DejaVu Serif"]
+                assert label.get_fontstyle() == "oblique"
+                assert label.get_fontweight() == "bold"
+            axis = fig.axes[1].yaxis
+            assert axis.label.get_fontsize() == 19
+            assert axis.label.get_fontweight() == "semibold"
+            assert axis.label.get_fontstyle() == "italic"
+            for label in axis.get_ticklabels():
+                assert label.get_fontsize() == 9
+                assert label.get_fontstyle() == "oblique"
+                assert label.get_fontweight() == "bold"
+            assert {key: rcParams[key] for key in settings} == original
+        finally:
+            plt.close(fig)

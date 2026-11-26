@@ -11,7 +11,7 @@ plot = pax.ParallelPlot()
 plot.set_data(df[columns].values.tolist())
 for index, column in enumerate(columns):
     plot.set_axis_label(index, column)
-plot.set_colorbar(0, label=columns[0])
+plot.set_colorbar(0, title=pax.ColorbarTitle(text=columns[0]))
 
 fig = plot.render(figsize=(11, 5))
 plt.show()

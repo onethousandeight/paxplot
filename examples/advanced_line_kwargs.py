@@ -13,7 +13,7 @@ for index, column in enumerate(columns):
     plot.set_axis_label(index, column)
 plot.set_default_line_style(alpha=0.35, width=1.0)
 plot.set_line_style(0, color="crimson", width=2.5, zorder=10)
-plot.set_colorbar(0, label=columns[0])
+plot.set_colorbar(0, title=pax.ColorbarTitle(text=columns[0]))
 
 fig = plot.render(figsize=(10, 5))
 plt.show()

@@ -26,6 +26,8 @@ def summarize(plot: pax.ParallelPlot) -> dict[str, object]:
                     "label_visible": axis.label_visible,
                     "tick_marks_visible": axis.tick_marks_visible,
                     "tick_labels_visible": axis.tick_labels_visible,
+                    "title_font": axis.title_font.model_dump(mode="json"),
+                    "tick_labels_font": axis.tick_labels_font.model_dump(mode="json"),
                     "ticks": list(
                         zip(axis.tick_positions, axis.tick_labels, strict=True)
                     ),
@@ -39,6 +41,12 @@ def summarize(plot: pax.ParallelPlot) -> dict[str, object]:
                 "label": render_data.colorbar.label,
                 "lower": render_data.colorbar.lower,
                 "upper": render_data.colorbar.upper,
+                "title_visible": render_data.colorbar.title_visible,
+                "title_font": render_data.colorbar.title_font.model_dump(mode="json"),
+                "tick_labels_font": render_data.colorbar.tick_labels_font.model_dump(
+                    mode="json"
+                ),
+                "tick_labels_visible": render_data.colorbar.tick_labels_visible,
             },
             "colors": render_data.line_colors.round(4).tolist(),
             "alphas": render_data.line_alphas.tolist(),
@@ -98,7 +106,7 @@ def assert_workflow_results(
 def assert_snapshot_and_roundtrip(
     plot: pax.ParallelPlot, tmp_path: Path, snapshot
 ) -> None:
-    figsize = (max(6.0, 1.5 * len(plot.state.presentation.axes)), 4.0)
+    figsize = (max(6.0, 2.0 * len(plot.state.presentation.axes)), 4.0)
     original = run_workflow(plot, tmp_path / "plot", figsize)
 
     restored_plot = pax.ParallelPlot.from_json(original.json_path)
@@ -111,6 +119,7 @@ def assert_snapshot_and_roundtrip(
 def test_standard_workflow_snapshot_and_roundtrip(tmp_path, snapshot) -> None:
     numeric = [0.0, 1.0, 4.0]
     categorical = ["medium", "low", "high"]
+    shared_font = pax.FontSpec(weight="bold")
     # Columns are defined separately so each feature has a visible baseline.
     columns = [
         numeric,  # 1: numeric defaults; no axis configuration
@@ -135,6 +144,13 @@ def test_standard_workflow_snapshot_and_roundtrip(tmp_path, snapshot) -> None:
         categorical,  # 20: hide all decorations; keep the data dimension
         numeric,  # 21: explicitly configure zero numeric ticks
         categorical,  # 22: explicitly configure zero categorical ticks
+        numeric,  # 23: title family, size, weight, and style
+        numeric,  # 24: custom numeric tick-label fonts
+        categorical,  # 25: custom categorical tick-label fonts
+        numeric,  # 26: shared weight override; retain role-specific sizes
+        numeric,  # 27: Mathtext title and numeric tick labels
+        categorical,  # 28: grouped word subscripts and categorical tick labels
+        numeric,  # 29: literal underscore for comparison with Mathtext
     ]
     plot = (
         pax.ParallelPlot()
@@ -198,9 +214,76 @@ def test_standard_workflow_snapshot_and_roundtrip(tmp_path, snapshot) -> None:
             title=pax.AxisTitle(text="Zero category ticks"),
             ticks=pax.AxisTicks(values=[]),
         )
+        .set_axis(
+            22,
+            title=pax.AxisTitle(
+                text="Styled title",
+                font=pax.FontSpec(
+                    family=["DejaVu Serif", "serif"],
+                    size=13,
+                    weight="bold",
+                    style="italic",
+                ),
+            ),
+        )
+        .set_axis(
+            23,
+            title=pax.AxisTitle(text="Numeric font"),
+            ticks=pax.AxisTicks(
+                labels=pax.AxisTickLabels(
+                    font=pax.FontSpec(
+                        family="DejaVu Sans Mono", size=9, weight="semibold"
+                    ),
+                )
+            ),
+        )
+        .set_axis(
+            24,
+            title=pax.AxisTitle(text="Category font"),
+            ticks=pax.AxisTicks(
+                labels=pax.AxisTickLabels(
+                    font=pax.FontSpec(family="DejaVu Serif", size=10, style="italic"),
+                )
+            ),
+        )
+        .set_axis(
+            25,
+            title=pax.AxisTitle(text="Shared weight", font=shared_font),
+            ticks=pax.AxisTicks(labels=pax.AxisTickLabels(font=shared_font)),
+        )
+        .set_axis_label(26, r"$x_1$")
+        .set_axis_ticks(26, values=[0.0, 1.0, 4.0], labels=[r"$0$", r"$1$", r"$2^2$"])
+        .set_axis_label(27, r"$y_{\mathrm{test}}$")
+        .set_axis_ticks(
+            27,
+            values=["medium", "low", "high"],
+            labels=[
+                r"$y_{\mathrm{medium}}$",
+                r"$y_{\mathrm{low}}$",
+                r"$y_{\mathrm{high}}$",
+            ],
+        )
+        .set_axis_label(28, "x_1")
+        .set_colorbar(
+            22,
+            palette="plasma",
+            title=pax.ColorbarTitle(
+                text=r"$x_1$",
+                font=pax.FontSpec(family="DejaVu Serif", size=13, weight="bold"),
+            ),
+            ticks=pax.ColorbarTicks(
+                labels=pax.ColorbarTickLabels(
+                    font=pax.FontSpec(
+                        family="DejaVu Sans Mono", size=9, style="italic"
+                    ),
+                )
+            ),
+        )
     )
 
-    assert_snapshot_and_roundtrip(plot, tmp_path, snapshot)
+    # Dollar-delimited expressions use built-in Mathtext, without external LaTeX.
+    with plt.rc_context({"text.usetex": False}):
+        assert_snapshot_and_roundtrip(plot, tmp_path, snapshot)
 
 
 @pytest.mark.integration
@@ -210,7 +293,7 @@ def test_colorbar_workflow_snapshot_and_roundtrip(tmp_path, snapshot) -> None:
         .set_data([[0.0], [1.0], [2.0]])
         .set_axis_label(0, "A")
         .set_default_line_style(color="black", width=1.25, linestyle="--")
-        .set_colorbar(0, palette="viridis", label="A scale")
+        .set_colorbar(0, palette="viridis", title=pax.ColorbarTitle(text="A scale"))
         .set_line_style(2, color="crimson", width=2.5, linestyle="-")
     )
 

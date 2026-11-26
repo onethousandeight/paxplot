@@ -7,9 +7,27 @@ from collections import defaultdict
 import numpy as np
 from matplotlib.collections import LineCollection
 from matplotlib.colors import Normalize
+from matplotlib.text import Text
 
 from paxplot.rendering._styles import resolve_palette
 from paxplot.rendering.data import RenderData
+from paxplot.state import FontSpec
+
+
+def _apply_font(text: Text, font: FontSpec) -> None:
+    """Apply explicit overrides without replacing role-specific defaults.
+
+    Implements the FontSpec portability contract for matplotlib: only
+    fields the user set are applied, and unset fields keep matplotlib's
+    role-specific defaults.
+    """
+
+    text.set(
+        **{
+            f"font{name}": value
+            for name, value in font.model_dump(exclude_none=True).items()
+        }
+    )
 
 
 def _segments(render_data: RenderData) -> np.ndarray:
@@ -63,7 +81,7 @@ def render_matplotlib(render_data: RenderData, **kwargs):
         if axis.spine_visible:
             ax.vlines(axis.x, 0.0, 1.0, color=axis_color, linewidth=1.0, zorder=3)
         if axis.label_visible:
-            ax.text(
+            title = ax.text(
                 axis.x,
                 1.04,
                 axis.label,
@@ -71,6 +89,7 @@ def render_matplotlib(render_data: RenderData, **kwargs):
                 va="bottom",
                 fontsize="medium",
             )
+            _apply_font(title, axis.title_font)
         for position, label in zip(axis.tick_positions, axis.tick_labels, strict=True):
             if axis.tick_marks_visible:
                 ax.hlines(
@@ -82,7 +101,7 @@ def render_matplotlib(render_data: RenderData, **kwargs):
                     zorder=4,
                 )
             if axis.tick_labels_visible:
-                ax.text(
+                tick_label = ax.text(
                     axis.x - tick_half_width * 1.8,
                     position,
                     label,
@@ -90,6 +109,7 @@ def render_matplotlib(render_data: RenderData, **kwargs):
                     va="center",
                     fontsize="small",
                 )
+                _apply_font(tick_label, axis.tick_labels_font)
 
     ax.set_xlim(float(render_data.x.min()) - 0.2, float(render_data.x.max()) + 0.2)
     ax.set_ylim(-0.05, 1.08)
@@ -111,5 +131,24 @@ def render_matplotlib(render_data: RenderData, **kwargs):
             and render_data.colorbar.label is not None
         ):
             colorbar.set_label(render_data.colorbar.label)
+        long_axis = (
+            colorbar.ax.yaxis
+            if colorbar.orientation == "vertical"
+            else colorbar.ax.xaxis
+        )
+        _apply_font(long_axis.label, render_data.colorbar.title_font)
+        for tick in (*long_axis.get_major_ticks(), *long_axis.get_minor_ticks()):
+            _apply_font(tick.label1, render_data.colorbar.tick_labels_font)
+            _apply_font(tick.label2, render_data.colorbar.tick_labels_font)
+        _apply_font(long_axis.get_offset_text(), render_data.colorbar.tick_labels_font)
+        if not render_data.colorbar.tick_labels_visible:
+            colorbar.ax.tick_params(
+                which="both",
+                labelleft=False,
+                labelright=False,
+                labeltop=False,
+                labelbottom=False,
+            )
+            long_axis.get_offset_text().set_visible(False)
 
     return fig

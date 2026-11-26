@@ -61,6 +61,8 @@ def prepare_render_data(state: PlotState) -> RenderData:
                 label_visible=axis.title.visible,
                 tick_marks_visible=axis.ticks.marks.visible,
                 tick_labels_visible=axis.ticks.labels.visible,
+                title_font=axis.title.font,
+                tick_labels_font=axis.ticks.labels.font,
             )
         )
 
@@ -75,6 +77,9 @@ def prepare_render_data(state: PlotState) -> RenderData:
             palette=encoding.palette,
             label=encoding.colorbar.title.text,
             title_visible=encoding.colorbar.title.visible,
+            title_font=encoding.colorbar.title.font,
+            tick_labels_font=encoding.colorbar.ticks.labels.font,
+            tick_labels_visible=encoding.colorbar.ticks.labels.visible,
             lower=lower,
             upper=upper,
         )

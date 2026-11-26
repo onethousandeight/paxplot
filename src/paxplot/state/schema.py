@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from math import isnan
-from typing import Literal
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
@@ -48,10 +48,41 @@ class PlotData(StateModel):
     columns: list[ColumnSpec] = Field(default_factory=list)
 
 
+_FontName = Annotated[str, Field(min_length=1)]
+_PointSize = Annotated[float, Field(gt=0, allow_inf_nan=False)]
+_WeightName = Literal[
+    "thin",
+    "extra light",
+    "light",
+    "normal",
+    "medium",
+    "semibold",
+    "bold",
+    "extra bold",
+    "black",
+]
+
+
+class FontSpec(StateModel):
+    """Renderer-neutral font intent; None leaves a property to the renderer.
+
+    State stores font intent, not renderer settings. Each renderer maps
+    FontSpec onto its native text styling and may approximate or ignore
+    fields it cannot honor. Weight names follow the CSS 100-900 scale
+    ("thin" through "black"); sizes are absolute points.
+    """
+
+    family: _FontName | Annotated[list[_FontName], Field(min_length=1)] | None = None
+    size: _PointSize | None = None
+    weight: _WeightName | None = None
+    style: Literal["normal", "italic", "oblique"] | None = None
+
+
 class TextAppearance(StateModel):
     """Shared appearance fields inherited directly by text components."""
 
     visible: bool = True
+    font: FontSpec = Field(default_factory=FontSpec)
 
 
 class AxisTitle(TextAppearance):
@@ -183,10 +214,21 @@ class ColorbarTitle(TextAppearance):
     text: str | None = None
 
 
+class ColorbarTickLabels(TextAppearance):
+    """Appearance of automatic colorbar tick labels and offset text."""
+
+
+class ColorbarTicks(StateModel):
+    """Colorbar tick presentation; reference values remain automatic."""
+
+    labels: ColorbarTickLabels = Field(default_factory=ColorbarTickLabels)
+
+
 class ColorbarPresentation(StateModel):
     """Visual components owned by a color encoding's colorbar."""
 
     title: ColorbarTitle = Field(default_factory=ColorbarTitle)
+    ticks: ColorbarTicks = Field(default_factory=ColorbarTicks)
 
 
 class ColorEncoding(StateModel):

@@ -278,7 +278,7 @@ def test_json_round_trip_includes_defaults_and_integer_override_keys(tmp_path) -
         .set_axis_label(0, "Column A")
         .set_default_line_style(color="black", alpha=0.5)
         .set_line_style(1, color="crimson", width=2.0)
-        .set_colorbar(0, label="A scale")
+        .set_colorbar(0, title=pax.ColorbarTitle(text="A scale"))
     )
     plot.to_json(path)
     document = json.loads(path.read_text(encoding="utf-8"))
@@ -289,6 +289,7 @@ def test_json_round_trip_includes_defaults_and_integer_override_keys(tmp_path) -
     assert document["state"]["presentation"]["axes"][0]["title"] == {
         "text": "Column A",
         "visible": True,
+        "font": {"family": None, "size": None, "weight": None, "style": None},
     }
     restored = pax.ParallelPlot.from_json(path)
     assert restored.state == plot.state
@@ -336,8 +337,10 @@ def test_missing_envelopes_payloads_and_obsolete_state_rejected(
         ("state", "presentation", "axes", 0),
         ("state", "presentation", "axes", 0, "scale"),
         ("state", "presentation", "axes", 0, "title"),
+        ("state", "presentation", "axes", 0, "title", "font"),
         ("state", "presentation", "axes", 0, "ticks"),
         ("state", "presentation", "axes", 0, "ticks", "labels"),
+        ("state", "presentation", "axes", 0, "ticks", "labels", "font"),
         ("state", "presentation", "axes", 0, "ticks", "marks"),
         ("state", "presentation", "axes", 0, "spine"),
         ("state", "presentation", "lines"),
@@ -346,6 +349,35 @@ def test_missing_envelopes_payloads_and_obsolete_state_rejected(
         ("state", "presentation", "lines", "color_encoding"),
         ("state", "presentation", "lines", "color_encoding", "colorbar"),
         ("state", "presentation", "lines", "color_encoding", "colorbar", "title"),
+        (
+            "state",
+            "presentation",
+            "lines",
+            "color_encoding",
+            "colorbar",
+            "title",
+            "font",
+        ),
+        ("state", "presentation", "lines", "color_encoding", "colorbar", "ticks"),
+        (
+            "state",
+            "presentation",
+            "lines",
+            "color_encoding",
+            "colorbar",
+            "ticks",
+            "labels",
+        ),
+        (
+            "state",
+            "presentation",
+            "lines",
+            "color_encoding",
+            "colorbar",
+            "ticks",
+            "labels",
+            "font",
+        ),
     ],
 )
 def test_unknown_fields_rejected_at_every_level(location, tmp_path) -> None:
@@ -359,3 +391,113 @@ def test_unknown_fields_rejected_at_every_level(location, tmp_path) -> None:
     path.write_text(json.dumps(document), encoding="utf-8")
     with pytest.raises(ValidationError, match="Extra inputs"):
         pax.ParallelPlot.from_json(path)
+
+
+def test_fonts_survive_focused_edits_and_json_without_shared_mutation(tmp_path) -> None:
+    font = pax.FontSpec(
+        family=["DejaVu Serif", "serif"], size=18, weight="semibold", style="italic"
+    )
+    plot = (
+        pax.ParallelPlot()
+        .set_data([[0, 10], [1, 20]])
+        .set_axis(
+            0,
+            title=pax.AxisTitle(text="Before", font=font),
+            ticks=pax.AxisTicks(labels=pax.AxisTickLabels(font=font)),
+        )
+        .set_colorbar(
+            1,
+            title=pax.ColorbarTitle(text="Scale", font=font),
+            ticks=pax.ColorbarTicks(labels=pax.ColorbarTickLabels(font=font)),
+        )
+    )
+    expected = font.model_dump()
+    font.family.append("monospace")
+    font.size = 24
+    plot.set_axis_label(0, "After").set_axis_ticks(0, [0, 1], ["Low", "High"])
+    plot.set_axis_limits(0, -1, 2).invert_axis(0)
+    plot.set_colorbar(0, palette="plasma", limits=(-1, 2))
+    path = tmp_path / "fonts.json"
+    plot.to_json(path)
+    restored = pax.ParallelPlot.from_json(path)
+    assert restored.state == plot.state
+    axis = restored.state.presentation.axes[0]
+    encoding = restored.state.presentation.lines.color_encoding
+    for component in (
+        axis.title,
+        axis.ticks.labels,
+        encoding.colorbar.title,
+        encoding.colorbar.ticks.labels,
+    ):
+        assert component.font.model_dump() == expected
+    axis.title.font.family.append("cursive")
+    assert axis.ticks.labels.font.family == expected["family"]
+    assert encoding.axis == 0 and encoding.palette == "plasma"
+    assert (encoding.lower, encoding.upper) == (-1, 2)
+
+
+def test_font_component_replacement_resets_only_supplied_components() -> None:
+    font = pax.FontSpec(weight="bold")
+    plot = (
+        pax.ParallelPlot()
+        .set_data([[0], [1]])
+        .set_axis(
+            0,
+            title=pax.AxisTitle(font=font),
+            ticks=pax.AxisTicks(labels=pax.AxisTickLabels(font=font)),
+        )
+        .set_colorbar(
+            0,
+            palette="plasma",
+            limits=(-1, 2),
+            title=pax.ColorbarTitle(text="Scale", font=font),
+            ticks=pax.ColorbarTicks(labels=pax.ColorbarTickLabels(font=font)),
+        )
+    )
+    plot.set_axis(0, title=pax.AxisTitle())
+    assert plot.state.presentation.axes[0].title.font == pax.FontSpec()
+    assert plot.state.presentation.axes[0].ticks.labels.font == font
+    plot.set_colorbar(0, title=pax.ColorbarTitle())
+    encoding = plot.state.presentation.lines.color_encoding
+    assert encoding.colorbar.title == pax.ColorbarTitle()
+    assert encoding.colorbar.ticks.labels.font == font
+    assert encoding.palette == "viridis"
+    assert (encoding.lower, encoding.upper) == (None, None)
+    plot.set_colorbar(0, ticks=pax.ColorbarTicks())
+    assert (
+        plot.state.presentation.lines.color_encoding.colorbar.ticks
+        == pax.ColorbarTicks()
+    )
+    plot.set_axis(0, ticks=pax.AxisTicks())
+    assert plot.state.presentation.axes[0].ticks.labels.font == pax.FontSpec()
+
+
+@pytest.mark.parametrize(
+    "target", ["axis_title", "axis_ticks", "colorbar_title", "colorbar_ticks"]
+)
+def test_invalid_font_model_replacements_are_atomic(target) -> None:
+    plot = pax.ParallelPlot().set_data([[0], [1]]).set_colorbar(0)
+    state = plot.state
+    before = state.model_dump()
+    bad_font = pax.FontSpec.model_construct(size=-1)
+    with pytest.raises(ValidationError):
+        if target == "axis_title":
+            plot.set_axis(0, title=pax.AxisTitle.model_construct(font=bad_font))
+        elif target == "axis_ticks":
+            plot.set_axis(
+                0,
+                ticks=pax.AxisTicks.model_construct(
+                    labels=pax.AxisTickLabels.model_construct(font=bad_font)
+                ),
+            )
+        elif target == "colorbar_title":
+            plot.set_colorbar(0, title=pax.ColorbarTitle.model_construct(font=bad_font))
+        else:
+            plot.set_colorbar(
+                0,
+                ticks=pax.ColorbarTicks.model_construct(
+                    labels=pax.ColorbarTickLabels.model_construct(font=bad_font)
+                ),
+            )
+    assert plot.state is state
+    assert plot.state.model_dump() == before

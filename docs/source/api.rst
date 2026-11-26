@@ -49,6 +49,9 @@ components. Each component owns its configuration and appearance directly.
 .. autoclass:: paxplot.TextAppearance
    :members:
 
+.. autoclass:: paxplot.FontSpec
+   :members:
+
 .. autoclass:: paxplot.LinePresentation
    :members:
 
@@ -65,4 +68,10 @@ components. Each component owns its configuration and appearance directly.
    :members:
 
 .. autoclass:: paxplot.ColorbarTitle
+   :members:
+
+.. autoclass:: paxplot.ColorbarTicks
+   :members:
+
+.. autoclass:: paxplot.ColorbarTickLabels
    :members:

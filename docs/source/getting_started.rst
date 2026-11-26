@@ -30,7 +30,7 @@ Basic Usage
    plot.set_axis_limits(0, lower=-1.0, upper=3.0)
    plot.set_axis_ticks(1, values=["low", "medium", "high"])
    plot.invert_axis(2)
-   plot.set_colorbar(0, palette="viridis", label="Column A")
+   plot.set_colorbar(0, palette="viridis", title=pax.ColorbarTitle(text="Column A"))
 
    fig = plot.render(figsize=(10, 6))
 

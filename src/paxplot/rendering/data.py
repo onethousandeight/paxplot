@@ -6,7 +6,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from paxplot.state import LineStyle
+from paxplot.state import FontSpec, LineStyle
 
 
 @dataclass
@@ -19,6 +19,8 @@ class RenderAxis:
     label_visible: bool
     tick_marks_visible: bool
     tick_labels_visible: bool
+    title_font: FontSpec
+    tick_labels_font: FontSpec
 
 
 @dataclass
@@ -29,6 +31,9 @@ class RenderColorbar:
     lower: float
     upper: float
     title_visible: bool
+    title_font: FontSpec
+    tick_labels_font: FontSpec
+    tick_labels_visible: bool
 
 
 @dataclass

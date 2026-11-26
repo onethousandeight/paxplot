@@ -24,7 +24,7 @@ plot = (
     )
     .set_axis_label(2, "C")
     .invert_axis(2)
-    .set_colorbar(0, palette="viridis", label="Column A")
+    .set_colorbar(0, palette="viridis", title=pax.ColorbarTitle(text="Column A"))
 )
 
 fig = plot.render(figsize=(10, 6))

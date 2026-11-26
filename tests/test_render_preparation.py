@@ -81,7 +81,7 @@ def test_hidden_decorations_preserve_geometry_and_tick_configuration(values) -> 
     )
     if isinstance(values[0], float):
         plot.set_axis_limits(0, lower=-2.0, upper=6.0)
-        plot.set_colorbar(0, label="Hidden axis scale")
+        plot.set_colorbar(0, title=pax.ColorbarTitle(text="Hidden axis scale"))
     else:
         plot.set_axis(0, scale=pax.AxisScale(categories=["high", "low"], inverted=True))
     baseline = prepare_render_data(plot.state)
