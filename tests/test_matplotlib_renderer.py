@@ -291,12 +291,14 @@ def test_partial_fonts_preserve_role_defaults_and_do_not_modify_rcparams() -> No
             title, *labels = fig.axes[0].texts
             assert (
                 title.get_fontsize()
-                == FontProperties(size="medium").get_size_in_points()
+                == FontProperties(size=rcParams["axes.titlesize"]).get_size_in_points()
             )
             for label in labels:
                 assert (
                     label.get_fontsize()
-                    == FontProperties(size="small").get_size_in_points()
+                    == FontProperties(
+                        size=rcParams["ytick.labelsize"]
+                    ).get_size_in_points()
                 )
             for label in (title, *labels):
                 assert label.get_family() == ["DejaVu Serif"]
@@ -311,6 +313,40 @@ def test_partial_fonts_preserve_role_defaults_and_do_not_modify_rcparams() -> No
                 assert label.get_fontstyle() == "oblique"
                 assert label.get_fontweight() == "bold"
             assert {key: rcParams[key] for key in settings} == original
+        finally:
+            plt.close(fig)
+
+
+def test_unsupported_font_weight_is_mapped_with_a_warning() -> None:
+    plot = (
+        pax.ParallelPlot()
+        .set_data([[0], [1]])
+        .set_axis(
+            0,
+            title=pax.AxisTitle(text="Heading", font=pax.FontSpec(weight="thin")),
+        )
+    )
+
+    with pytest.warns(UserWarning, match="not supported by matplotlib"):
+        fig = plot.render()
+    try:
+        fig.canvas.draw()
+        assert fig.axes[0].texts[0].get_fontweight() == 100
+    finally:
+        plt.close(fig)
+
+
+def test_axis_font_sizes_follow_rcparams() -> None:
+    with rc_context({"axes.titlesize": 14, "ytick.labelsize": 8}):
+        plot = pax.ParallelPlot().set_data([[0], [1]])
+        fig = plot.render()
+        try:
+            fig.canvas.draw()
+            title, *labels = fig.axes[0].texts
+            assert title.get_fontsize() == 14
+            assert labels
+            for label in labels:
+                assert label.get_fontsize() == 8
         finally:
             plt.close(fig)
 

@@ -2,38 +2,35 @@
 
 from __future__ import annotations
 
-from collections.abc import Sequence
-from math import isnan
-from typing import Any
+import math
+from collections.abc import Mapping, Sequence
 
 import numpy as np
 
+from paxplot._values import finite_float, is_missing, padded_bounds
 from paxplot.state import AxisScale
-
-
-def is_missing(value: Any) -> bool:
-    """Return True for None and NaN-like values."""
-
-    if value is None:
-        return True
-    try:
-        return bool(isnan(value))
-    except TypeError:
-        return False
 
 
 def numeric_bounds(values: Sequence[object], scale: AxisScale) -> tuple[float, float]:
     """Resolve numeric bounds from configured limits and data."""
 
-    finite = [float(value) for value in values if not is_missing(value)]
+    finite: list[float] = []
+    for value in values:
+        if is_missing(value):
+            continue
+        finite.append(finite_float(value, kind="numeric"))
+
     data_lower = min(finite) if finite else 0.0
     data_upper = max(finite) if finite else 1.0
     lower = data_lower if scale.limits[0] is None else scale.limits[0]
     upper = data_upper if scale.limits[1] is None else scale.limits[1]
-    if lower == upper:
-        padding = abs(lower) * 0.05 or 0.5
-        return lower - padding, upper + padding
-    return lower, upper
+    if not math.isfinite(lower) or not math.isfinite(upper):
+        msg = "axis limits must be finite"
+        raise ValueError(msg)
+    if lower > upper:
+        msg = "axis lower limit cannot be greater than upper limit"
+        raise ValueError(msg)
+    return padded_bounds(lower, upper)
 
 
 def scale_numeric_value(value: object, lower: float, upper: float) -> float:
@@ -41,37 +38,26 @@ def scale_numeric_value(value: object, lower: float, upper: float) -> float:
 
     if is_missing(value):
         return float("nan")
-    return (float(value) - lower) / (upper - lower)
+    number = finite_float(value, kind="numeric")
+    return (number - lower) / (upper - lower)
 
 
-def resolve_categories(values: Sequence[object], scale: AxisScale) -> list[str]:
-    """Resolve categorical order from config or first appearance."""
-
-    if scale.categories is not None:
-        return scale.categories
-
-    categories: list[str] = []
-    for value in values:
-        if is_missing(value):
-            continue
-        category = str(value)
-        if category not in categories:
-            categories.append(category)
-    return categories
-
-
-def scale_categorical_value(value: object, categories: Sequence[str]) -> float:
+def scale_categorical_value(
+    value: object, positions: Mapping[str, int], category_count: int
+) -> float:
     """Scale one categorical value to normalized coordinates."""
 
     if is_missing(value):
         return float("nan")
     category = str(value)
-    if category not in categories:
+    try:
+        index = positions[category]
+    except KeyError as exc:
         msg = f"unknown category {category!r}"
-        raise ValueError(msg)
-    if len(categories) == 1:
+        raise ValueError(msg) from exc
+    if category_count == 1:
         return 0.5
-    return categories.index(category) / (len(categories) - 1)
+    return index / (category_count - 1)
 
 
 def apply_inversion(values: np.ndarray, inverted: bool) -> np.ndarray:

@@ -2,16 +2,36 @@
 
 from __future__ import annotations
 
+import warnings
 from collections import defaultdict
 
 import numpy as np
+from matplotlib import rcParams
 from matplotlib.collections import LineCollection
 from matplotlib.colors import Normalize
+from matplotlib.figure import Figure
 from matplotlib.text import Text
 
 from paxplot.rendering._styles import resolve_palette
 from paxplot.rendering.data import RenderData
 from paxplot.state import FontSpec
+
+# CSS weight names that matplotlib does not accept directly.
+_WEIGHT_MAP = {"thin": 100, "extra light": 200}
+
+
+def _matplotlib_weight(weight: str) -> str | int:
+    """Translate renderer-neutral weight names to matplotlib values."""
+
+    mapped = _WEIGHT_MAP.get(weight)
+    if mapped is None:
+        return weight
+    warnings.warn(
+        f"font weight {weight!r} is not supported by matplotlib; using {mapped}",
+        UserWarning,
+        stacklevel=3,
+    )
+    return mapped
 
 
 def _apply_font(text: Text, font: FontSpec) -> None:
@@ -22,12 +42,10 @@ def _apply_font(text: Text, font: FontSpec) -> None:
     role-specific defaults.
     """
 
-    text.set(
-        **{
-            f"font{name}": value
-            for name, value in font.model_dump(exclude_none=True).items()
-        }
-    )
+    values = font.model_dump(exclude_none=True)
+    if "weight" in values:
+        values["weight"] = _matplotlib_weight(values["weight"])
+    text.set(**{f"font{name}": value for name, value in values.items()})
 
 
 def _segments(render_data: RenderData) -> np.ndarray:
@@ -83,7 +101,7 @@ def _right_limit_for_labels(
     return max(base_right, required)
 
 
-def render_matplotlib(render_data: RenderData, **kwargs):
+def render_matplotlib(render_data: RenderData, **kwargs: object) -> Figure:
     """Draw render-ready data with matplotlib and return a Figure."""
 
     import matplotlib.pyplot as plt
@@ -92,41 +110,26 @@ def render_matplotlib(render_data: RenderData, **kwargs):
     fig, ax = plt.subplots(figsize=figsize, **kwargs)
 
     segments = _segments(render_data)
-    zorders = (
-        render_data.line_zorders
-        if render_data.line_zorders is not None
-        else np.full(render_data.y.shape[0], np.nan)
-    )
     groups: dict[float, list[int]] = defaultdict(list)
-    for index, zorder in enumerate(zorders):
+    for index, zorder in enumerate(render_data.line_zorders):
         key = 2.0 if np.isnan(zorder) else float(zorder)
         groups[key].append(index)
 
     for zorder, indices in sorted(groups.items()):
         collection = LineCollection(
             segments[indices],
-            colors=None
-            if render_data.line_colors is None
-            else render_data.line_colors[indices],
-            linewidths=(
-                None
-                if render_data.line_widths is None
-                else render_data.line_widths[indices]
-            ),
-            linestyles=(
-                "solid"
-                if render_data.line_linestyles is None
-                else render_data.line_linestyles[indices].tolist()
-            ),
+            colors=render_data.line_colors[indices],
+            linewidths=render_data.line_widths[indices],
+            linestyles=render_data.line_linestyles[indices].tolist(),
             zorder=zorder,
         )
         ax.add_collection(collection)
 
-    axis_color = "0.2"
-    axis_linewidth = 1.0
-    # Tick geometry is physical, matching matplotlib's ytick.major defaults.
-    tick_length_points = 3.5
-    tick_label_offset_points = 7.0
+    axis_color = rcParams["axes.edgecolor"]
+    axis_linewidth = rcParams["axes.linewidth"]
+    # Tick geometry follows matplotlib's ytick.major defaults.
+    tick_length_points = rcParams["ytick.major.size"]
+    tick_label_offset_points = tick_length_points + rcParams["ytick.major.pad"]
     last_axis_index = len(render_data.axes) - 1
     right_labels: list[Text] = []
     label_specs: list[tuple[Text, str, float]] = []
@@ -150,7 +153,8 @@ def render_matplotlib(render_data: RenderData, **kwargs):
                 axis.label,
                 ha="center",
                 va="bottom",
-                fontsize="medium",
+                fontsize=rcParams["axes.titlesize"],
+                fontweight=rcParams["axes.titleweight"],
             )
             _apply_font(title, axis.title_font)
         if axis.tick_labels_visible:
@@ -165,7 +169,7 @@ def render_matplotlib(render_data: RenderData, **kwargs):
                     label,
                     ha=horizontal_alignment,
                     va="center",
-                    fontsize="small",
+                    fontsize=rcParams["ytick.labelsize"],
                 )
                 _apply_font(tick_label, axis.tick_labels_font)
                 label_specs.append((tick_label, side, axis.x))
@@ -184,7 +188,9 @@ def render_matplotlib(render_data: RenderData, **kwargs):
     if render_data.colorbar is not None:
         cmap = resolve_palette(render_data.colorbar.palette)
         norm = Normalize(
-            vmin=render_data.colorbar.lower, vmax=render_data.colorbar.upper
+            vmin=render_data.colorbar.lower,
+            vmax=render_data.colorbar.upper,
+            clip=True,
         )
         mappable = plt.cm.ScalarMappable(norm=norm, cmap=cmap)
         mappable.set_array([])

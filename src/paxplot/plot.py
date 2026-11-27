@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
-from math import isnan
+from collections.abc import Iterable, Mapping, Sequence, Set
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
+from paxplot._values import is_missing, resolve_categories
 from paxplot.rendering import prepare_render_data, render_matplotlib
 from paxplot.state import (
     AxisPresentation,
@@ -30,18 +30,19 @@ from paxplot.state import (
 )
 from paxplot.state.schema import infer_dtype
 
+if TYPE_CHECKING:
+    from matplotlib.figure import Figure
 
-def _is_missing(value: Any) -> bool:
-    if value is None:
-        return True
-    try:
-        return bool(isnan(value))
-    except TypeError:
-        return False
+
+class _Unset:
+    """Sentinel distinguishing omitted arguments from explicit ``None``."""
+
+
+_UNSET = _Unset()
 
 
 def _plain_value(value: Any) -> object:
-    if _is_missing(value):
+    if is_missing(value):
         return None
     if hasattr(value, "item"):
         try:
@@ -51,29 +52,22 @@ def _plain_value(value: Any) -> object:
     return value
 
 
-def _categories(values: Sequence[object]) -> list[str] | None:
-    if infer_dtype(list(values)) != "categorical":
-        return None
-    categories: list[str] = []
-    for value in values:
-        if _is_missing(value):
-            continue
-        category = str(value)
-        if category not in categories:
-            categories.append(category)
-    return categories
-
-
-def _coerce_rows(data: Any) -> list[list[object]]:
+def _coerce_rows(data: Iterable[Sequence[object]]) -> list[list[object]]:
     if hasattr(data, "to_dict") and hasattr(data, "columns"):
         msg = "set_data accepts row-oriented sequences only"
         raise TypeError(msg)
 
-    if isinstance(data, Mapping):
+    if isinstance(data, Mapping | Set):
         msg = "set_data accepts row-oriented sequences only"
         raise TypeError(msg)
 
-    rows = [_coerce_row(row) for row in data]
+    try:
+        iterator = iter(data)
+    except TypeError as exc:
+        msg = "data must be a row-oriented sequence"
+        raise TypeError(msg) from exc
+
+    rows = [_coerce_row(row) for row in iterator]
     if not rows:
         msg = "data must contain at least one row"
         raise ValueError(msg)
@@ -92,7 +86,15 @@ def _coerce_row(row: Any) -> list[object]:
     if isinstance(row, str | bytes):
         msg = "each row must be a sequence of values"
         raise TypeError(msg)
-    return [_plain_value(value) for value in row]
+    if isinstance(row, Mapping | Set):
+        msg = "each row must be an ordered sequence of values"
+        raise TypeError(msg)
+    try:
+        values = list(row)
+    except TypeError as exc:
+        msg = "each row must be a sequence of values"
+        raise TypeError(msg) from exc
+    return [_plain_value(value) for value in values]
 
 
 def _column_values(rows: Sequence[Sequence[object]], axis: int) -> list[object]:
@@ -105,21 +107,30 @@ class ParallelPlot:
     def __init__(self, state: PlotState | None = None) -> None:
         self.state = PlotState.model_validate(state or PlotState())
 
-    def set_data(self, data) -> ParallelPlot:
+    def set_data(self, data: Iterable[Sequence[object]]) -> ParallelPlot:
         """Set plot data from rectangular row-oriented values."""
 
         rows = _coerce_rows(data)
         axis_count = len(rows[0])
         columns = [_column_values(rows, axis) for axis in range(axis_count)]
+        dtypes = [infer_dtype(values) for values in columns]
         self._replace_state(
             data=PlotData(
                 rows=rows,
-                columns=[ColumnSpec(dtype=infer_dtype(values)) for values in columns],
+                columns=[ColumnSpec(dtype=dtype) for dtype in dtypes],
             ),
             presentation=PlotPresentation(
                 axes=[
-                    AxisPresentation(scale=AxisScale(categories=_categories(values)))
-                    for values in columns
+                    AxisPresentation(
+                        scale=AxisScale(
+                            categories=(
+                                resolve_categories(values)
+                                if dtype == "categorical"
+                                else None
+                            )
+                        )
+                    )
+                    for values, dtype in zip(columns, dtypes, strict=True)
                 ],
                 lines=LinePresentation(default=self.state.presentation.lines.default),
             ),
@@ -165,13 +176,37 @@ class ParallelPlot:
     def set_axis_limits(
         self,
         axis: int,
-        lower: float | None = None,
-        upper: float | None = None,
+        lower: float | None | _Unset = _UNSET,
+        upper: float | None | _Unset = _UNSET,
     ) -> ParallelPlot:
-        """Update numeric limits, preserving inversion and category order."""
+        """Update numeric limits, preserving omitted bounds and other settings."""
 
         update = self._axis(axis).model_dump()
-        update["scale"]["limits"] = (lower, upper)
+        limits = list(update["scale"]["limits"])
+        if lower is not _UNSET:
+            limits[0] = lower
+        if upper is not _UNSET:
+            limits[1] = upper
+        update["scale"]["limits"] = tuple(limits)
+        self._replace_axis(axis, update)
+        return self
+
+    def reset_axis_limits(
+        self,
+        axis: int,
+        *,
+        lower: bool = True,
+        upper: bool = True,
+    ) -> ParallelPlot:
+        """Reset selected limits to their automatic data-derived values."""
+
+        update = self._axis(axis).model_dump()
+        limits = list(update["scale"]["limits"])
+        if lower:
+            limits[0] = None
+        if upper:
+            limits[1] = None
+        update["scale"]["limits"] = tuple(limits)
         self._replace_axis(axis, update)
         return self
 
@@ -204,7 +239,10 @@ class ParallelPlot:
         alpha: float | None = None,
         width: float | None = None,
         linestyle: str | None = None,
+        zorder: float | None = None,
     ) -> ParallelPlot:
+        """Update default line appearance, preserving omitted fields."""
+
         update = self.state.presentation.lines.default.model_dump()
         if color is not None:
             update["color"] = color
@@ -214,6 +252,8 @@ class ParallelPlot:
             update["width"] = width
         if linestyle is not None:
             update["linestyle"] = linestyle
+        if zorder is not None:
+            update["zorder"] = zorder
         self._replace_lines(default=LineStyle(**update))
         return self
 
@@ -227,20 +267,31 @@ class ParallelPlot:
         linestyle: str | None = None,
         zorder: float | None = None,
     ) -> ParallelPlot:
-        if not isinstance(row, int):
-            msg = "row must be an integer index"
-            raise TypeError(msg)
-        if row < 0 or row >= len(self.state.data.rows):
-            msg = f"unknown row index {row}"
-            raise ValueError(msg)
+        """Update one row's line appearance, preserving omitted fields."""
+
+        self._row(row)
         styles = dict(self.state.presentation.lines.overrides)
-        styles[row] = LineStyleOverride(
-            color=color,
-            alpha=alpha,
-            width=width,
-            linestyle=linestyle,
-            zorder=zorder,
-        )
+        existing = styles.get(row)
+        update = existing.model_dump() if existing is not None else {}
+        for name, value in (
+            ("color", color),
+            ("alpha", alpha),
+            ("width", width),
+            ("linestyle", linestyle),
+            ("zorder", zorder),
+        ):
+            if value is not None:
+                update[name] = value
+        styles[row] = LineStyleOverride(**update)
+        self._replace_lines(overrides=styles)
+        return self
+
+    def clear_line_style(self, row: int) -> ParallelPlot:
+        """Remove all style overrides for one row."""
+
+        self._row(row)
+        styles = dict(self.state.presentation.lines.overrides)
+        styles.pop(row, None)
         self._replace_lines(overrides=styles)
         return self
 
@@ -282,7 +333,7 @@ class ParallelPlot:
         )
         return self
 
-    def render(self, **kwargs):
+    def render(self, **kwargs: Any) -> Figure:
         """Render the plot with matplotlib and return a Figure."""
 
         return render_matplotlib(prepare_render_data(self.state), **kwargs)
@@ -311,19 +362,41 @@ class ParallelPlot:
             msg = f"unknown axis index {axis}"
             raise ValueError(msg) from exc
 
-    def _replace_axis(self, index: int, axis: dict) -> None:
-        presentation = self.state.presentation.model_dump()
-        presentation["axes"][index] = axis
-        self._replace_state(presentation=presentation)
+    def _row(self, row: int) -> int:
+        if not isinstance(row, int):
+            msg = "row must be an integer index"
+            raise TypeError(msg)
+        if row < 0 or row >= len(self.state.data.rows):
+            msg = f"unknown row index {row}"
+            raise ValueError(msg)
+        return row
 
-    def _replace_lines(self, **updates) -> None:
-        presentation = self.state.presentation.model_dump()
-        presentation["lines"].update(updates)
-        self._replace_state(presentation=presentation)
+    def _replace_axis(self, index: int, axis: dict[str, Any]) -> None:
+        presentation = self.state.presentation.model_copy(deep=True)
+        presentation.axes[index] = AxisPresentation.model_validate(axis)
+        PlotState._validate_presentation(
+            self.state.data,
+            presentation,
+            changed_axes={index},
+            check_dtypes=False,
+        )
+        self.state = self.state.model_copy(update={"presentation": presentation})
 
-    def _replace_state(self, **updates) -> None:
+    def _replace_lines(self, **updates: Any) -> None:
+        presentation = self.state.presentation.model_copy(deep=True)
+        presentation.lines = LinePresentation.model_validate(
+            presentation.lines.model_copy(update=updates)
+        )
+        PlotState._validate_presentation(
+            self.state.data,
+            presentation,
+            changed_axes=set(),
+            check_dtypes=False,
+        )
+        self.state = self.state.model_copy(update={"presentation": presentation})
+
+    def _replace_state(self, **updates: Any) -> None:
         """Validate an entire candidate before committing any edit."""
 
-        candidate = self.state.model_dump()
-        candidate.update(updates)
+        candidate = self.state.model_copy(update=updates)
         self.state = PlotState.model_validate(candidate)

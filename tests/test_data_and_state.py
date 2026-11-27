@@ -58,6 +58,55 @@ def test_set_data_rejects_mappings_dataframes_and_bad_rows() -> None:
             pax.ParallelPlot().set_data(data)
 
 
+def test_set_data_rejects_mapping_rows() -> None:
+    with pytest.raises(TypeError, match="ordered sequence"):
+        pax.ParallelPlot().set_data([{"a": 1, "b": 2}])
+
+
+def test_pandas_na_is_normalized_to_missing() -> None:
+    rows = pd.DataFrame({"a": [1.0, pd.NA]}).values.tolist()
+
+    plot = pax.ParallelPlot().set_data(rows)
+
+    assert plot.state.data.rows == [[1.0], [None]]
+    assert plot.state.data.columns[0].dtype == "numeric"
+
+
+def test_successive_line_style_updates_merge_and_can_be_cleared() -> None:
+    plot = pax.ParallelPlot().set_data([[0], [1]])
+    plot.set_line_style(0, color="red")
+    plot.set_line_style(0, width=3.0)
+
+    override = plot.state.presentation.lines.overrides[0]
+    assert override.color == "red"
+    assert override.width == 3.0
+
+    plot.clear_line_style(0)
+    assert 0 not in plot.state.presentation.lines.overrides
+
+
+def test_default_line_style_accepts_zorder() -> None:
+    plot = pax.ParallelPlot().set_data([[0], [1]]).set_default_line_style(zorder=7)
+
+    assert plot.state.presentation.lines.default.zorder == 7
+
+
+def test_single_sided_axis_limits_preserve_the_other_bound() -> None:
+    plot = pax.ParallelPlot().set_data([[0], [1]])
+    plot.set_axis_limits(0, lower=-1)
+    plot.set_axis_limits(0, upper=2)
+
+    assert plot.state.presentation.axes[0].scale.limits == (-1, 2)
+
+    plot.reset_axis_limits(0, lower=True, upper=False)
+    assert plot.state.presentation.axes[0].scale.limits == (None, 2)
+
+
+def test_tick_count_is_bounded() -> None:
+    with pytest.raises(ValidationError):
+        pax.AxisTicks(count=1001)
+
+
 def test_position_configuration_and_focused_updates() -> None:
     plot = (
         pax.ParallelPlot()
@@ -326,22 +375,30 @@ def test_json_row_escaping_keeps_one_line_per_row(tmp_path) -> None:
     assert len(row_lines) == len(values)
 
 
-def test_json_non_finite_values_serialize_as_null(tmp_path) -> None:
+def test_json_nan_serializes_as_null_and_inf_is_rejected(tmp_path) -> None:
     path = tmp_path / "plot.json"
     state = pax.PlotState(
         data=pax.PlotData(
-            rows=[[float("nan"), float("inf")]],
-            columns=[pax.ColumnSpec(dtype="numeric")] * 2,
+            rows=[[float("nan")]],
+            columns=[pax.ColumnSpec(dtype="numeric")],
         ),
-        presentation=pax.PlotPresentation(
-            axes=[pax.AxisPresentation(), pax.AxisPresentation()]
-        ),
+        presentation=pax.PlotPresentation(axes=[pax.AxisPresentation()]),
     )
     pax.ParallelPlot(state).to_json(path)
 
     text = path.read_text(encoding="utf-8")
-    assert "[null, null]" in text
-    assert pax.ParallelPlot.from_json(path).state.data.rows == [[None, None]]
+    assert "[null]" in text
+    assert pax.ParallelPlot.from_json(path).state.data.rows == [[None]]
+
+    infinite = pax.PlotState(
+        data=pax.PlotData(
+            rows=[[float("inf")]],
+            columns=[pax.ColumnSpec(dtype="numeric")],
+        ),
+        presentation=pax.PlotPresentation(axes=[pax.AxisPresentation()]),
+    )
+    with pytest.raises(ValueError, match="non-finite value"):
+        pax.ParallelPlot(infinite).to_json(path)
 
 
 @pytest.mark.parametrize("version", [1, 3, True, 2.0, "2", None])

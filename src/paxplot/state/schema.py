@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-from math import isnan
 from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+
+from paxplot._values import is_missing
 
 
 class StateModel(BaseModel):
@@ -19,11 +20,10 @@ def infer_dtype(values: list[object]) -> Literal["numeric", "categorical"]:
 
     kinds = set()
     for value in values:
-        if value is None:
+        if is_missing(value):
             continue
         if isinstance(value, (int, float)):
-            if not isnan(value):
-                kinds.add("numeric")
+            kinds.add("numeric")
         elif isinstance(value, str):
             kinds.add("categorical")
         else:
@@ -107,7 +107,7 @@ class AxisTicks(StateModel):
     """Tick reference values, automatic count, marks, and labels."""
 
     values: list[float | str] | None = None
-    count: int | None = Field(default=None, ge=2)
+    count: int | None = Field(default=None, ge=2, le=1000)
     marks: AxisTickMarks = Field(default_factory=AxisTickMarks)
     labels: AxisTickLabels = Field(default_factory=AxisTickLabels)
 
@@ -293,9 +293,35 @@ class PlotState(StateModel):
         elif columns or axes:
             raise ValueError("columns and axes cannot be defined without data")
 
-        for index, (column, axis) in enumerate(zip(columns, axes, strict=True)):
+        self._validate_presentation(self.data, self.presentation, check_dtypes=True)
+        return self
+
+    @staticmethod
+    def _validate_presentation(
+        data: PlotData,
+        presentation: PlotPresentation,
+        *,
+        changed_axes: set[int] | None = None,
+        check_dtypes: bool = False,
+    ) -> None:
+        """Validate presentation components, optionally only changed axes."""
+
+        rows = data.rows
+        columns = data.columns
+        axes = presentation.axes
+        if rows and len(axes) != len(rows[0]):
+            raise ValueError("number of axes must match row width")
+        if not rows and axes:
+            raise ValueError("columns and axes cannot be defined without data")
+
+        indices = range(len(columns)) if changed_axes is None else changed_axes
+        for index in indices:
+            if index < 0 or index >= len(columns) or index >= len(axes):
+                raise ValueError(f"unknown axis index {index}")
+            column = columns[index]
+            axis = axes[index]
             values = [row[index] for row in rows]
-            if column.dtype != infer_dtype(values):
+            if check_dtypes and column.dtype != infer_dtype(values):
                 raise ValueError(f"column {index} dtype does not match observations")
             scale = axis.scale
             if column.dtype == "numeric":
@@ -322,7 +348,7 @@ class PlotState(StateModel):
                         "categorical tick values must reference known categories"
                     )
 
-        lines = self.presentation.lines
+        lines = presentation.lines
         for row in lines.overrides:
             if row < 0 or row >= len(rows):
                 raise ValueError(f"line style references unknown row index {row}")
@@ -332,4 +358,3 @@ class PlotState(StateModel):
                 raise ValueError(f"unknown axis index {index}")
             if columns[index].dtype != "numeric":
                 raise ValueError("colorbar encoding only supports numeric axes")
-        return self

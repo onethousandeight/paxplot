@@ -14,7 +14,6 @@ authors = [
 ]
 dependencies = [
     "matplotlib>=3.10",
-    "pandas>=2.2.3",
     "pydantic>=2.7"
 ]
 classifiers = [
@@ -28,6 +27,7 @@ Homepage = "https://github.com/kravitsjacob/paxplot"
 [project.optional-dependencies]
 dev = [
     "build>=1.2",
+    "pandas>=2.2.3",
     "pytest>=8",
     "ruff>=0.6",
     "setuptools>=77",

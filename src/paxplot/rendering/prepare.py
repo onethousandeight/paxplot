@@ -4,14 +4,18 @@ from __future__ import annotations
 
 import numpy as np
 
+from paxplot._values import category_positions, resolve_categories
 from paxplot.rendering._scaling import (
     apply_inversion,
     numeric_bounds,
-    resolve_categories,
     scale_categorical_value,
     scale_numeric_value,
 )
-from paxplot.rendering._styles import resolve_color_bounds, resolve_line_styles
+from paxplot.rendering._styles import (
+    resolve_color_bounds,
+    resolve_colors,
+    resolve_line_styles,
+)
 from paxplot.rendering._ticks import resolve_categorical_ticks, resolve_numeric_ticks
 from paxplot.rendering.data import RenderAxis, RenderColorbar, RenderData
 from paxplot.state import PlotState
@@ -43,17 +47,27 @@ def prepare_render_data(state: PlotState) -> RenderData:
             )
             tick_positions, tick_labels = resolve_numeric_ticks(axis, lower, upper)
         else:
-            categories = resolve_categories(column, axis.scale)
+            categories = resolve_categories(column, axis.scale.categories)
+            positions = category_positions(categories)
             scaled = np.asarray(
-                [scale_categorical_value(value, categories) for value in column],
+                [
+                    scale_categorical_value(value, positions, len(categories))
+                    for value in column
+                ],
                 dtype=float,
             )
-            tick_positions, tick_labels = resolve_categorical_ticks(axis, categories)
+            tick_positions, tick_labels = resolve_categorical_ticks(
+                axis, categories, positions
+            )
 
         y[:, axis_index] = apply_inversion(scaled, axis.scale.inverted)
         render_axes.append(
             RenderAxis(
-                label=axis.title.text or f"Axis {axis_index + 1}",
+                label=(
+                    axis.title.text
+                    if axis.title.text is not None
+                    else f"Axis {axis_index + 1}"
+                ),
                 x=float(x[axis_index]),
                 tick_positions=tick_positions,
                 tick_labels=tick_labels,
@@ -67,11 +81,18 @@ def prepare_render_data(state: PlotState) -> RenderData:
         )
 
     encoding = lines.color_encoding
-    color_values = None
+    base_colors = None
     colorbar = None
     if encoding is not None:
         color_values = [row[encoding.axis] for row in rows]
         lower, upper = resolve_color_bounds(color_values, encoding)
+        base_colors = resolve_colors(
+            color_values,
+            encoding.palette,
+            lower,
+            upper,
+            fallback=lines.default.color or "C0",
+        )
         colorbar = RenderColorbar(
             axis=encoding.axis,
             palette=encoding.palette,
@@ -84,22 +105,19 @@ def prepare_render_data(state: PlotState) -> RenderData:
             upper=upper,
         )
 
-    colors, widths, alphas, linestyles, zorders = resolve_line_styles(
+    colors, widths, linestyles, zorders = resolve_line_styles(
         row_count,
         lines.default,
         lines.overrides,
-        color_values=color_values,
-        encoding=encoding,
+        base_colors=base_colors,
     )
 
     return RenderData(
         x=x,
         y=y,
         axes=render_axes,
-        default_line_style=lines.default,
         line_colors=colors,
         line_widths=widths,
-        line_alphas=alphas,
         line_linestyles=linestyles,
         line_zorders=zorders,
         colorbar=colorbar,

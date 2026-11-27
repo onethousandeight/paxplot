@@ -1,9 +1,12 @@
 """Default datasets included with PaxPlot."""
 
+from __future__ import annotations
+
 from importlib import resources
+from typing import BinaryIO
 
 
-def tradeoff():
+def tradeoff() -> BinaryIO:
     """
     Trade-off dataset
 
@@ -15,7 +18,7 @@ def tradeoff():
     return (resources.files(__package__) / "data" / "tradeoff.csv").open("rb")
 
 
-def hydroclimate_model_evaluation():
+def hydroclimate_model_evaluation() -> BinaryIO:
     """
     Hydroclimate model evaluation dataset from Nele Reyniers
 

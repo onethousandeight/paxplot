@@ -3,6 +3,9 @@
 from __future__ import annotations
 
 import json
+import math
+import os
+import tempfile
 from pathlib import Path
 from typing import Literal
 
@@ -24,7 +27,7 @@ class _StateDocument(StateModel):
     def validate_version(cls, value: object) -> object:
         if type(value) is not int or value != PLOT_STATE_SCHEMA_VERSION:
             raise ValueError(
-                f"plot state requires schema version {value!r}; supported versions: 2"
+                f"unsupported schema version {value!r}; supported versions: 2"
             )
         return value
 
@@ -37,7 +40,8 @@ def _format_json(value: object, level: int = 0) -> str:
             return "{}"
         prefix = _INDENT * (level + 1)
         entries = [
-            f"{prefix}{json.dumps(key)}: {_format_json(item, level + 1)}"
+            f"{prefix}{json.dumps(key, ensure_ascii=False)}: "
+            f"{_format_json(item, level + 1)}"
             for key, item in value.items()
         ]
         return "{\n" + ",\n".join(entries) + "\n" + _INDENT * level + "}"
@@ -50,6 +54,24 @@ def _format_json(value: object, level: int = 0) -> str:
     return json.dumps(value, ensure_ascii=False)
 
 
+def _first_infinite(value: object, path: str) -> str | None:
+    """Return the path of the first non-finite float, if any."""
+
+    if isinstance(value, float) and math.isinf(value):
+        return path
+    if isinstance(value, dict):
+        for key, item in value.items():
+            found = _first_infinite(item, f"{path}.{key}")
+            if found is not None:
+                return found
+    elif isinstance(value, list):
+        for index, item in enumerate(value):
+            found = _first_infinite(item, f"{path}[{index}]")
+            if found is not None:
+                return found
+    return None
+
+
 def save_state(state: PlotState, path: str | Path) -> None:
     """Write validated canonical state, including defaults, in a v2 envelope.
 
@@ -57,9 +79,33 @@ def save_state(state: PlotState, path: str | Path) -> None:
     entry per line so documents stay readable and diff-friendly.
     """
 
+    payload = state.model_dump(mode="python")
+    infinite_path = _first_infinite(payload, "state")
+    if infinite_path is not None:
+        msg = (
+            f"cannot save non-finite value at {infinite_path}; "
+            "use None or NaN for missing data"
+        )
+        raise ValueError(msg)
+
     document = _StateDocument(schema_version=PLOT_STATE_SCHEMA_VERSION, state=state)
     text = _format_json(document.model_dump(mode="json"))
-    Path(path).write_text(text + "\n", encoding="utf-8")
+    target = Path(path)
+    handle = tempfile.NamedTemporaryFile(
+        mode="w",
+        encoding="utf-8",
+        dir=target.parent,
+        prefix=f"{target.name}.",
+        suffix=".tmp",
+        delete=False,
+    )
+    try:
+        with handle:
+            handle.write(text + "\n")
+        os.replace(handle.name, target)
+    except BaseException:
+        Path(handle.name).unlink(missing_ok=True)
+        raise
 
 
 def load_state(path: str | Path) -> PlotState:

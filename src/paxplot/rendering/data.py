@@ -6,7 +6,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from paxplot.state import FontSpec, LineStyle
+from paxplot.state import FontSpec
 
 
 @dataclass
@@ -41,10 +41,8 @@ class RenderData:
     x: np.ndarray
     y: np.ndarray
     axes: list[RenderAxis]
-    default_line_style: LineStyle
-    line_colors: np.ndarray | None = None
-    line_widths: np.ndarray | None = None
-    line_alphas: np.ndarray | None = None
-    line_linestyles: np.ndarray | None = None
-    line_zorders: np.ndarray | None = None
+    line_colors: np.ndarray
+    line_widths: np.ndarray
+    line_linestyles: np.ndarray
+    line_zorders: np.ndarray
     colorbar: RenderColorbar | None = None

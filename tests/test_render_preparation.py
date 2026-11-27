@@ -145,6 +145,87 @@ def test_line_style_precedence_with_colorbar_and_override() -> None:
     assert np.allclose(render_data.line_colors[1], [0.862745, 0.078431, 0.235294, 0.4])
 
 
+def test_tick_labels_without_values_apply_to_automatic_ticks() -> None:
+    numeric = (
+        pax.ParallelPlot()
+        .set_data([[0], [10]])
+        .set_axis(
+            0,
+            ticks=pax.AxisTicks(
+                labels=pax.AxisTickLabels(text=["zero", "a", "b", "c", "ten"])
+            ),
+        )
+    )
+    categorical = (
+        pax.ParallelPlot()
+        .set_data([["low"], ["high"]])
+        .set_axis(
+            0,
+            ticks=pax.AxisTicks(labels=pax.AxisTickLabels(text=["Low", "High"])),
+        )
+    )
+
+    assert prepare_render_data(numeric.state).axes[0].tick_labels == [
+        "zero",
+        "a",
+        "b",
+        "c",
+        "ten",
+    ]
+    assert prepare_render_data(categorical.state).axes[0].tick_labels == [
+        "Low",
+        "High",
+    ]
+
+
+def test_tick_label_count_mismatch_fails_during_preparation() -> None:
+    plot = (
+        pax.ParallelPlot()
+        .set_data([["low"], ["high"]])
+        .set_axis(
+            0,
+            ticks=pax.AxisTicks(labels=pax.AxisTickLabels(text=["only one"])),
+        )
+    )
+
+    with pytest.raises(ValueError, match="tick labels must match"):
+        prepare_render_data(plot.state)
+
+
+@pytest.mark.parametrize(
+    "edit",
+    [
+        lambda plot: plot.set_data([[0.0], [float("inf")]]),
+        lambda plot: plot.set_axis_limits(0, lower=float("inf")),
+        lambda plot: plot.set_default_line_style(width=float("inf")),
+        lambda plot: plot.set_colorbar(0, limits=(0.0, float("inf"))),
+    ],
+)
+def test_non_finite_values_fail_during_preparation(edit) -> None:
+    plot = pax.ParallelPlot().set_data([[0.0], [1.0]])
+    edit(plot)
+
+    with pytest.raises(ValueError, match="finite"):
+        prepare_render_data(plot.state)
+
+
+def test_single_sided_limits_that_invert_data_fail_during_preparation() -> None:
+    plot = pax.ParallelPlot().set_data([[0.0], [1.0]]).set_axis_limits(0, lower=10)
+
+    with pytest.raises(ValueError, match="lower limit cannot be greater"):
+        prepare_render_data(plot.state)
+
+
+def test_empty_axis_title_is_preserved() -> None:
+    plot = (
+        pax.ParallelPlot()
+        .set_data([[0.0], [1.0]])
+        .set_axis(0, title=pax.AxisTitle(text=""))
+    )
+
+    assert prepare_render_data(plot.state).axes[0].label == ""
+
+
 def test_colorbar_requires_numeric_axis() -> None:
     plot = pax.ParallelPlot().set_data([["low"], ["high"]])
 

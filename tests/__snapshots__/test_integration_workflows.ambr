@@ -2,11 +2,6 @@
 # name: test_axis_interaction_workflow_snapshot_and_roundtrip
   dict({
     'render': dict({
-      'alphas': list([
-        0.7,
-        0.7,
-        0.7,
-      ]),
       'axes': list([
         dict({
           'label': 'Axis 1',
@@ -273,11 +268,6 @@
 # name: test_colorbar_workflow_snapshot_and_roundtrip
   dict({
     'render': dict({
-      'alphas': list([
-        0.7,
-        0.7,
-        0.7,
-      ]),
       'axes': list([
         dict({
           'label': 'A',
@@ -507,14 +497,6 @@
 # name: test_line_style_workflow_snapshot_and_roundtrip
   dict({
     'render': dict({
-      'alphas': list([
-        0.6,
-        0.6,
-        0.6,
-        0.25,
-        0.6,
-        0.6,
-      ]),
       'axes': list([
         dict({
           'label': 'Axis 1',
@@ -867,11 +849,6 @@
 # name: test_standard_workflow_snapshot_and_roundtrip
   dict({
     'render': dict({
-      'alphas': list([
-        0.7,
-        0.7,
-        0.7,
-      ]),
       'axes': list([
         dict({
           'label': 'Axis 1',

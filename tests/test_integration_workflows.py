@@ -50,7 +50,6 @@ def summarize(plot: pax.ParallelPlot) -> dict[str, object]:
                 "tick_labels_visible": render_data.colorbar.tick_labels_visible,
             },
             "colors": render_data.line_colors.round(4).tolist(),
-            "alphas": render_data.line_alphas.tolist(),
             "zorders": [
                 None if np.isnan(value) else float(value)
                 for value in render_data.line_zorders
