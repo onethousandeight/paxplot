@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import time
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -334,3 +335,33 @@ def test_axis_interaction_workflow_snapshot_and_roundtrip(tmp_path, snapshot) ->
     )
 
     assert_snapshot_and_roundtrip(plot, tmp_path, snapshot)
+
+
+@pytest.mark.integration
+def test_large_dataset_workflow_performance(tmp_path, record_property) -> None:
+    rows = np.random.default_rng(0).normal(size=(10_000, 10)).tolist()
+    png_path = tmp_path / "large.png"
+    json_path = tmp_path / "large.json"
+
+    start = time.perf_counter()
+    plot = pax.ParallelPlot().set_data(rows)
+    fig = plot.render(figsize=(12.0, 5.0))
+    try:
+        fig.savefig(png_path)
+    finally:
+        plt.close(fig)
+    plot.to_json(json_path)
+    restored = pax.ParallelPlot.from_json(json_path)
+    elapsed = time.perf_counter() - start
+
+    # Correctness at scale, so this is not a timing-only test.
+    assert restored.state == plot.state
+    assert len(restored.state.data.rows) == 10_000
+    for path in (png_path, json_path):
+        assert path.is_file()
+        assert path.stat().st_size > 0
+
+    record_property("elapsed_seconds", round(elapsed, 3))
+    # ~17x headroom over the ~1.7 s measured on a typical machine, so slower
+    # runners pass while algorithmic (e.g. O(n^2)) regressions still fail.
+    assert elapsed < 30.0, f"large workflow took {elapsed:.1f}s"
