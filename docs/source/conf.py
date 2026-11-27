@@ -55,7 +55,7 @@ exclude_patterns = []
 html_theme = "pydata_sphinx_theme"
 
 # For sitemap creation
-html_baseurl = "https://kravitsjacob.github.io/paxplot/"
+html_baseurl = "https://docs.paxplot.org"
 
 # Numpy Docstrings
 napoleon_numpy_docstring = True

@@ -9,8 +9,11 @@ authors:
     email: kravitsjacob@gmail.com
     orcid: "https://orcid.org/0000-0002-9170-0496"
     family-names: Kravits
-repository-code: "https://github.com/kravitsjacob/paxplot"
-url: "https://kravitsjacob.github.io/paxplot/"
+identifiers:
+  - type: doi
+    value: 10.1008/paxplot.v0.1.4-beta
+repository-code: 'https://github.com/paxplot/paxplot'
+url: 'https://docs.paxplot.org'
 keywords:
   - high-dimensional-data
   - matplotlib

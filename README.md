@@ -1,9 +1,12 @@
 [![PyPI](https://img.shields.io/pypi/v/paxplot)](https://pypi.org/project/paxplot/)
-[![GitHub license](https://img.shields.io/github/license/kravitsjacob/paxplot)](https://github.com/kravitsjacob/paxplot/blob/main/LICENSE)
+[![CI](https://img.shields.io/github/workflow/status/paxplot/paxplot/CI)](https://github.com/paxplot/paxplot/actions)
+[![GitHub license](https://img.shields.io/github/license/paxplot/paxplot)](https://github.com/paxplot/paxplot/blob/main/LICENSE)
 
 # PaxPlot
 
 PaxPlot stores a serializable definition of a parallel coordinate plot and renders it with matplotlib.
+
+Check out our [homepage](https://docs.paxplot.org) for more information.
 
 ```python
 import paxplot as pax
@@ -28,9 +31,11 @@ fig = plot.render()
 pip install paxplot
 ```
 
+For additional installation instructions, see the [Getting Started](https://docs.paxplot.org/getting_started.html) documentation.
+
 ## Reporting Bugs
 
-Please report all bugs using [issues](https://github.com/kravitsjacob/paxplot/issues).
+Please report all bugs using [issues](https://github.com/paxplot/paxplot/issues).
 
 ## Contributing
 
