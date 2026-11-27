@@ -35,6 +35,54 @@ def _segments(render_data: RenderData) -> np.ndarray:
     return np.stack((x, render_data.y), axis=-1)
 
 
+def _points_to_data(fig, ax, points: float) -> float:
+    """Convert a physical length in points to data units along the x-axis."""
+
+    bbox = ax.bbox
+    left, right = ax.get_xlim()
+    if bbox.width <= 0 or right <= left:
+        return points / 72.0
+    return points * (fig.dpi / 72.0) * (right - left) / bbox.width
+
+
+def _right_limit_for_labels(
+    fig, ax, labels: list[Text], base_right: float, margin_px: float = 16.0
+) -> float:
+    """Return a right x-limit that keeps right-side labels clear of the colorbar."""
+
+    if not labels:
+        return base_right
+
+    try:
+        renderer = fig.canvas.get_renderer()
+    except AttributeError:
+        longest = max(len(label.get_text()) for label in labels)
+        return max(base_right, 0.1 + 0.04 * longest)
+
+    left, right = ax.get_xlim()
+    bbox = ax.bbox
+    if bbox.width <= 0 or right <= left:
+        return base_right
+
+    boundary = fig.bbox.x1 - margin_px
+    if len(fig.axes) > 1:
+        boundary = min(boundary, fig.axes[-1].bbox.x0 - margin_px)
+
+    required = right
+    for label in labels:
+        extent = label.get_window_extent(renderer=renderer)
+        x_data = label.get_position()[0]
+        available = boundary - extent.width - bbox.x0
+        if available > 0:
+            candidate = left + (x_data - left) * bbox.width / available
+        else:
+            overflow = extent.width - (boundary - bbox.x0)
+            candidate = right + overflow * (right - left) / bbox.width
+        required = max(required, candidate)
+
+    return max(base_right, required)
+
+
 def render_matplotlib(render_data: RenderData, **kwargs):
     """Draw render-ready data with matplotlib and return a Figure."""
 
@@ -75,11 +123,26 @@ def render_matplotlib(render_data: RenderData, **kwargs):
         ax.add_collection(collection)
 
     axis_color = "0.2"
-    tick_color = "0.35"
-    tick_half_width = 0.035
-    for axis in render_data.axes:
+    axis_linewidth = 1.0
+    # Tick geometry is physical, matching matplotlib's ytick.major defaults.
+    tick_length_points = 3.5
+    tick_label_offset_points = 7.0
+    last_axis_index = len(render_data.axes) - 1
+    right_labels: list[Text] = []
+    label_specs: list[tuple[Text, str, float]] = []
+
+    for axis_index, axis in enumerate(render_data.axes):
+        side = "right" if axis_index == last_axis_index else "left"
         if axis.spine_visible:
-            ax.vlines(axis.x, 0.0, 1.0, color=axis_color, linewidth=1.0, zorder=3)
+            ax.vlines(
+                axis.x,
+                0.0,
+                1.0,
+                color=axis_color,
+                linewidth=axis_linewidth,
+                capstyle="projecting",
+                zorder=3,
+            )
         if axis.label_visible:
             title = ax.text(
                 axis.x,
@@ -90,28 +153,28 @@ def render_matplotlib(render_data: RenderData, **kwargs):
                 fontsize="medium",
             )
             _apply_font(title, axis.title_font)
-        for position, label in zip(axis.tick_positions, axis.tick_labels, strict=True):
-            if axis.tick_marks_visible:
-                ax.hlines(
-                    position,
-                    axis.x - tick_half_width,
-                    axis.x + tick_half_width,
-                    color=tick_color,
-                    linewidth=0.8,
-                    zorder=4,
-                )
-            if axis.tick_labels_visible:
+        if axis.tick_labels_visible:
+            horizontal_alignment = "left" if side == "right" else "right"
+            for position, label in zip(
+                axis.tick_positions, axis.tick_labels, strict=True
+            ):
+                # Provisional position; corrected once the final x-limit is known.
                 tick_label = ax.text(
-                    axis.x - tick_half_width * 1.8,
+                    axis.x,
                     position,
                     label,
-                    ha="right",
+                    ha=horizontal_alignment,
                     va="center",
                     fontsize="small",
                 )
                 _apply_font(tick_label, axis.tick_labels_font)
+                label_specs.append((tick_label, side, axis.x))
+                if side == "right":
+                    right_labels.append(tick_label)
 
-    ax.set_xlim(float(render_data.x.min()) - 0.2, float(render_data.x.max()) + 0.2)
+    left_limit = float(render_data.x.min()) - 0.2
+    right_limit = float(render_data.x.max()) + 0.2
+    ax.set_xlim(left_limit, right_limit)
     ax.set_ylim(-0.05, 1.08)
     ax.set_xticks([])
     ax.set_yticks([])
@@ -150,5 +213,44 @@ def render_matplotlib(render_data: RenderData, **kwargs):
                 labelbottom=False,
             )
             long_axis.get_offset_text().set_visible(False)
+
+    # The colorbar shrinks the axes, so settle right-label space and physical tick
+    # geometry after it exists. Moving the labels changes the required right limit,
+    # which changes the data-units scale, so iterate until both are stable.
+    right_limit = _right_limit_for_labels(fig, ax, right_labels, right_limit)
+    for _ in range(16):
+        ax.set_xlim(left_limit, right_limit)
+        offset = _points_to_data(fig, ax, tick_label_offset_points)
+        for text, side, axis_x in label_specs:
+            text.set_x(axis_x + offset if side == "right" else axis_x - offset)
+        updated = _right_limit_for_labels(fig, ax, right_labels, right_limit)
+        if np.isclose(updated, right_limit, rtol=1e-6, atol=1e-9):
+            break
+        right_limit = updated
+
+    ax.set_xlim(left_limit, right_limit)
+    offset = _points_to_data(fig, ax, tick_label_offset_points)
+    for text, side, axis_x in label_specs:
+        text.set_x(axis_x + offset if side == "right" else axis_x - offset)
+
+    tick_length = _points_to_data(fig, ax, tick_length_points)
+    for axis_index, axis in enumerate(render_data.axes):
+        if not axis.tick_marks_visible:
+            continue
+        side = "right" if axis_index == last_axis_index else "left"
+        for position in axis.tick_positions:
+            if side == "right":
+                start, end = axis.x, axis.x + tick_length
+            else:
+                start, end = axis.x - tick_length, axis.x
+            ax.hlines(
+                position,
+                start,
+                end,
+                color=axis_color,
+                linewidth=axis_linewidth,
+                capstyle="butt",
+                zorder=4,
+            )
 
     return fig

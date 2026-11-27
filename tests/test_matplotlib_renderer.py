@@ -313,3 +313,129 @@ def test_partial_fonts_preserve_role_defaults_and_do_not_modify_rcparams() -> No
             assert {key: rcParams[key] for key in settings} == original
         finally:
             plt.close(fig)
+
+
+def test_last_axis_ticks_and_labels_face_outward() -> None:
+    plot = (
+        pax.ParallelPlot()
+        .set_data([[0.0, 0.0], [1.0, 1.0]])
+        .set_axis(0, ticks=pax.AxisTicks(values=[0.0, 1.0]))
+        .set_axis(1, ticks=pax.AxisTicks(values=[0.0, 1.0]))
+    )
+    fig = plot.render()
+    try:
+        ax = fig.axes[0]
+        segments = [
+            segment
+            for item in ax.collections
+            if item.get_zorder() == 4
+            for segment in item.get_segments()
+        ]
+
+        # Interior axes point left; the last axis points right.
+        left_marks = [
+            segment for segment in segments if np.isclose(segment[:, 0].max(), 0.0)
+        ]
+        right_marks = [
+            segment for segment in segments if np.isclose(segment[:, 0].min(), 1.0)
+        ]
+        assert left_marks and right_marks
+        for segment in left_marks:
+            assert segment[0, 0] < 0.0
+            assert segment[1, 0] == pytest.approx(0.0)
+        for segment in right_marks:
+            assert segment[0, 0] == pytest.approx(1.0)
+            assert segment[1, 0] > 1.0
+
+        fig.canvas.draw()
+        for segment in segments:
+            start = ax.transData.transform(segment[0])
+            end = ax.transData.transform(segment[1])
+            length_points = np.hypot(*(end - start)) * 72.0 / fig.dpi
+            assert length_points == pytest.approx(3.5)
+
+        spine = next(item for item in ax.collections if item.get_zorder() == 3)
+        mark = next(item for item in ax.collections if item.get_zorder() == 4)
+        np.testing.assert_allclose(mark.get_colors(), spine.get_colors())
+        assert mark.get_linewidths()[0] == pytest.approx(spine.get_linewidths()[0])
+        assert spine.get_capstyle() == "projecting"
+        assert mark.get_capstyle() == "butt"
+
+        for text in ax.texts:
+            x, _ = text.get_position()
+            if x < 0:
+                assert text.get_ha() == "right"
+            elif x > 1:
+                assert text.get_ha() == "left"
+    finally:
+        plt.close(fig)
+
+
+@pytest.mark.parametrize(
+    "figsize",
+    [(6.4, 4.8), (5.0, 5.0), (8.0, 4.0), (10.0, 4.0), (4.0, 6.0), (4.0, 8.0)],
+)
+def test_tick_geometry_is_physical_across_figure_sizes(figsize) -> None:
+    plot = (
+        pax.ParallelPlot()
+        .set_data([[0.0, 0.0], [1.0, 1.0]])
+        .set_axis(0, ticks=pax.AxisTicks(values=[0.0, 1.0]))
+        .set_axis(1, ticks=pax.AxisTicks(values=[0.0, 1.0]))
+        .set_colorbar(0, title=pax.ColorbarTitle(text="A"))
+    )
+    fig = plot.render(figsize=figsize)
+    try:
+        fig.canvas.draw()
+        ax = fig.axes[0]
+        marks = [item for item in ax.collections if item.get_zorder() == 4]
+        assert marks
+        for item in marks:
+            for segment in item.get_segments():
+                start = ax.transData.transform(segment[0])
+                end = ax.transData.transform(segment[1])
+                length_points = np.hypot(*(end - start)) * 72.0 / fig.dpi
+                assert length_points == pytest.approx(3.5)
+
+        # Labels sit one tick length plus a 3.5 pt pad from the axis.
+        for text in ax.texts:
+            if text.get_ha() not in {"left", "right"}:
+                continue
+            x, y = text.get_position()
+            axis_x = 1.0 if text.get_ha() == "left" else 0.0
+            anchor = ax.transData.transform((axis_x, y))
+            label = ax.transData.transform((x, y))
+            offset_points = abs(label[0] - anchor[0]) * 72.0 / fig.dpi
+            assert offset_points == pytest.approx(7.0)
+    finally:
+        plt.close(fig)
+
+
+def test_last_axis_labels_do_not_overlap_colorbar() -> None:
+    labels = ["a very long tick label", "another very long tick label"]
+    plot = (
+        pax.ParallelPlot()
+        .set_data([[0.0, 0.0], [1.0, 1.0]])
+        .set_axis(
+            1,
+            ticks=pax.AxisTicks(
+                values=[0.0, 1.0],
+                labels=pax.AxisTickLabels(text=labels),
+            ),
+        )
+        .set_colorbar(0, title=pax.ColorbarTitle(text="A"))
+    )
+    fig = plot.render()
+    try:
+        fig.canvas.draw()
+        ax, colorbar_axis = fig.axes
+        right_labels = [
+            text
+            for text in ax.texts
+            if text.get_position()[0] > 1 and text.get_text() in labels
+        ]
+        assert len(right_labels) == 2
+        for label in right_labels:
+            assert label.get_ha() == "left"
+            assert label.get_window_extent().x1 < colorbar_axis.bbox.x0
+    finally:
+        plt.close(fig)
