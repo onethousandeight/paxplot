@@ -46,25 +46,10 @@ components. Each component owns its configuration and appearance directly.
 .. autoclass:: paxplot.AxisSpine
    :members:
 
-.. autoclass:: paxplot.TextAppearance
-   :members:
-
 .. autoclass:: paxplot.FontSpec
    :members:
 
-.. autoclass:: paxplot.LinePresentation
-   :members:
-
-.. autoclass:: paxplot.LineStyle
-   :members:
-
-.. autoclass:: paxplot.LineStyleOverride
-   :members:
-
 .. autoclass:: paxplot.ColorEncoding
-   :members:
-
-.. autoclass:: paxplot.ColorbarPresentation
    :members:
 
 .. autoclass:: paxplot.ColorbarTitle

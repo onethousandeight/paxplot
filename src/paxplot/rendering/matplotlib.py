@@ -19,6 +19,10 @@ from paxplot.state import FontSpec
 # CSS weight names that matplotlib does not accept directly.
 _WEIGHT_MAP = {"thin": 100, "extra light": 200}
 
+# Upper bound for settling right-label space against physical tick offsets; the
+# feedback loop normally converges in a handful of passes.
+_MAX_LABEL_PASSES = 16
+
 
 def _matplotlib_weight(weight: str) -> str | int:
     """Translate renderer-neutral weight names to matplotlib values."""
@@ -71,11 +75,7 @@ def _right_limit_for_labels(
     if not labels:
         return base_right
 
-    try:
-        renderer = fig.canvas.get_renderer()
-    except AttributeError:
-        longest = max(len(label.get_text()) for label in labels)
-        return max(base_right, 0.1 + 0.04 * longest)
+    renderer = fig.canvas.get_renderer()
 
     left, right = ax.get_xlim()
     bbox = ax.bbox
@@ -112,6 +112,8 @@ def render_matplotlib(render_data: RenderData, **kwargs: object) -> Figure:
     segments = _segments(render_data)
     groups: dict[float, list[int]] = defaultdict(list)
     for index, zorder in enumerate(render_data.line_zorders):
+        # Lines without an explicit zorder group at matplotlib's default line
+        # level (2), below the spines and tick marks drawn at levels 3 and 4.
         key = 2.0 if np.isnan(zorder) else float(zorder)
         groups[key].append(index)
 
@@ -220,24 +222,27 @@ def render_matplotlib(render_data: RenderData, **kwargs: object) -> Figure:
             )
             long_axis.get_offset_text().set_visible(False)
 
-    # The colorbar shrinks the axes, so settle right-label space and physical tick
-    # geometry after it exists. Moving the labels changes the required right limit,
-    # which changes the data-units scale, so iterate until both are stable.
-    right_limit = _right_limit_for_labels(fig, ax, right_labels, right_limit)
-    for _ in range(16):
-        ax.set_xlim(left_limit, right_limit)
+    def place_labels() -> None:
+        """Offset each tick label from its axis by one label pad, in data units."""
+
         offset = _points_to_data(fig, ax, tick_label_offset_points)
         for text, side, axis_x in label_specs:
             text.set_x(axis_x + offset if side == "right" else axis_x - offset)
+
+    # The colorbar shrinks the axes, so settle right-label space and physical tick
+    # geometry after it exists. Moving the labels changes the required right limit,
+    # which changes the data-units scale, so iterate until both are stable.
+    for _ in range(_MAX_LABEL_PASSES):
+        ax.set_xlim(left_limit, right_limit)
+        place_labels()
         updated = _right_limit_for_labels(fig, ax, right_labels, right_limit)
         if np.isclose(updated, right_limit, rtol=1e-6, atol=1e-9):
             break
         right_limit = updated
-
-    ax.set_xlim(left_limit, right_limit)
-    offset = _points_to_data(fig, ax, tick_label_offset_points)
-    for text, side, axis_x in label_specs:
-        text.set_x(axis_x + offset if side == "right" else axis_x - offset)
+    else:
+        # Never converged: commit the final estimate for a consistent figure.
+        ax.set_xlim(left_limit, right_limit)
+        place_labels()
 
     tick_length = _points_to_data(fig, ax, tick_length_points)
     for axis_index, axis in enumerate(render_data.axes):

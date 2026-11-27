@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Iterable, Mapping, Sequence, Set
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Self
 
 from paxplot._values import is_missing, resolve_categories
 from paxplot.rendering import prepare_render_data, render_matplotlib
@@ -20,15 +20,14 @@ from paxplot.state import (
     ColorEncoding,
     ColumnSpec,
     LinePresentation,
-    LineStyle,
     LineStyleOverride,
     PlotData,
     PlotPresentation,
     PlotState,
+    infer_dtype,
     load_state,
     save_state,
 )
-from paxplot.state.schema import infer_dtype
 
 if TYPE_CHECKING:
     from matplotlib.figure import Figure
@@ -105,9 +104,9 @@ class ParallelPlot:
     """User-facing object for configuring, rendering, and saving a PaxPlot."""
 
     def __init__(self, state: PlotState | None = None) -> None:
-        self.state = PlotState.model_validate(state or PlotState())
+        self.state = state if state is not None else PlotState()
 
-    def set_data(self, data: Iterable[Sequence[object]]) -> ParallelPlot:
+    def set_data(self, data: Iterable[Sequence[object]]) -> Self:
         """Set plot data from rectangular row-oriented values."""
 
         rows = _coerce_rows(data)
@@ -145,7 +144,7 @@ class ParallelPlot:
         title: AxisTitle | None = None,
         ticks: AxisTicks | None = None,
         spine: AxisSpine | None = None,
-    ) -> ParallelPlot:
+    ) -> Self:
         """Replace supplied components, preserving omitted components.
 
         Each component owns both configuration and appearance. To change only
@@ -153,24 +152,24 @@ class ParallelPlot:
         or construct a replacement from its current ``model_dump()``.
         """
 
-        update = self._axis(axis).model_dump()
-        for name, component in (
-            ("scale", scale),
-            ("title", title),
-            ("ticks", ticks),
-            ("spine", spine),
-        ):
-            if component is not None:
-                update[name] = component
-        self._replace_axis(axis, update)
+        replacement = self._axis(axis).model_copy(deep=True)
+        if scale is not None:
+            replacement.scale = scale
+        if title is not None:
+            replacement.title = title
+        if ticks is not None:
+            replacement.ticks = ticks
+        if spine is not None:
+            replacement.spine = spine
+        self._replace_axis(axis, replacement)
         return self
 
-    def set_axis_label(self, axis: int, label: str) -> ParallelPlot:
+    def set_axis_label(self, axis: int, label: str) -> Self:
         """Update title text, preserving its appearance."""
 
-        update = self._axis(axis).model_dump()
-        update["title"]["text"] = label
-        self._replace_axis(axis, update)
+        replacement = self._axis(axis).model_copy(deep=True)
+        replacement.title.text = label
+        self._replace_axis(axis, replacement)
         return self
 
     def set_axis_limits(
@@ -178,17 +177,17 @@ class ParallelPlot:
         axis: int,
         lower: float | None | _Unset = _UNSET,
         upper: float | None | _Unset = _UNSET,
-    ) -> ParallelPlot:
+    ) -> Self:
         """Update numeric limits, preserving omitted bounds and other settings."""
 
-        update = self._axis(axis).model_dump()
-        limits = list(update["scale"]["limits"])
+        replacement = self._axis(axis).model_copy(deep=True)
+        lower_bound, upper_bound = replacement.scale.limits
         if lower is not _UNSET:
-            limits[0] = lower
+            lower_bound = lower
         if upper is not _UNSET:
-            limits[1] = upper
-        update["scale"]["limits"] = tuple(limits)
-        self._replace_axis(axis, update)
+            upper_bound = upper
+        replacement.scale.limits = (lower_bound, upper_bound)
+        self._replace_axis(axis, replacement)
         return self
 
     def reset_axis_limits(
@@ -197,17 +196,16 @@ class ParallelPlot:
         *,
         lower: bool = True,
         upper: bool = True,
-    ) -> ParallelPlot:
+    ) -> Self:
         """Reset selected limits to their automatic data-derived values."""
 
-        update = self._axis(axis).model_dump()
-        limits = list(update["scale"]["limits"])
-        if lower:
-            limits[0] = None
-        if upper:
-            limits[1] = None
-        update["scale"]["limits"] = tuple(limits)
-        self._replace_axis(axis, update)
+        replacement = self._axis(axis).model_copy(deep=True)
+        lower_bound, upper_bound = replacement.scale.limits
+        replacement.scale.limits = (
+            None if lower else lower_bound,
+            None if upper else upper_bound,
+        )
+        self._replace_axis(axis, replacement)
         return self
 
     def set_axis_ticks(
@@ -215,64 +213,39 @@ class ParallelPlot:
         axis: int,
         values: list[float | str],
         labels: list[str] | None = None,
-    ) -> ParallelPlot:
+    ) -> Self:
         """Update reference values and text, preserving appearance and count."""
 
-        update = self._axis(axis).model_dump()
-        update["ticks"]["values"] = values
-        update["ticks"]["labels"]["text"] = labels
-        self._replace_axis(axis, update)
+        replacement = self._axis(axis).model_copy(deep=True)
+        replacement.ticks.values = values
+        replacement.ticks.labels.text = labels
+        self._replace_axis(axis, replacement)
         return self
 
-    def invert_axis(self, axis: int, inverted: bool = True) -> ParallelPlot:
+    def invert_axis(self, axis: int, inverted: bool = True) -> Self:
         """Update inversion, preserving the other scale settings."""
 
-        update = self._axis(axis).model_dump()
-        update["scale"]["inverted"] = inverted
-        self._replace_axis(axis, update)
+        replacement = self._axis(axis).model_copy(deep=True)
+        replacement.scale.inverted = inverted
+        self._replace_axis(axis, replacement)
         return self
 
     def set_default_line_style(
         self,
         *,
-        color: str | None = None,
-        alpha: float | None = None,
-        width: float | None = None,
-        linestyle: str | None = None,
-        zorder: float | None = None,
-    ) -> ParallelPlot:
-        """Update default line appearance, preserving omitted fields."""
+        color: str | None | _Unset = _UNSET,
+        alpha: float | None | _Unset = _UNSET,
+        width: float | None | _Unset = _UNSET,
+        linestyle: str | None | _Unset = _UNSET,
+        zorder: float | None | _Unset = _UNSET,
+    ) -> Self:
+        """Update default line appearance, preserving omitted fields.
 
-        update = self.state.presentation.lines.default.model_dump()
-        if color is not None:
-            update["color"] = color
-        if alpha is not None:
-            update["alpha"] = alpha
-        if width is not None:
-            update["width"] = width
-        if linestyle is not None:
-            update["linestyle"] = linestyle
-        if zorder is not None:
-            update["zorder"] = zorder
-        self._replace_lines(default=LineStyle(**update))
-        return self
+        Passing ``None`` resets a field, since every ``LineStyle`` field is
+        optional.
+        """
 
-    def set_line_style(
-        self,
-        row: int,
-        *,
-        color: str | None = None,
-        alpha: float | None = None,
-        width: float | None = None,
-        linestyle: str | None = None,
-        zorder: float | None = None,
-    ) -> ParallelPlot:
-        """Update one row's line appearance, preserving omitted fields."""
-
-        self._row(row)
-        styles = dict(self.state.presentation.lines.overrides)
-        existing = styles.get(row)
-        update = existing.model_dump() if existing is not None else {}
+        replacement = self.state.presentation.lines.default.model_copy()
         for name, value in (
             ("color", color),
             ("alpha", alpha),
@@ -280,13 +253,45 @@ class ParallelPlot:
             ("linestyle", linestyle),
             ("zorder", zorder),
         ):
-            if value is not None:
-                update[name] = value
-        styles[row] = LineStyleOverride(**update)
+            if value is not _UNSET:
+                setattr(replacement, name, value)
+        self._replace_lines(default=replacement)
+        return self
+
+    def set_line_style(
+        self,
+        row: int,
+        *,
+        color: str | None | _Unset = _UNSET,
+        alpha: float | None | _Unset = _UNSET,
+        width: float | None | _Unset = _UNSET,
+        linestyle: str | None | _Unset = _UNSET,
+        zorder: float | None | _Unset = _UNSET,
+    ) -> Self:
+        """Update one row's line appearance, preserving omitted fields.
+
+        Passing ``None`` resets a field to the default line appearance.
+        """
+
+        self._row(row)
+        styles = dict(self.state.presentation.lines.overrides)
+        replacement = (
+            styles[row].model_copy() if row in styles else LineStyleOverride()
+        )
+        for name, value in (
+            ("color", color),
+            ("alpha", alpha),
+            ("width", width),
+            ("linestyle", linestyle),
+            ("zorder", zorder),
+        ):
+            if value is not _UNSET:
+                setattr(replacement, name, value)
+        styles[row] = replacement
         self._replace_lines(overrides=styles)
         return self
 
-    def clear_line_style(self, row: int) -> ParallelPlot:
+    def clear_line_style(self, row: int) -> Self:
         """Remove all style overrides for one row."""
 
         self._row(row)
@@ -303,7 +308,7 @@ class ParallelPlot:
         title: ColorbarTitle | None = None,
         ticks: ColorbarTicks | None = None,
         limits: tuple[float | None, float | None] | None = None,
-    ) -> ParallelPlot:
+    ) -> Self:
         """Configure color encoding, replacing supplied colorbar components.
 
         Omitted title and tick components retain their existing settings.
@@ -314,21 +319,21 @@ class ParallelPlot:
         lower, upper = limits or (None, None)
         encoding = self.state.presentation.lines.color_encoding
         colorbar = (
-            encoding.colorbar.model_dump()
+            encoding.colorbar.model_copy(deep=True)
             if encoding is not None
-            else ColorbarPresentation().model_dump()
+            else ColorbarPresentation()
         )
         if title is not None:
-            colorbar["title"] = title
+            colorbar.title = title
         if ticks is not None:
-            colorbar["ticks"] = ticks
+            colorbar.ticks = ticks
         self._replace_lines(
             color_encoding=ColorEncoding(
                 axis=axis,
                 palette=palette,
                 lower=lower,
                 upper=upper,
-                colorbar=ColorbarPresentation.model_validate(colorbar),
+                colorbar=colorbar,
             )
         )
         return self
@@ -344,7 +349,7 @@ class ParallelPlot:
         save_state(self.state, path)
 
     @classmethod
-    def from_json(cls, path: str | Path) -> ParallelPlot:
+    def from_json(cls, path: str | Path) -> Self:
         """Load a plot definition from JSON."""
 
         return cls(load_state(path))
@@ -371,32 +376,20 @@ class ParallelPlot:
             raise ValueError(msg)
         return row
 
-    def _replace_axis(self, index: int, axis: dict[str, Any]) -> None:
-        presentation = self.state.presentation.model_copy(deep=True)
-        presentation.axes[index] = AxisPresentation.model_validate(axis)
-        PlotState._validate_presentation(
-            self.state.data,
-            presentation,
-            changed_axes={index},
-            check_dtypes=False,
+    def _replace_axis(self, index: int, replacement: AxisPresentation) -> None:
+        axes = list(self.state.presentation.axes)
+        axes[index] = replacement
+        self._replace_state(
+            presentation=self.state.presentation.model_copy(update={"axes": axes})
         )
-        self.state = self.state.model_copy(update={"presentation": presentation})
 
     def _replace_lines(self, **updates: Any) -> None:
-        presentation = self.state.presentation.model_copy(deep=True)
-        presentation.lines = LinePresentation.model_validate(
-            presentation.lines.model_copy(update=updates)
+        lines = self.state.presentation.lines.model_copy(update=updates)
+        self._replace_state(
+            presentation=self.state.presentation.model_copy(update={"lines": lines})
         )
-        PlotState._validate_presentation(
-            self.state.data,
-            presentation,
-            changed_axes=set(),
-            check_dtypes=False,
-        )
-        self.state = self.state.model_copy(update={"presentation": presentation})
 
     def _replace_state(self, **updates: Any) -> None:
         """Validate an entire candidate before committing any edit."""
 
-        candidate = self.state.model_copy(update=updates)
-        self.state = PlotState.model_validate(candidate)
+        self.state = PlotState.model_validate(self.state.model_copy(update=updates))

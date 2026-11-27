@@ -78,5 +78,5 @@ def padded_bounds(lower: float, upper: float) -> tuple[float, float]:
 
     if lower != upper:
         return lower, upper
-    padding = abs(lower) * 0.05 or 0.5
+    padding = 0.5 if lower == 0 else abs(lower) * 0.05
     return lower - padding, upper + padding

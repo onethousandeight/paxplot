@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from paxplot._values import is_missing
 
@@ -50,6 +50,8 @@ class PlotData(StateModel):
 
 _FontName = Annotated[str, Field(min_length=1)]
 _PointSize = Annotated[float, Field(gt=0, allow_inf_nan=False)]
+_Alpha = Annotated[float, Field(ge=0, le=1)]
+_LineWidth = Annotated[float, Field(gt=0)]
 _WeightName = Literal[
     "thin",
     "extra light",
@@ -160,52 +162,20 @@ class LineStyle(StateModel):
     """Default serializable line appearance."""
 
     color: str | None = None
-    alpha: float = 0.7
-    width: float = 1.0
+    alpha: _Alpha = 0.7
+    width: _LineWidth = 1.0
     linestyle: str = "-"
     zorder: float | None = None
-
-    @field_validator("alpha")
-    @classmethod
-    def validate_alpha(cls, value: float) -> float:
-        if not 0.0 <= value <= 1.0:
-            msg = "alpha must be between 0 and 1"
-            raise ValueError(msg)
-        return value
-
-    @field_validator("width")
-    @classmethod
-    def validate_width(cls, value: float) -> float:
-        if value <= 0:
-            msg = "line width must be positive"
-            raise ValueError(msg)
-        return value
 
 
 class LineStyleOverride(StateModel):
     """Optional per-row line appearance overrides."""
 
     color: str | None = None
-    alpha: float | None = None
-    width: float | None = None
+    alpha: _Alpha | None = None
+    width: _LineWidth | None = None
     linestyle: str | None = None
     zorder: float | None = None
-
-    @field_validator("alpha")
-    @classmethod
-    def validate_alpha(cls, value: float | None) -> float | None:
-        if value is not None and not 0.0 <= value <= 1.0:
-            msg = "alpha must be between 0 and 1"
-            raise ValueError(msg)
-        return value
-
-    @field_validator("width")
-    @classmethod
-    def validate_width(cls, value: float | None) -> float | None:
-        if value is not None and value <= 0:
-            msg = "line width must be positive"
-            raise ValueError(msg)
-        return value
 
 
 class ColorbarTitle(TextAppearance):
@@ -293,68 +263,56 @@ class PlotState(StateModel):
         elif columns or axes:
             raise ValueError("columns and axes cannot be defined without data")
 
-        self._validate_presentation(self.data, self.presentation, check_dtypes=True)
+        for index, (column, axis) in enumerate(zip(columns, axes, strict=True)):
+            values = [row[index] for row in rows]
+            if column.dtype != infer_dtype(values):
+                raise ValueError(f"column {index} dtype does not match observations")
+            self._validate_axis_data(column, axis, values)
+
+        self._validate_lines()
         return self
 
-    @staticmethod
-    def _validate_presentation(
-        data: PlotData,
-        presentation: PlotPresentation,
-        *,
-        changed_axes: set[int] | None = None,
-        check_dtypes: bool = False,
+    def _validate_axis_data(
+        self, column: ColumnSpec, axis: AxisPresentation, values: list[object]
     ) -> None:
-        """Validate presentation components, optionally only changed axes."""
+        """Check one axis's scale and ticks against its column's observations."""
 
-        rows = data.rows
-        columns = data.columns
-        axes = presentation.axes
-        if rows and len(axes) != len(rows[0]):
-            raise ValueError("number of axes must match row width")
-        if not rows and axes:
-            raise ValueError("columns and axes cannot be defined without data")
+        scale = axis.scale
+        if column.dtype == "numeric":
+            if scale.categories is not None:
+                raise ValueError("numeric axes cannot define categories")
+            if axis.ticks.values is not None and any(
+                isinstance(value, str) for value in axis.ticks.values
+            ):
+                raise ValueError("numeric axes require numeric tick values")
+        else:
+            if scale.limits != (None, None):
+                raise ValueError("categorical axes cannot define numeric limits")
+            categories = scale.categories
+            observed = {value for value in values if isinstance(value, str)}
+            if categories is not None and not observed.issubset(categories):
+                raise ValueError(
+                    "axis categories must include every observed category"
+                )
+            allowed = set(categories) if categories is not None else observed
+            if axis.ticks.values is not None and any(
+                value not in allowed for value in axis.ticks.values
+            ):
+                raise ValueError(
+                    "categorical tick values must reference known categories"
+                )
 
-        indices = range(len(columns)) if changed_axes is None else changed_axes
-        for index in indices:
-            if index < 0 or index >= len(columns) or index >= len(axes):
-                raise ValueError(f"unknown axis index {index}")
-            column = columns[index]
-            axis = axes[index]
-            values = [row[index] for row in rows]
-            if check_dtypes and column.dtype != infer_dtype(values):
-                raise ValueError(f"column {index} dtype does not match observations")
-            scale = axis.scale
-            if column.dtype == "numeric":
-                if scale.categories is not None:
-                    raise ValueError("numeric axes cannot define categories")
-                if axis.ticks.values is not None and any(
-                    isinstance(value, str) for value in axis.ticks.values
-                ):
-                    raise ValueError("numeric axes require numeric tick values")
-            else:
-                if scale.limits != (None, None):
-                    raise ValueError("categorical axes cannot define numeric limits")
-                categories = scale.categories
-                observed = {value for value in values if isinstance(value, str)}
-                if categories is not None and not observed.issubset(categories):
-                    raise ValueError(
-                        "axis categories must include every observed category"
-                    )
-                allowed = set(categories) if categories is not None else observed
-                if axis.ticks.values is not None and any(
-                    value not in allowed for value in axis.ticks.values
-                ):
-                    raise ValueError(
-                        "categorical tick values must reference known categories"
-                    )
+    def _validate_lines(self) -> None:
+        """Check line overrides and color encoding against this state's data."""
 
-        lines = presentation.lines
+        lines = self.presentation.lines
+        rows = self.data.rows
         for row in lines.overrides:
             if row < 0 or row >= len(rows):
                 raise ValueError(f"line style references unknown row index {row}")
         if lines.color_encoding is not None:
             index = lines.color_encoding.axis
-            if index < 0 or index >= len(columns):
+            if index < 0 or index >= len(self.data.columns):
                 raise ValueError(f"unknown axis index {index}")
-            if columns[index].dtype != "numeric":
+            if self.data.columns[index].dtype != "numeric":
                 raise ValueError("colorbar encoding only supports numeric axes")

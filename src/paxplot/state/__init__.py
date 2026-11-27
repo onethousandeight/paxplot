@@ -22,6 +22,7 @@ from paxplot.state.schema import (
     PlotPresentation,
     PlotState,
     TextAppearance,
+    infer_dtype,
 )
 from paxplot.state.serialization import load_state, save_state
 
@@ -47,6 +48,7 @@ __all__ = [
     "PlotPresentation",
     "PlotState",
     "TextAppearance",
+    "infer_dtype",
     "load_state",
     "save_state",
 ]

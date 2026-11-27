@@ -19,7 +19,7 @@ _INDENT = "  "
 
 
 class _StateDocument(StateModel):
-    schema_version: Literal[2]
+    schema_version: Literal[PLOT_STATE_SCHEMA_VERSION]
     state: PlotState
 
     @field_validator("schema_version", mode="before")
@@ -27,7 +27,8 @@ class _StateDocument(StateModel):
     def validate_version(cls, value: object) -> object:
         if type(value) is not int or value != PLOT_STATE_SCHEMA_VERSION:
             raise ValueError(
-                f"unsupported schema version {value!r}; supported versions: 2"
+                f"unsupported schema version {value!r}; "
+                f"supported versions: {PLOT_STATE_SCHEMA_VERSION}"
             )
         return value
 

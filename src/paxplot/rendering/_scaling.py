@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import math
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping
 
 import numpy as np
 
@@ -11,17 +11,17 @@ from paxplot._values import finite_float, is_missing, padded_bounds
 from paxplot.state import AxisScale
 
 
-def numeric_bounds(values: Sequence[object], scale: AxisScale) -> tuple[float, float]:
-    """Resolve numeric bounds from configured limits and data."""
+def numeric_bounds(numbers: np.ndarray, scale: AxisScale) -> tuple[float, float]:
+    """Resolve numeric bounds from a column array of prepared numeric values."""
 
-    finite: list[float] = []
-    for value in values:
-        if is_missing(value):
-            continue
-        finite.append(finite_float(value, kind="numeric"))
+    infinite = np.isinf(numbers)
+    if infinite.any():
+        msg = f"numeric value {numbers[infinite][0]!r} is not a finite number"
+        raise ValueError(msg)
 
-    data_lower = min(finite) if finite else 0.0
-    data_upper = max(finite) if finite else 1.0
+    finite = numbers[np.isfinite(numbers)]
+    data_lower = float(finite.min()) if finite.size else 0.0
+    data_upper = float(finite.max()) if finite.size else 1.0
     lower = data_lower if scale.limits[0] is None else scale.limits[0]
     upper = data_upper if scale.limits[1] is None else scale.limits[1]
     if not math.isfinite(lower) or not math.isfinite(upper):
