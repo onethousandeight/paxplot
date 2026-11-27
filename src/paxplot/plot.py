@@ -275,9 +275,7 @@ class ParallelPlot:
 
         self._row(row)
         styles = dict(self.state.presentation.lines.overrides)
-        replacement = (
-            styles[row].model_copy() if row in styles else LineStyleOverride()
-        )
+        replacement = styles[row].model_copy() if row in styles else LineStyleOverride()
         for name, value in (
             ("color", color),
             ("alpha", alpha),

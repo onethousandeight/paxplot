@@ -29,6 +29,7 @@ dev = [
     "build>=1.2",
     "pandas>=2.2.3",
     "pytest>=8",
+    "pytest-cov>=7",
     "ruff>=0.6",
     "setuptools>=77",
     "sphinx>=8",

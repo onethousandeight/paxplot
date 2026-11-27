@@ -291,9 +291,7 @@ class PlotState(StateModel):
             categories = scale.categories
             observed = {value for value in values if isinstance(value, str)}
             if categories is not None and not observed.issubset(categories):
-                raise ValueError(
-                    "axis categories must include every observed category"
-                )
+                raise ValueError("axis categories must include every observed category")
             allowed = set(categories) if categories is not None else observed
             if axis.ticks.values is not None and any(
                 value not in allowed for value in axis.ticks.values
