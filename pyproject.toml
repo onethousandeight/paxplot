@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "paxplot"
-version = "0.2.0"
-description = "PaxPlot stores and renders serializable parallel coordinate plots."
+version = "1.0.0"
+description = "paxplot stores and renders serializable parallel coordinate plots."
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.12"
 license = "MIT"
@@ -22,7 +22,7 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/kravitsjacob/paxplot"
+Homepage = "https://github.com/onethousandeight/paxplot"
 
 [project.optional-dependencies]
 dev = [
@@ -32,12 +32,19 @@ dev = [
     "pytest-cov>=7",
     "ruff>=0.6",
     "setuptools>=77",
-    "sphinx>=8",
     "syrupy>=4.7"
 ]
+
+[dependency-groups]
 docs = [
+    "linkify-it-py",
+    "myst-parser",
+    "pandas>=2.2.3",
     "pydata-sphinx-theme",
     "sphinx>=8",
+    "sphinx-autobuild",
+    "sphinx-copybutton",
+    "sphinx-gallery",
     "sphinx-sitemap"
 ]
 

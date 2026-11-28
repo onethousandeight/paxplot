@@ -1,3 +1,11 @@
+"""
+Advanced Line Styling
+=====================
+
+Combine a dimmed default style, a single highlighted row, and a colorbar
+driven by the first column.
+"""
+
 import matplotlib.pyplot as plt
 import pandas as pd
 
@@ -5,7 +13,7 @@ import paxplot as pax
 from paxplot import hydroclimate_model_evaluation
 
 df = pd.read_csv(hydroclimate_model_evaluation()).head(20)
-columns = df.select_dtypes(include="number").columns[:4].tolist()
+columns = ["nse", "lognse", "aeq5", "kge12"]
 
 plot = pax.ParallelPlot()
 plot.set_data(df[columns].values.tolist())

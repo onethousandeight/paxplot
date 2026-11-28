@@ -1,3 +1,11 @@
+"""
+Basic Usage
+===========
+
+Build a parallel coordinate plot from a list of rows, label the axes, and
+render a Matplotlib figure.
+"""
+
 import matplotlib.pyplot as plt
 
 import paxplot as pax

@@ -1,4 +1,4 @@
-"""PaxPlot public API."""
+"""paxplot public API."""
 
 from paxplot.datasets import hydroclimate_model_evaluation, tradeoff
 from paxplot.plot import ParallelPlot

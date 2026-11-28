@@ -1,4 +1,4 @@
-"""Matplotlib renderer for PaxPlot."""
+"""Matplotlib renderer for paxplot."""
 
 from __future__ import annotations
 

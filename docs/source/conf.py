@@ -1,61 +1,108 @@
 # Configuration file for the Sphinx documentation builder.
 #
-# This file only contains a selection of the most common options. For a full
-# list see the documentation:
+# For the full list of options see:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
-# -- Path setup --------------------------------------------------------------
-
-# If extensions (or modules to document with autodoc) are in another directory,
-# add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath to make it absolute, like shown here.
-#
 import os
 import sys
+from datetime import date
+from functools import partial
+from importlib import metadata
+
+from sphinx_gallery.scrapers import matplotlib_scraper
 
 sys.path.insert(0, os.path.abspath("../../src"))
 
 
 # -- Project information -----------------------------------------------------
 
-project = "PaxPlot"
-copyright = "2022, Jacob Kravits"
+project = "paxplot"
 author = "Jacob Kravits"
+copyright = f"2022-{date.today().year}, onethousandeight"
 
-# The full version, including alpha/beta/rc tags
-release = "0.2.0"
+# Keep the docs version in sync with the installed package.
+try:
+    release = metadata.version("paxplot")
+except metadata.PackageNotFoundError:
+    release = "1.0.0"
+version = ".".join(release.split(".")[:2])
 
 
 # -- General configuration ---------------------------------------------------
 
-# Add any Sphinx extension module names here, as strings. They can be
-# extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
-# ones.
 extensions = [
+    "myst_parser",
     "sphinx.ext.autodoc",
-    "sphinx.ext.autosummary",
-    "sphinx_sitemap",
+    "sphinx.ext.intersphinx",
     "sphinx.ext.napoleon",
+    "sphinx_copybutton",
+    "sphinx_gallery.gen_gallery",
+    "sphinx_sitemap",
 ]
 
-# Add any paths that contain templates here, relative to this directory.
-templates_path = ["_templates"]
+source_suffix = {
+    ".md": "markdown",
+    ".rst": "restructuredtext",
+}
 
-# List of patterns, relative to source directory, that match files and
-# directories to ignore when looking for source files.
-# This pattern also affects html_extra_path.
-exclude_patterns = []
+templates_path = ["_templates"]
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
+
+# Numpy-style docstrings.
+napoleon_numpy_docstring = True
+
+# Move type hints out of signatures, which keeps pydantic models readable.
+autodoc_typehints = "description"
+autodoc_member_order = "bysource"
+
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3", None),
+    "numpy": ("https://numpy.org/doc/stable/", None),
+    "matplotlib": ("https://matplotlib.org/stable/", None),
+    "pandas": ("https://pandas.pydata.org/docs/", None),
+    "pydantic": ("https://pydantic.dev/docs/validation/latest/", None),
+}
+intersphinx_timeout = 15
+
+# Markdown support (MyST).
+myst_enable_extensions = ["colon_fence", "deflist", "tasklist", "linkify"]
+myst_heading_anchors = 3
+
+# Execute the scripts in examples/ and build the gallery.
+sphinx_gallery_conf = {
+    "examples_dirs": "../../examples",
+    "gallery_dirs": "auto_examples",
+    "filename_pattern": r"\.py",
+    # Save vector graphics so figures stay sharp at any size.
+    "image_scrapers": (partial(matplotlib_scraper, format="svg"),),
+    "within_subsection_order": "FileNameSortKey",
+    "remove_config_comments": True,
+    "download_all_examples": False,
+}
 
 
 # -- Options for HTML output -------------------------------------------------
 
-# The theme to use for HTML and HTML Help pages.  See the documentation for
-# a list of builtin themes.
-#
 html_theme = "pydata_sphinx_theme"
+html_title = "paxplot"
 
-# For sitemap creation
-html_baseurl = "https://docs.paxplot.org"
+# Used by the sitemap extension and canonical links.
+html_baseurl = "https://docs.paxplot.org/"
 
-# Numpy Docstrings
-napoleon_numpy_docstring = True
+html_theme_options = {
+    "github_url": "https://github.com/onethousandeight/paxplot",
+    "use_edit_page_button": True,
+    "navigation_depth": 2,
+    "show_prev_next": False,
+}
+
+html_context = {
+    "github_user": "onethousandeight",
+    "github_repo": "paxplot",
+    "github_version": "main",
+    "doc_path": "docs/source",
+}
+
+# Strip prompts from copied code blocks.
+copybutton_prompt_text = r">>> |\.\.\. |\$ "
+copybutton_prompt_is_regexp = True

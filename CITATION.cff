@@ -1,7 +1,7 @@
 cff-version: 1.2.0
-title: PaxPlot
+title: paxplot
 message: >-
-  PaxPlot stores serializable parallel coordinate plot definitions and renders
+  paxplot stores serializable parallel coordinate plot definitions and renders
   them with Matplotlib.
 type: software
 authors:
@@ -12,7 +12,7 @@ authors:
 identifiers:
   - type: doi
     value: 10.1008/paxplot.v0.1.4-beta
-repository-code: 'https://github.com/paxplot/paxplot'
+repository-code: 'https://github.com/onethousandeight/paxplot'
 url: 'https://docs.paxplot.org'
 keywords:
   - high-dimensional-data
@@ -20,4 +20,4 @@ keywords:
   - multi-objective
   - parallel-coordinates-plot
 license: MIT
-version: 0.2.0
+version: 1.0.0

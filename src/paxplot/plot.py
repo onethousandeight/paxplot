@@ -1,4 +1,4 @@
-"""Public PaxPlot plotting object."""
+"""Public paxplot plotting object."""
 
 from __future__ import annotations
 
@@ -101,7 +101,7 @@ def _column_values(rows: Sequence[Sequence[object]], axis: int) -> list[object]:
 
 
 class ParallelPlot:
-    """User-facing object for configuring, rendering, and saving a PaxPlot."""
+    """User-facing object for configuring, rendering, and saving a paxplot."""
 
     def __init__(self, state: PlotState | None = None) -> None:
         self.state = state if state is not None else PlotState()

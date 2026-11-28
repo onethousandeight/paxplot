@@ -60,3 +60,10 @@ components. Each component owns its configuration and appearance directly.
 
 .. autoclass:: paxplot.ColorbarTickLabels
    :members:
+
+Datasets
+--------
+
+.. autofunction:: paxplot.tradeoff
+
+.. autofunction:: paxplot.hydroclimate_model_evaluation

@@ -1,3 +1,10 @@
+"""
+Categorical Axes
+================
+
+Map string columns onto ordered categories instead of numeric scales.
+"""
+
 import matplotlib.pyplot as plt
 
 import paxplot as pax

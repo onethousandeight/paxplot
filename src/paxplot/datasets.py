@@ -1,4 +1,4 @@
-"""Default datasets included with PaxPlot."""
+"""Default datasets included with paxplot."""
 
 from __future__ import annotations
 

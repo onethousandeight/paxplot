@@ -1,4 +1,10 @@
-"""Reuse font specifications across axes and automatic colorbar labels."""
+"""
+Font Customization
+==================
+
+Reuse a font specification across axis titles, tick labels, and the
+colorbar while leaving other text at renderer defaults.
+"""
 
 from matplotlib import pyplot as plt
 

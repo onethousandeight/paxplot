@@ -1,10 +1,10 @@
 [![PyPI](https://img.shields.io/pypi/v/paxplot)](https://pypi.org/project/paxplot/)
-[![CI](https://img.shields.io/github/workflow/status/paxplot/paxplot/CI)](https://github.com/paxplot/paxplot/actions)
-[![GitHub license](https://img.shields.io/github/license/paxplot/paxplot)](https://github.com/paxplot/paxplot/blob/main/LICENSE)
+[![CI](https://img.shields.io/github/actions/workflow/status/onethousandeight/paxplot/ci.yml?branch=main)](https://github.com/onethousandeight/paxplot/actions/workflows/ci.yml)
+[![GitHub license](https://img.shields.io/github/license/onethousandeight/paxplot)](https://github.com/onethousandeight/paxplot/blob/main/LICENSE)
 
-# PaxPlot
+# paxplot
 
-PaxPlot stores a serializable definition of a parallel coordinate plot and renders it with matplotlib.
+paxplot stores a serializable definition of a parallel coordinate plot and renders it with matplotlib.
 
 Check out our [homepage](https://docs.paxplot.org) for more information.
 
@@ -35,15 +35,9 @@ For additional installation instructions, see the [Getting Started](https://docs
 
 ## Reporting Bugs
 
-Please report all bugs using [issues](https://github.com/paxplot/paxplot/issues).
+Please report all bugs using [issues](https://github.com/onethousandeight/paxplot/issues).
 
 ## Contributing
 
-PaxPlot uses `uv`, `ruff`, `pytest`, and Sphinx.
-
-```console
-uv sync --extra dev --extra docs
-uv run ruff format .
-uv run ruff check .
-uv run pytest
-```
+See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, tests, and instructions for
+building the documentation locally.

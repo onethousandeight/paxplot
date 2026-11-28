@@ -1,3 +1,11 @@
+"""
+Advanced Usage
+==============
+
+Configure scales, ticks, axis titles, and color encoding through chained
+component replacements.
+"""
+
 import matplotlib.pyplot as plt
 
 import paxplot as pax

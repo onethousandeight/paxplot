@@ -1,3 +1,11 @@
+"""
+Highlight a Row
+===============
+
+Dim every line with a default style and pull a single observation forward
+with a row override.
+"""
+
 import matplotlib.pyplot as plt
 import pandas as pd
 
@@ -5,7 +13,7 @@ import paxplot as pax
 from paxplot import tradeoff
 
 df = pd.read_csv(tradeoff()).head(12)
-columns = df.select_dtypes(include="number").columns[:4].tolist()
+columns = df.columns.tolist()
 
 plot = pax.ParallelPlot()
 plot.set_data(df[columns].values.tolist())

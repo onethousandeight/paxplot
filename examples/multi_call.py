@@ -1,3 +1,10 @@
+"""
+Axis Limits and Inversion
+=========================
+
+Adjust a single axis without rebuilding the rest of the plot.
+"""
+
 import matplotlib.pyplot as plt
 
 import paxplot as pax

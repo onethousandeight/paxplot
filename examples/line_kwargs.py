@@ -1,3 +1,10 @@
+"""
+Line Styling
+============
+
+Set a default line style and override individual rows.
+"""
+
 import matplotlib.pyplot as plt
 
 import paxplot as pax
