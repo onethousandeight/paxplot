@@ -1,32 +1,43 @@
 [![PyPI](https://img.shields.io/pypi/v/paxplot)](https://pypi.org/project/paxplot/)
-[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/paxplot/paxplot/Version%20Testing)](https://github.com/paxplot/paxplot/actions)
-[![GitHub license](https://img.shields.io/github/license/paxplot/paxplot)](https://github.com/paxplot/paxplot/blob/main/LICENSE)
+[![CI](https://img.shields.io/github/actions/workflow/status/onethousandeight/paxplot/ci.yml?branch=main)](https://github.com/onethousandeight/paxplot/actions/workflows/ci.yml)
+[![GitHub license](https://img.shields.io/github/license/onethousandeight/paxplot)](https://github.com/onethousandeight/paxplot/blob/main/LICENSE)
 
-# Paxplot
-Paxplot is a Python visualization library for parallel coordinate plots based on matplotlib.
+# paxplot
+
+paxplot stores a serializable definition of a parallel coordinate plot and renders it with matplotlib.
 
 Check out our [homepage](https://docs.paxplot.org) for more information.
 
-# Installation
-The latest stable release (and required dependencies) can be installed from PyPI:
+```python
+import paxplot as pax
 
+plot = pax.ParallelPlot()
+plot.set_data([[0.0, "low", 2.0], [1.0, "medium", 1.0], [3.0, "high", 0.0]])
+plot.set_axis_label(0, "A")
+plot.set_axis(
+    1,
+    title=pax.AxisTitle(text="Risk"),
+    scale=pax.AxisScale(categories=["low", "medium", "high"]),
+)
+plot.set_axis_label(2, "C")
+plot.set_colorbar(0, title=pax.ColorbarTitle(text="Column A"))
+
+fig = plot.render()
 ```
+
+## Installation
+
+```console
 pip install paxplot
 ```
 
-For addition installation instructions, see the [Getting Started](https://docs.paxplot.org/getting_started.html) documentation.
+For additional installation instructions, see the [Getting Started](https://docs.paxplot.org/getting_started.html) documentation.
 
-# Reporting Bugs
-Please report all bugs using [issues](https://github.com/paxplot/paxplot/issues).
+## Reporting Bugs
 
-# Contributing
-Paxplot welcomes contributions! Users familiar with matplotlib should have no problem using/contributing to this project.
+Please report all bugs using [issues](https://github.com/onethousandeight/paxplot/issues).
 
-1. We recommend conda to manage environments and ensure consistent results. Download [miniconda](https://docs.conda.io/en/latest/miniconda.html) and ensure you can activate it from your terminal by running `$ conda activate`
-    * Depending on system configuration, this can be an involved process. [Here](https://discuss.codecademy.com/t/setting-up-conda-in-git-bash/534473) is a recommended thread.
-3. Clone the repository using `$ git clone https://github.com/paxplot/paxplot.git`
-4. Change to the current working directory using `$ cd paxplot`
-5. Install the development environment `$ conda env create -f environment.yml`
-6. Activate the environmnet `$ conda activate paxplot`
-7. Install an editable version of paxplot `$ pip install --editable .`
-8. Paxplot uses test-driven development. All changes to Paxplot must pass the tests in the `testing` folder. All new features should have associated tests.
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, tests, and instructions for
+building the documentation locally.

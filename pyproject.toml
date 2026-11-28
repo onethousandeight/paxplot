@@ -1,6 +1,70 @@
 [build-system]
-requires = [
-    "setuptools>=42",
-    "wheel"
-]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "paxplot"
+version = "1.0.0"
+description = "paxplot stores and renders serializable parallel coordinate plots."
+readme = { file = "README.md", content-type = "text/markdown" }
+requires-python = ">=3.12"
+license = "MIT"
+authors = [
+    { name = "Jacob Kravits", email = "kravitsjacob@gmail.com" }
+]
+dependencies = [
+    "matplotlib>=3.10",
+    "pydantic>=2.7"
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent"
+]
+
+[project.urls]
+Homepage = "https://github.com/onethousandeight/paxplot"
+
+[project.optional-dependencies]
+dev = [
+    "build>=1.2",
+    "pandas>=2.2.3",
+    "pytest>=8",
+    "pytest-cov>=7",
+    "ruff>=0.6",
+    "setuptools>=77",
+    "syrupy>=4.7"
+]
+
+[dependency-groups]
+docs = [
+    "linkify-it-py",
+    "myst-parser",
+    "pandas>=2.2.3",
+    "pydata-sphinx-theme",
+    "sphinx>=8",
+    "sphinx-autobuild",
+    "sphinx-copybutton",
+    "sphinx-gallery",
+    "sphinx-sitemap"
+]
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"paxplot" = ["data/tradeoff.csv", "data/hydroclimate_model_evaluation.csv"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["B", "E", "F", "I", "UP", "W"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+markers = ["integration: marks end-to-end plotting workflows"]

@@ -1,29 +1,69 @@
 API Reference
 =============
 
-Functions
----------
-.. automodule:: paxplot
-    :members: pax_parallel
+Plot Object
+-----------
 
-Classes
--------
-.. autoclass:: PaxFigure
-    :members: plot, set_label, set_labels, set_even_ticks, set_ticks, set_lim, invert_axis, add_legend, add_colorbar, savefig
+.. autoclass:: paxplot.ParallelPlot
+   :members:
 
-Contents
+State Models
+------------
+
+Data owns observations and their types. Presentation owns scales and visual
+components. Each component owns its configuration and appearance directly.
+
+.. autoclass:: paxplot.PlotState
+   :members:
+
+.. autoclass:: paxplot.PlotData
+   :members:
+
+.. autoclass:: paxplot.ColumnSpec
+   :members:
+
+.. autoclass:: paxplot.PlotPresentation
+   :members:
+
+.. autoclass:: paxplot.AxisPresentation
+   :members:
+
+.. autoclass:: paxplot.AxisScale
+   :members:
+
+.. autoclass:: paxplot.AxisTitle
+   :members:
+
+.. autoclass:: paxplot.AxisTicks
+   :members:
+
+.. autoclass:: paxplot.AxisTickMarks
+   :members:
+
+.. autoclass:: paxplot.AxisTickLabels
+   :members:
+
+.. autoclass:: paxplot.AxisSpine
+   :members:
+
+.. autoclass:: paxplot.FontSpec
+   :members:
+
+.. autoclass:: paxplot.ColorEncoding
+   :members:
+
+.. autoclass:: paxplot.ColorbarTitle
+   :members:
+
+.. autoclass:: paxplot.ColorbarTicks
+   :members:
+
+.. autoclass:: paxplot.ColorbarTickLabels
+   :members:
+
+Datasets
 --------
-.. autosummary::
-    :toctree: generated
 
-    pax_parallel
-    PaxFigure.plot
-    PaxFigure.set_label
-    PaxFigure.set_labels
-    PaxFigure.set_even_ticks
-    PaxFigure.set_ticks
-    PaxFigure.set_lim
-    PaxFigure.invert_axis
-    PaxFigure.add_legend
-    PaxFigure.add_colorbar
-    PaxFigure.savefig
+.. autofunction:: paxplot.tradeoff
+
+.. autofunction:: paxplot.hydroclimate_model_evaluation

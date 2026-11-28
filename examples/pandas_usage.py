@@ -1,25 +1,24 @@
-import pandas as pd
+"""
+Pandas DataFrames
+=================
+
+Load the trade-off dataset, plot its columns, and add a colorbar.
+"""
+
 import matplotlib.pyplot as plt
-import paxplot
+import pandas as pd
 
-# Import data
-path_to_data = paxplot.datasets.tradeoff()
-df = pd.read_csv(path_to_data)
-cols = df.columns
+import paxplot as pax
+from paxplot import tradeoff
 
-# Create figure
-paxfig = paxplot.pax_parallel(n_axes=len(cols))
-paxfig.plot(df.to_numpy())
+df = pd.read_csv(tradeoff())
+columns = df.columns.tolist()
 
-# Add labels
-paxfig.set_labels(cols)
+plot = pax.ParallelPlot()
+plot.set_data(df[columns].values.tolist())
+for index, column in enumerate(columns):
+    plot.set_axis_label(index, column)
+plot.set_colorbar(0, palette="viridis", title=pax.ColorbarTitle(text=columns[0]))
 
-# Add colorbar
-color_col = 0
-paxfig.add_colorbar(
-    ax_idx=color_col,
-    cmap='viridis',
-    colorbar_kwargs={'label': cols[color_col]}
-)
-
-plt.show(block=False)
+fig = plot.render(figsize=(6.4, 4.8))
+plt.show()

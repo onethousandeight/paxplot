@@ -1,0 +1,3542 @@
+# serializer version: 1
+# name: test_axis_interaction_workflow_snapshot_and_roundtrip
+  dict({
+    'render': dict({
+      'axes': list([
+        dict({
+          'label': 'Axis 1',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
+          'ticks': list([
+            tuple(
+              0.0,
+              '0',
+            ),
+            tuple(
+              0.25,
+              '1',
+            ),
+            tuple(
+              0.5,
+              '2',
+            ),
+            tuple(
+              0.75,
+              '3',
+            ),
+            tuple(
+              1.0,
+              '4',
+            ),
+          ]),
+          'title_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+        }),
+        dict({
+          'label': 'Axis 2',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
+          'ticks': list([
+            tuple(
+              1.0,
+              'Minimum',
+            ),
+            tuple(
+              0.625,
+              'Target',
+            ),
+            tuple(
+              0.0,
+              'Maximum',
+            ),
+          ]),
+          'title_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+        }),
+      ]),
+      'colorbar': None,
+      'colors': list([
+        list([
+          0.1216,
+          0.4667,
+          0.7059,
+          0.7,
+        ]),
+        list([
+          0.1216,
+          0.4667,
+          0.7059,
+          0.7,
+        ]),
+        list([
+          0.1216,
+          0.4667,
+          0.7059,
+          0.7,
+        ]),
+      ]),
+      'linestyles': list([
+        '-',
+        '-',
+        '-',
+      ]),
+      'widths': list([
+        1.0,
+        1.0,
+        1.0,
+      ]),
+      'x': list([
+        0.0,
+        1.0,
+      ]),
+      'y': list([
+        list([
+          0.0,
+          0.75,
+        ]),
+        list([
+          0.25,
+          0.625,
+        ]),
+        list([
+          1.0,
+          0.25,
+        ]),
+      ]),
+      'zorders': list([
+        None,
+        None,
+        None,
+      ]),
+    }),
+    'state': dict({
+      'data': dict({
+        'columns': list([
+          dict({
+            'dtype': 'numeric',
+          }),
+          dict({
+            'dtype': 'numeric',
+          }),
+        ]),
+        'rows': list([
+          list([
+            0.0,
+            0.0,
+          ]),
+          list([
+            1.0,
+            1.0,
+          ]),
+          list([
+            4.0,
+            4.0,
+          ]),
+        ]),
+      }),
+      'presentation': dict({
+        'axes': list([
+          dict({
+            'scale': dict({
+              'categories': None,
+              'inverted': False,
+              'limits': list([
+                None,
+                None,
+              ]),
+            }),
+            'spine': dict({
+              'visible': True,
+            }),
+            'ticks': dict({
+              'count': None,
+              'labels': dict({
+                'font': dict({
+                  'family': None,
+                  'size': None,
+                  'style': None,
+                  'weight': None,
+                }),
+                'text': None,
+                'visible': True,
+              }),
+              'marks': dict({
+                'visible': True,
+              }),
+              'values': None,
+            }),
+            'title': dict({
+              'font': dict({
+                'family': None,
+                'size': None,
+                'style': None,
+                'weight': None,
+              }),
+              'text': None,
+              'visible': True,
+            }),
+          }),
+          dict({
+            'scale': dict({
+              'categories': None,
+              'inverted': True,
+              'limits': list([
+                -2.0,
+                6.0,
+              ]),
+            }),
+            'spine': dict({
+              'visible': True,
+            }),
+            'ticks': dict({
+              'count': None,
+              'labels': dict({
+                'font': dict({
+                  'family': None,
+                  'size': None,
+                  'style': None,
+                  'weight': None,
+                }),
+                'text': list([
+                  'Minimum',
+                  'Target',
+                  'Maximum',
+                ]),
+                'visible': True,
+              }),
+              'marks': dict({
+                'visible': True,
+              }),
+              'values': list([
+                -2.0,
+                1.0,
+                6.0,
+              ]),
+            }),
+            'title': dict({
+              'font': dict({
+                'family': None,
+                'size': None,
+                'style': None,
+                'weight': None,
+              }),
+              'text': None,
+              'visible': True,
+            }),
+          }),
+        ]),
+        'lines': dict({
+          'color_encoding': None,
+          'default': dict({
+            'alpha': 0.7,
+            'color': None,
+            'linestyle': '-',
+            'width': 1.0,
+            'zorder': None,
+          }),
+          'overrides': dict({
+          }),
+        }),
+      }),
+    }),
+  })
+# ---
+# name: test_colorbar_workflow_snapshot_and_roundtrip
+  dict({
+    'render': dict({
+      'axes': list([
+        dict({
+          'label': 'A',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
+          'ticks': list([
+            tuple(
+              0.0,
+              '0',
+            ),
+            tuple(
+              0.25,
+              '0.5',
+            ),
+            tuple(
+              0.5,
+              '1',
+            ),
+            tuple(
+              0.75,
+              '1.5',
+            ),
+            tuple(
+              1.0,
+              '2',
+            ),
+          ]),
+          'title_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+        }),
+      ]),
+      'colorbar': dict({
+        'axis': 0,
+        'label': 'A scale',
+        'lower': 0.0,
+        'tick_labels_font': dict({
+          'family': None,
+          'size': None,
+          'style': None,
+          'weight': None,
+        }),
+        'tick_labels_visible': True,
+        'title_font': dict({
+          'family': None,
+          'size': None,
+          'style': None,
+          'weight': None,
+        }),
+        'title_visible': True,
+        'upper': 2.0,
+      }),
+      'colors': list([
+        list([
+          0.267,
+          0.0049,
+          0.3294,
+          0.7,
+        ]),
+        list([
+          0.1276,
+          0.5669,
+          0.5506,
+          0.7,
+        ]),
+        list([
+          0.8627,
+          0.0784,
+          0.2353,
+          0.7,
+        ]),
+      ]),
+      'linestyles': list([
+        '--',
+        '--',
+        '-',
+      ]),
+      'widths': list([
+        1.25,
+        1.25,
+        2.5,
+      ]),
+      'x': list([
+        0.0,
+      ]),
+      'y': list([
+        list([
+          0.0,
+        ]),
+        list([
+          0.5,
+        ]),
+        list([
+          1.0,
+        ]),
+      ]),
+      'zorders': list([
+        None,
+        None,
+        None,
+      ]),
+    }),
+    'state': dict({
+      'data': dict({
+        'columns': list([
+          dict({
+            'dtype': 'numeric',
+          }),
+        ]),
+        'rows': list([
+          list([
+            0.0,
+          ]),
+          list([
+            1.0,
+          ]),
+          list([
+            2.0,
+          ]),
+        ]),
+      }),
+      'presentation': dict({
+        'axes': list([
+          dict({
+            'scale': dict({
+              'categories': None,
+              'inverted': False,
+              'limits': list([
+                None,
+                None,
+              ]),
+            }),
+            'spine': dict({
+              'visible': True,
+            }),
+            'ticks': dict({
+              'count': None,
+              'labels': dict({
+                'font': dict({
+                  'family': None,
+                  'size': None,
+                  'style': None,
+                  'weight': None,
+                }),
+                'text': None,
+                'visible': True,
+              }),
+              'marks': dict({
+                'visible': True,
+              }),
+              'values': None,
+            }),
+            'title': dict({
+              'font': dict({
+                'family': None,
+                'size': None,
+                'style': None,
+                'weight': None,
+              }),
+              'text': 'A',
+              'visible': True,
+            }),
+          }),
+        ]),
+        'lines': dict({
+          'color_encoding': dict({
+            'axis': 0,
+            'colorbar': dict({
+              'ticks': dict({
+                'labels': dict({
+                  'font': dict({
+                    'family': None,
+                    'size': None,
+                    'style': None,
+                    'weight': None,
+                  }),
+                  'visible': True,
+                }),
+              }),
+              'title': dict({
+                'font': dict({
+                  'family': None,
+                  'size': None,
+                  'style': None,
+                  'weight': None,
+                }),
+                'text': 'A scale',
+                'visible': True,
+              }),
+            }),
+            'lower': None,
+            'palette': 'viridis',
+            'upper': None,
+          }),
+          'default': dict({
+            'alpha': 0.7,
+            'color': 'black',
+            'linestyle': '--',
+            'width': 1.25,
+            'zorder': None,
+          }),
+          'overrides': dict({
+            '2': dict({
+              'alpha': None,
+              'color': 'crimson',
+              'linestyle': '-',
+              'width': 2.5,
+              'zorder': None,
+            }),
+          }),
+        }),
+      }),
+    }),
+  })
+# ---
+# name: test_line_style_workflow_snapshot_and_roundtrip
+  dict({
+    'render': dict({
+      'axes': list([
+        dict({
+          'label': 'Axis 1',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
+          'ticks': list([
+            tuple(
+              0.0,
+              '0',
+            ),
+            tuple(
+              0.25,
+              '1.25',
+            ),
+            tuple(
+              0.5,
+              '2.5',
+            ),
+            tuple(
+              0.75,
+              '3.75',
+            ),
+            tuple(
+              1.0,
+              '5',
+            ),
+          ]),
+          'title_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+        }),
+        dict({
+          'label': 'Axis 2',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
+          'ticks': list([
+            tuple(
+              0.0,
+              '0',
+            ),
+            tuple(
+              0.25,
+              '1.25',
+            ),
+            tuple(
+              0.5,
+              '2.5',
+            ),
+            tuple(
+              0.75,
+              '3.75',
+            ),
+            tuple(
+              1.0,
+              '5',
+            ),
+          ]),
+          'title_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+        }),
+      ]),
+      'colorbar': None,
+      'colors': list([
+        list([
+          0.2745,
+          0.5098,
+          0.7059,
+          0.6,
+        ]),
+        list([
+          0.8627,
+          0.0784,
+          0.2353,
+          0.6,
+        ]),
+        list([
+          0.2745,
+          0.5098,
+          0.7059,
+          0.6,
+        ]),
+        list([
+          0.2745,
+          0.5098,
+          0.7059,
+          0.25,
+        ]),
+        list([
+          0.2745,
+          0.5098,
+          0.7059,
+          0.6,
+        ]),
+        list([
+          0.2745,
+          0.5098,
+          0.7059,
+          0.6,
+        ]),
+      ]),
+      'linestyles': list([
+        '--',
+        '--',
+        '--',
+        '--',
+        ':',
+        '--',
+      ]),
+      'widths': list([
+        1.2,
+        1.2,
+        2.5,
+        1.2,
+        1.2,
+        1.2,
+      ]),
+      'x': list([
+        0.0,
+        1.0,
+      ]),
+      'y': list([
+        list([
+          0.0,
+          1.0,
+        ]),
+        list([
+          0.2,
+          0.8,
+        ]),
+        list([
+          0.4,
+          0.6,
+        ]),
+        list([
+          0.6,
+          0.4,
+        ]),
+        list([
+          0.8,
+          0.2,
+        ]),
+        list([
+          1.0,
+          0.0,
+        ]),
+      ]),
+      'zorders': list([
+        None,
+        None,
+        None,
+        None,
+        None,
+        10.0,
+      ]),
+    }),
+    'state': dict({
+      'data': dict({
+        'columns': list([
+          dict({
+            'dtype': 'numeric',
+          }),
+          dict({
+            'dtype': 'numeric',
+          }),
+        ]),
+        'rows': list([
+          list([
+            0,
+            5.0,
+          ]),
+          list([
+            1,
+            4.0,
+          ]),
+          list([
+            2,
+            3.0,
+          ]),
+          list([
+            3,
+            2.0,
+          ]),
+          list([
+            4,
+            1.0,
+          ]),
+          list([
+            5,
+            0.0,
+          ]),
+        ]),
+      }),
+      'presentation': dict({
+        'axes': list([
+          dict({
+            'scale': dict({
+              'categories': None,
+              'inverted': False,
+              'limits': list([
+                None,
+                None,
+              ]),
+            }),
+            'spine': dict({
+              'visible': True,
+            }),
+            'ticks': dict({
+              'count': None,
+              'labels': dict({
+                'font': dict({
+                  'family': None,
+                  'size': None,
+                  'style': None,
+                  'weight': None,
+                }),
+                'text': None,
+                'visible': True,
+              }),
+              'marks': dict({
+                'visible': True,
+              }),
+              'values': None,
+            }),
+            'title': dict({
+              'font': dict({
+                'family': None,
+                'size': None,
+                'style': None,
+                'weight': None,
+              }),
+              'text': None,
+              'visible': True,
+            }),
+          }),
+          dict({
+            'scale': dict({
+              'categories': None,
+              'inverted': False,
+              'limits': list([
+                None,
+                None,
+              ]),
+            }),
+            'spine': dict({
+              'visible': True,
+            }),
+            'ticks': dict({
+              'count': None,
+              'labels': dict({
+                'font': dict({
+                  'family': None,
+                  'size': None,
+                  'style': None,
+                  'weight': None,
+                }),
+                'text': None,
+                'visible': True,
+              }),
+              'marks': dict({
+                'visible': True,
+              }),
+              'values': None,
+            }),
+            'title': dict({
+              'font': dict({
+                'family': None,
+                'size': None,
+                'style': None,
+                'weight': None,
+              }),
+              'text': None,
+              'visible': True,
+            }),
+          }),
+        ]),
+        'lines': dict({
+          'color_encoding': None,
+          'default': dict({
+            'alpha': 0.6,
+            'color': 'steelblue',
+            'linestyle': '--',
+            'width': 1.2,
+            'zorder': None,
+          }),
+          'overrides': dict({
+            '1': dict({
+              'alpha': None,
+              'color': 'crimson',
+              'linestyle': None,
+              'width': None,
+              'zorder': None,
+            }),
+            '2': dict({
+              'alpha': None,
+              'color': None,
+              'linestyle': None,
+              'width': 2.5,
+              'zorder': None,
+            }),
+            '3': dict({
+              'alpha': 0.25,
+              'color': None,
+              'linestyle': None,
+              'width': None,
+              'zorder': None,
+            }),
+            '4': dict({
+              'alpha': None,
+              'color': None,
+              'linestyle': ':',
+              'width': None,
+              'zorder': None,
+            }),
+            '5': dict({
+              'alpha': None,
+              'color': None,
+              'linestyle': None,
+              'width': None,
+              'zorder': 10.0,
+            }),
+          }),
+        }),
+      }),
+    }),
+  })
+# ---
+# name: test_standard_workflow_snapshot_and_roundtrip
+  dict({
+    'render': dict({
+      'axes': list([
+        dict({
+          'label': 'Axis 1',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
+          'ticks': list([
+            tuple(
+              0.0,
+              '0',
+            ),
+            tuple(
+              0.25,
+              '1',
+            ),
+            tuple(
+              0.5,
+              '2',
+            ),
+            tuple(
+              0.75,
+              '3',
+            ),
+            tuple(
+              1.0,
+              '4',
+            ),
+          ]),
+          'title_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+        }),
+        dict({
+          'label': 'Label only',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
+          'ticks': list([
+            tuple(
+              0.0,
+              '0',
+            ),
+            tuple(
+              0.25,
+              '1',
+            ),
+            tuple(
+              0.5,
+              '2',
+            ),
+            tuple(
+              0.75,
+              '3',
+            ),
+            tuple(
+              1.0,
+              '4',
+            ),
+          ]),
+          'title_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+        }),
+        dict({
+          'label': 'Axis 3',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
+          'ticks': list([
+            tuple(
+              0.0,
+              '-2',
+            ),
+            tuple(
+              0.25,
+              '0',
+            ),
+            tuple(
+              0.5,
+              '2',
+            ),
+            tuple(
+              0.75,
+              '4',
+            ),
+            tuple(
+              1.0,
+              '6',
+            ),
+          ]),
+          'title_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+        }),
+        dict({
+          'label': 'Axis 4',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
+          'ticks': list([
+            tuple(
+              0.0,
+              '0.0',
+            ),
+            tuple(
+              0.25,
+              '1.0',
+            ),
+            tuple(
+              1.0,
+              '4.0',
+            ),
+          ]),
+          'title_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+        }),
+        dict({
+          'label': 'Axis 5',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
+          'ticks': list([
+            tuple(
+              0.0,
+              'Minimum',
+            ),
+            tuple(
+              0.25,
+              'Target',
+            ),
+            tuple(
+              1.0,
+              'Maximum',
+            ),
+          ]),
+          'title_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+        }),
+        dict({
+          'label': 'Axis 6',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
+          'ticks': list([
+            tuple(
+              0.0,
+              '0',
+            ),
+            tuple(
+              0.5,
+              '2',
+            ),
+            tuple(
+              1.0,
+              '4',
+            ),
+          ]),
+          'title_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+        }),
+        dict({
+          'label': 'Axis 7',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
+          'ticks': list([
+            tuple(
+              1.0,
+              '0',
+            ),
+            tuple(
+              0.75,
+              '1',
+            ),
+            tuple(
+              0.5,
+              '2',
+            ),
+            tuple(
+              0.25,
+              '3',
+            ),
+            tuple(
+              0.0,
+              '4',
+            ),
+          ]),
+          'title_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+        }),
+        dict({
+          'label': 'Axis 8',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
+          'ticks': list([
+            tuple(
+              0.0,
+              'medium',
+            ),
+            tuple(
+              0.5,
+              'low',
+            ),
+            tuple(
+              1.0,
+              'high',
+            ),
+          ]),
+          'title_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+        }),
+        dict({
+          'label': 'Axis 9',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
+          'ticks': list([
+            tuple(
+              0.0,
+              'low',
+            ),
+            tuple(
+              0.5,
+              'medium',
+            ),
+            tuple(
+              1.0,
+              'high',
+            ),
+          ]),
+          'title_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+        }),
+        dict({
+          'label': 'Axis 10',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
+          'ticks': list([
+            tuple(
+              0.0,
+              'medium',
+            ),
+            tuple(
+              1.0,
+              'high',
+            ),
+          ]),
+          'title_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+        }),
+        dict({
+          'label': 'Axis 11',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
+          'ticks': list([
+            tuple(
+              0.0,
+              'Medium',
+            ),
+            tuple(
+              1.0,
+              'High',
+            ),
+          ]),
+          'title_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+        }),
+        dict({
+          'label': 'Axis 12',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
+          'ticks': list([
+            tuple(
+              0.0,
+              '0',
+            ),
+            tuple(
+              0.25,
+              '1',
+            ),
+            tuple(
+              0.5,
+              '2',
+            ),
+            tuple(
+              0.75,
+              '3',
+            ),
+            tuple(
+              1.0,
+              '4',
+            ),
+          ]),
+          'title_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+        }),
+        dict({
+          'label': 'Axis 13',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
+          'ticks': list([
+            tuple(
+              0.0,
+              'medium',
+            ),
+            tuple(
+              1.0,
+              'high',
+            ),
+          ]),
+          'title_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+        }),
+        dict({
+          'label': 'No numeric spine',
+          'label_visible': True,
+          'spine_visible': False,
+          'tick_labels_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
+          'ticks': list([
+            tuple(
+              0.0,
+              '0',
+            ),
+            tuple(
+              0.25,
+              '1',
+            ),
+            tuple(
+              0.5,
+              '2',
+            ),
+            tuple(
+              0.75,
+              '3',
+            ),
+            tuple(
+              1.0,
+              '4',
+            ),
+          ]),
+          'title_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+        }),
+        dict({
+          'label': 'No category spine',
+          'label_visible': True,
+          'spine_visible': False,
+          'tick_labels_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
+          'ticks': list([
+            tuple(
+              0.0,
+              'medium',
+            ),
+            tuple(
+              0.5,
+              'low',
+            ),
+            tuple(
+              1.0,
+              'high',
+            ),
+          ]),
+          'title_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+        }),
+        dict({
+          'label': 'Hidden title',
+          'label_visible': False,
+          'spine_visible': True,
+          'tick_labels_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
+          'ticks': list([
+            tuple(
+              0.0,
+              '0',
+            ),
+            tuple(
+              0.25,
+              '1',
+            ),
+            tuple(
+              0.5,
+              '2',
+            ),
+            tuple(
+              0.75,
+              '3',
+            ),
+            tuple(
+              1.0,
+              '4',
+            ),
+          ]),
+          'title_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+        }),
+        dict({
+          'label': 'Values only',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+          'tick_labels_visible': True,
+          'tick_marks_visible': False,
+          'ticks': list([
+            tuple(
+              0.0,
+              '0',
+            ),
+            tuple(
+              0.25,
+              '1',
+            ),
+            tuple(
+              0.5,
+              '2',
+            ),
+            tuple(
+              0.75,
+              '3',
+            ),
+            tuple(
+              1.0,
+              '4',
+            ),
+          ]),
+          'title_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+        }),
+        dict({
+          'label': 'Marks only',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+          'tick_labels_visible': False,
+          'tick_marks_visible': True,
+          'ticks': list([
+            tuple(
+              0.0,
+              'medium',
+            ),
+            tuple(
+              0.5,
+              'low',
+            ),
+            tuple(
+              1.0,
+              'high',
+            ),
+          ]),
+          'title_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+        }),
+        dict({
+          'label': 'No ticks',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+          'tick_labels_visible': False,
+          'tick_marks_visible': False,
+          'ticks': list([
+            tuple(
+              0.0,
+              '0',
+            ),
+            tuple(
+              0.25,
+              '1',
+            ),
+            tuple(
+              0.5,
+              '2',
+            ),
+            tuple(
+              0.75,
+              '3',
+            ),
+            tuple(
+              1.0,
+              '4',
+            ),
+          ]),
+          'title_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+        }),
+        dict({
+          'label': 'Axis 20',
+          'label_visible': False,
+          'spine_visible': False,
+          'tick_labels_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+          'tick_labels_visible': False,
+          'tick_marks_visible': False,
+          'ticks': list([
+            tuple(
+              0.0,
+              'medium',
+            ),
+            tuple(
+              0.5,
+              'low',
+            ),
+            tuple(
+              1.0,
+              'high',
+            ),
+          ]),
+          'title_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+        }),
+        dict({
+          'label': 'Zero numeric ticks',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
+          'ticks': list([
+          ]),
+          'title_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+        }),
+        dict({
+          'label': 'Zero category ticks',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
+          'ticks': list([
+          ]),
+          'title_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+        }),
+        dict({
+          'label': 'Styled title',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
+          'ticks': list([
+            tuple(
+              0.0,
+              '0',
+            ),
+            tuple(
+              0.25,
+              '1',
+            ),
+            tuple(
+              0.5,
+              '2',
+            ),
+            tuple(
+              0.75,
+              '3',
+            ),
+            tuple(
+              1.0,
+              '4',
+            ),
+          ]),
+          'title_font': dict({
+            'family': list([
+              'DejaVu Serif',
+              'serif',
+            ]),
+            'size': 13.0,
+            'style': 'italic',
+            'weight': 'bold',
+          }),
+        }),
+        dict({
+          'label': 'Numeric font',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_font': dict({
+            'family': 'DejaVu Sans Mono',
+            'size': 9.0,
+            'style': None,
+            'weight': 'semibold',
+          }),
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
+          'ticks': list([
+            tuple(
+              0.0,
+              '0',
+            ),
+            tuple(
+              0.25,
+              '1',
+            ),
+            tuple(
+              0.5,
+              '2',
+            ),
+            tuple(
+              0.75,
+              '3',
+            ),
+            tuple(
+              1.0,
+              '4',
+            ),
+          ]),
+          'title_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+        }),
+        dict({
+          'label': 'Category font',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_font': dict({
+            'family': 'DejaVu Serif',
+            'size': 10.0,
+            'style': 'italic',
+            'weight': None,
+          }),
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
+          'ticks': list([
+            tuple(
+              0.0,
+              'medium',
+            ),
+            tuple(
+              0.5,
+              'low',
+            ),
+            tuple(
+              1.0,
+              'high',
+            ),
+          ]),
+          'title_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+        }),
+        dict({
+          'label': 'Shared weight',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': 'bold',
+          }),
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
+          'ticks': list([
+            tuple(
+              0.0,
+              '0',
+            ),
+            tuple(
+              0.25,
+              '1',
+            ),
+            tuple(
+              0.5,
+              '2',
+            ),
+            tuple(
+              0.75,
+              '3',
+            ),
+            tuple(
+              1.0,
+              '4',
+            ),
+          ]),
+          'title_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': 'bold',
+          }),
+        }),
+        dict({
+          'label': '$x_1$',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
+          'ticks': list([
+            tuple(
+              0.0,
+              '$0$',
+            ),
+            tuple(
+              0.25,
+              '$1$',
+            ),
+            tuple(
+              1.0,
+              '$2^2$',
+            ),
+          ]),
+          'title_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+        }),
+        dict({
+          'label': '$y_{\\mathrm{test}}$',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
+          'ticks': list([
+            tuple(
+              0.0,
+              '$y_{\\mathrm{medium}}$',
+            ),
+            tuple(
+              0.5,
+              '$y_{\\mathrm{low}}$',
+            ),
+            tuple(
+              1.0,
+              '$y_{\\mathrm{high}}$',
+            ),
+          ]),
+          'title_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+        }),
+        dict({
+          'label': 'x_1',
+          'label_visible': True,
+          'spine_visible': True,
+          'tick_labels_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+          'tick_labels_visible': True,
+          'tick_marks_visible': True,
+          'ticks': list([
+            tuple(
+              0.0,
+              '0',
+            ),
+            tuple(
+              0.25,
+              '1',
+            ),
+            tuple(
+              0.5,
+              '2',
+            ),
+            tuple(
+              0.75,
+              '3',
+            ),
+            tuple(
+              1.0,
+              '4',
+            ),
+          ]),
+          'title_font': dict({
+            'family': None,
+            'size': None,
+            'style': None,
+            'weight': None,
+          }),
+        }),
+      ]),
+      'colorbar': dict({
+        'axis': 22,
+        'label': '$x_1$',
+        'lower': 0.0,
+        'tick_labels_font': dict({
+          'family': 'DejaVu Sans Mono',
+          'size': 9.0,
+          'style': 'italic',
+          'weight': None,
+        }),
+        'tick_labels_visible': True,
+        'title_font': dict({
+          'family': 'DejaVu Serif',
+          'size': 13.0,
+          'style': None,
+          'weight': 'bold',
+        }),
+        'title_visible': True,
+        'upper': 4.0,
+      }),
+      'colors': list([
+        list([
+          0.0504,
+          0.0298,
+          0.528,
+          0.7,
+        ]),
+        list([
+          0.4949,
+          0.012,
+          0.6579,
+          0.7,
+        ]),
+        list([
+          0.94,
+          0.9752,
+          0.1313,
+          0.7,
+        ]),
+      ]),
+      'linestyles': list([
+        '-',
+        '-',
+        '-',
+      ]),
+      'widths': list([
+        1.0,
+        1.0,
+        1.0,
+      ]),
+      'x': list([
+        0.0,
+        1.0,
+        2.0,
+        3.0,
+        4.0,
+        5.0,
+        6.0,
+        7.0,
+        8.0,
+        9.0,
+        10.0,
+        11.0,
+        12.0,
+        13.0,
+        14.0,
+        15.0,
+        16.0,
+        17.0,
+        18.0,
+        19.0,
+        20.0,
+        21.0,
+        22.0,
+        23.0,
+        24.0,
+        25.0,
+        26.0,
+        27.0,
+        28.0,
+      ]),
+      'y': list([
+        list([
+          0.0,
+          0.0,
+          0.25,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.5,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+        ]),
+        list([
+          0.25,
+          0.25,
+          0.375,
+          0.25,
+          0.25,
+          0.25,
+          0.75,
+          0.5,
+          0.0,
+          0.5,
+          0.5,
+          -999.0,
+          -999.0,
+          0.25,
+          0.5,
+          0.25,
+          0.25,
+          0.5,
+          0.25,
+          0.5,
+          0.25,
+          0.5,
+          0.25,
+          0.25,
+          0.5,
+          0.25,
+          0.25,
+          0.5,
+          0.25,
+        ]),
+        list([
+          1.0,
+          1.0,
+          0.75,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+        ]),
+      ]),
+      'zorders': list([
+        None,
+        None,
+        None,
+      ]),
+    }),
+    'state': dict({
+      'data': dict({
+        'columns': list([
+          dict({
+            'dtype': 'numeric',
+          }),
+          dict({
+            'dtype': 'numeric',
+          }),
+          dict({
+            'dtype': 'numeric',
+          }),
+          dict({
+            'dtype': 'numeric',
+          }),
+          dict({
+            'dtype': 'numeric',
+          }),
+          dict({
+            'dtype': 'numeric',
+          }),
+          dict({
+            'dtype': 'numeric',
+          }),
+          dict({
+            'dtype': 'categorical',
+          }),
+          dict({
+            'dtype': 'categorical',
+          }),
+          dict({
+            'dtype': 'categorical',
+          }),
+          dict({
+            'dtype': 'categorical',
+          }),
+          dict({
+            'dtype': 'numeric',
+          }),
+          dict({
+            'dtype': 'categorical',
+          }),
+          dict({
+            'dtype': 'numeric',
+          }),
+          dict({
+            'dtype': 'categorical',
+          }),
+          dict({
+            'dtype': 'numeric',
+          }),
+          dict({
+            'dtype': 'numeric',
+          }),
+          dict({
+            'dtype': 'categorical',
+          }),
+          dict({
+            'dtype': 'numeric',
+          }),
+          dict({
+            'dtype': 'categorical',
+          }),
+          dict({
+            'dtype': 'numeric',
+          }),
+          dict({
+            'dtype': 'categorical',
+          }),
+          dict({
+            'dtype': 'numeric',
+          }),
+          dict({
+            'dtype': 'numeric',
+          }),
+          dict({
+            'dtype': 'categorical',
+          }),
+          dict({
+            'dtype': 'numeric',
+          }),
+          dict({
+            'dtype': 'numeric',
+          }),
+          dict({
+            'dtype': 'categorical',
+          }),
+          dict({
+            'dtype': 'numeric',
+          }),
+        ]),
+        'rows': list([
+          list([
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            'medium',
+            'medium',
+            'medium',
+            'medium',
+            0.0,
+            'medium',
+            0.0,
+            'medium',
+            0.0,
+            0.0,
+            'medium',
+            0.0,
+            'medium',
+            0.0,
+            'medium',
+            0.0,
+            0.0,
+            'medium',
+            0.0,
+            0.0,
+            'medium',
+            0.0,
+          ]),
+          list([
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            'low',
+            'low',
+            'low',
+            'low',
+            None,
+            None,
+            1.0,
+            'low',
+            1.0,
+            1.0,
+            'low',
+            1.0,
+            'low',
+            1.0,
+            'low',
+            1.0,
+            1.0,
+            'low',
+            1.0,
+            1.0,
+            'low',
+            1.0,
+          ]),
+          list([
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            4.0,
+            'high',
+            'high',
+            'high',
+            'high',
+            4.0,
+            'high',
+            4.0,
+            'high',
+            4.0,
+            4.0,
+            'high',
+            4.0,
+            'high',
+            4.0,
+            'high',
+            4.0,
+            4.0,
+            'high',
+            4.0,
+            4.0,
+            'high',
+            4.0,
+          ]),
+        ]),
+      }),
+      'presentation': dict({
+        'axes': list([
+          dict({
+            'scale': dict({
+              'categories': None,
+              'inverted': False,
+              'limits': list([
+                None,
+                None,
+              ]),
+            }),
+            'spine': dict({
+              'visible': True,
+            }),
+            'ticks': dict({
+              'count': None,
+              'labels': dict({
+                'font': dict({
+                  'family': None,
+                  'size': None,
+                  'style': None,
+                  'weight': None,
+                }),
+                'text': None,
+                'visible': True,
+              }),
+              'marks': dict({
+                'visible': True,
+              }),
+              'values': None,
+            }),
+            'title': dict({
+              'font': dict({
+                'family': None,
+                'size': None,
+                'style': None,
+                'weight': None,
+              }),
+              'text': None,
+              'visible': True,
+            }),
+          }),
+          dict({
+            'scale': dict({
+              'categories': None,
+              'inverted': False,
+              'limits': list([
+                None,
+                None,
+              ]),
+            }),
+            'spine': dict({
+              'visible': True,
+            }),
+            'ticks': dict({
+              'count': None,
+              'labels': dict({
+                'font': dict({
+                  'family': None,
+                  'size': None,
+                  'style': None,
+                  'weight': None,
+                }),
+                'text': None,
+                'visible': True,
+              }),
+              'marks': dict({
+                'visible': True,
+              }),
+              'values': None,
+            }),
+            'title': dict({
+              'font': dict({
+                'family': None,
+                'size': None,
+                'style': None,
+                'weight': None,
+              }),
+              'text': 'Label only',
+              'visible': True,
+            }),
+          }),
+          dict({
+            'scale': dict({
+              'categories': None,
+              'inverted': False,
+              'limits': list([
+                -2.0,
+                6.0,
+              ]),
+            }),
+            'spine': dict({
+              'visible': True,
+            }),
+            'ticks': dict({
+              'count': None,
+              'labels': dict({
+                'font': dict({
+                  'family': None,
+                  'size': None,
+                  'style': None,
+                  'weight': None,
+                }),
+                'text': None,
+                'visible': True,
+              }),
+              'marks': dict({
+                'visible': True,
+              }),
+              'values': None,
+            }),
+            'title': dict({
+              'font': dict({
+                'family': None,
+                'size': None,
+                'style': None,
+                'weight': None,
+              }),
+              'text': None,
+              'visible': True,
+            }),
+          }),
+          dict({
+            'scale': dict({
+              'categories': None,
+              'inverted': False,
+              'limits': list([
+                None,
+                None,
+              ]),
+            }),
+            'spine': dict({
+              'visible': True,
+            }),
+            'ticks': dict({
+              'count': None,
+              'labels': dict({
+                'font': dict({
+                  'family': None,
+                  'size': None,
+                  'style': None,
+                  'weight': None,
+                }),
+                'text': None,
+                'visible': True,
+              }),
+              'marks': dict({
+                'visible': True,
+              }),
+              'values': list([
+                0.0,
+                1.0,
+                4.0,
+              ]),
+            }),
+            'title': dict({
+              'font': dict({
+                'family': None,
+                'size': None,
+                'style': None,
+                'weight': None,
+              }),
+              'text': None,
+              'visible': True,
+            }),
+          }),
+          dict({
+            'scale': dict({
+              'categories': None,
+              'inverted': False,
+              'limits': list([
+                None,
+                None,
+              ]),
+            }),
+            'spine': dict({
+              'visible': True,
+            }),
+            'ticks': dict({
+              'count': None,
+              'labels': dict({
+                'font': dict({
+                  'family': None,
+                  'size': None,
+                  'style': None,
+                  'weight': None,
+                }),
+                'text': list([
+                  'Minimum',
+                  'Target',
+                  'Maximum',
+                ]),
+                'visible': True,
+              }),
+              'marks': dict({
+                'visible': True,
+              }),
+              'values': list([
+                0.0,
+                1.0,
+                4.0,
+              ]),
+            }),
+            'title': dict({
+              'font': dict({
+                'family': None,
+                'size': None,
+                'style': None,
+                'weight': None,
+              }),
+              'text': None,
+              'visible': True,
+            }),
+          }),
+          dict({
+            'scale': dict({
+              'categories': None,
+              'inverted': False,
+              'limits': list([
+                None,
+                None,
+              ]),
+            }),
+            'spine': dict({
+              'visible': True,
+            }),
+            'ticks': dict({
+              'count': 3,
+              'labels': dict({
+                'font': dict({
+                  'family': None,
+                  'size': None,
+                  'style': None,
+                  'weight': None,
+                }),
+                'text': None,
+                'visible': True,
+              }),
+              'marks': dict({
+                'visible': True,
+              }),
+              'values': None,
+            }),
+            'title': dict({
+              'font': dict({
+                'family': None,
+                'size': None,
+                'style': None,
+                'weight': None,
+              }),
+              'text': None,
+              'visible': True,
+            }),
+          }),
+          dict({
+            'scale': dict({
+              'categories': None,
+              'inverted': True,
+              'limits': list([
+                None,
+                None,
+              ]),
+            }),
+            'spine': dict({
+              'visible': True,
+            }),
+            'ticks': dict({
+              'count': None,
+              'labels': dict({
+                'font': dict({
+                  'family': None,
+                  'size': None,
+                  'style': None,
+                  'weight': None,
+                }),
+                'text': None,
+                'visible': True,
+              }),
+              'marks': dict({
+                'visible': True,
+              }),
+              'values': None,
+            }),
+            'title': dict({
+              'font': dict({
+                'family': None,
+                'size': None,
+                'style': None,
+                'weight': None,
+              }),
+              'text': None,
+              'visible': True,
+            }),
+          }),
+          dict({
+            'scale': dict({
+              'categories': list([
+                'medium',
+                'low',
+                'high',
+              ]),
+              'inverted': False,
+              'limits': list([
+                None,
+                None,
+              ]),
+            }),
+            'spine': dict({
+              'visible': True,
+            }),
+            'ticks': dict({
+              'count': None,
+              'labels': dict({
+                'font': dict({
+                  'family': None,
+                  'size': None,
+                  'style': None,
+                  'weight': None,
+                }),
+                'text': None,
+                'visible': True,
+              }),
+              'marks': dict({
+                'visible': True,
+              }),
+              'values': None,
+            }),
+            'title': dict({
+              'font': dict({
+                'family': None,
+                'size': None,
+                'style': None,
+                'weight': None,
+              }),
+              'text': None,
+              'visible': True,
+            }),
+          }),
+          dict({
+            'scale': dict({
+              'categories': list([
+                'low',
+                'medium',
+                'high',
+              ]),
+              'inverted': False,
+              'limits': list([
+                None,
+                None,
+              ]),
+            }),
+            'spine': dict({
+              'visible': True,
+            }),
+            'ticks': dict({
+              'count': None,
+              'labels': dict({
+                'font': dict({
+                  'family': None,
+                  'size': None,
+                  'style': None,
+                  'weight': None,
+                }),
+                'text': None,
+                'visible': True,
+              }),
+              'marks': dict({
+                'visible': True,
+              }),
+              'values': None,
+            }),
+            'title': dict({
+              'font': dict({
+                'family': None,
+                'size': None,
+                'style': None,
+                'weight': None,
+              }),
+              'text': None,
+              'visible': True,
+            }),
+          }),
+          dict({
+            'scale': dict({
+              'categories': list([
+                'medium',
+                'low',
+                'high',
+              ]),
+              'inverted': False,
+              'limits': list([
+                None,
+                None,
+              ]),
+            }),
+            'spine': dict({
+              'visible': True,
+            }),
+            'ticks': dict({
+              'count': None,
+              'labels': dict({
+                'font': dict({
+                  'family': None,
+                  'size': None,
+                  'style': None,
+                  'weight': None,
+                }),
+                'text': None,
+                'visible': True,
+              }),
+              'marks': dict({
+                'visible': True,
+              }),
+              'values': list([
+                'medium',
+                'high',
+              ]),
+            }),
+            'title': dict({
+              'font': dict({
+                'family': None,
+                'size': None,
+                'style': None,
+                'weight': None,
+              }),
+              'text': None,
+              'visible': True,
+            }),
+          }),
+          dict({
+            'scale': dict({
+              'categories': list([
+                'medium',
+                'low',
+                'high',
+              ]),
+              'inverted': False,
+              'limits': list([
+                None,
+                None,
+              ]),
+            }),
+            'spine': dict({
+              'visible': True,
+            }),
+            'ticks': dict({
+              'count': None,
+              'labels': dict({
+                'font': dict({
+                  'family': None,
+                  'size': None,
+                  'style': None,
+                  'weight': None,
+                }),
+                'text': list([
+                  'Medium',
+                  'High',
+                ]),
+                'visible': True,
+              }),
+              'marks': dict({
+                'visible': True,
+              }),
+              'values': list([
+                'medium',
+                'high',
+              ]),
+            }),
+            'title': dict({
+              'font': dict({
+                'family': None,
+                'size': None,
+                'style': None,
+                'weight': None,
+              }),
+              'text': None,
+              'visible': True,
+            }),
+          }),
+          dict({
+            'scale': dict({
+              'categories': None,
+              'inverted': False,
+              'limits': list([
+                None,
+                None,
+              ]),
+            }),
+            'spine': dict({
+              'visible': True,
+            }),
+            'ticks': dict({
+              'count': None,
+              'labels': dict({
+                'font': dict({
+                  'family': None,
+                  'size': None,
+                  'style': None,
+                  'weight': None,
+                }),
+                'text': None,
+                'visible': True,
+              }),
+              'marks': dict({
+                'visible': True,
+              }),
+              'values': None,
+            }),
+            'title': dict({
+              'font': dict({
+                'family': None,
+                'size': None,
+                'style': None,
+                'weight': None,
+              }),
+              'text': None,
+              'visible': True,
+            }),
+          }),
+          dict({
+            'scale': dict({
+              'categories': list([
+                'medium',
+                'high',
+              ]),
+              'inverted': False,
+              'limits': list([
+                None,
+                None,
+              ]),
+            }),
+            'spine': dict({
+              'visible': True,
+            }),
+            'ticks': dict({
+              'count': None,
+              'labels': dict({
+                'font': dict({
+                  'family': None,
+                  'size': None,
+                  'style': None,
+                  'weight': None,
+                }),
+                'text': None,
+                'visible': True,
+              }),
+              'marks': dict({
+                'visible': True,
+              }),
+              'values': None,
+            }),
+            'title': dict({
+              'font': dict({
+                'family': None,
+                'size': None,
+                'style': None,
+                'weight': None,
+              }),
+              'text': None,
+              'visible': True,
+            }),
+          }),
+          dict({
+            'scale': dict({
+              'categories': None,
+              'inverted': False,
+              'limits': list([
+                None,
+                None,
+              ]),
+            }),
+            'spine': dict({
+              'visible': False,
+            }),
+            'ticks': dict({
+              'count': None,
+              'labels': dict({
+                'font': dict({
+                  'family': None,
+                  'size': None,
+                  'style': None,
+                  'weight': None,
+                }),
+                'text': None,
+                'visible': True,
+              }),
+              'marks': dict({
+                'visible': True,
+              }),
+              'values': None,
+            }),
+            'title': dict({
+              'font': dict({
+                'family': None,
+                'size': None,
+                'style': None,
+                'weight': None,
+              }),
+              'text': 'No numeric spine',
+              'visible': True,
+            }),
+          }),
+          dict({
+            'scale': dict({
+              'categories': list([
+                'medium',
+                'low',
+                'high',
+              ]),
+              'inverted': False,
+              'limits': list([
+                None,
+                None,
+              ]),
+            }),
+            'spine': dict({
+              'visible': False,
+            }),
+            'ticks': dict({
+              'count': None,
+              'labels': dict({
+                'font': dict({
+                  'family': None,
+                  'size': None,
+                  'style': None,
+                  'weight': None,
+                }),
+                'text': None,
+                'visible': True,
+              }),
+              'marks': dict({
+                'visible': True,
+              }),
+              'values': None,
+            }),
+            'title': dict({
+              'font': dict({
+                'family': None,
+                'size': None,
+                'style': None,
+                'weight': None,
+              }),
+              'text': 'No category spine',
+              'visible': True,
+            }),
+          }),
+          dict({
+            'scale': dict({
+              'categories': None,
+              'inverted': False,
+              'limits': list([
+                None,
+                None,
+              ]),
+            }),
+            'spine': dict({
+              'visible': True,
+            }),
+            'ticks': dict({
+              'count': None,
+              'labels': dict({
+                'font': dict({
+                  'family': None,
+                  'size': None,
+                  'style': None,
+                  'weight': None,
+                }),
+                'text': None,
+                'visible': True,
+              }),
+              'marks': dict({
+                'visible': True,
+              }),
+              'values': None,
+            }),
+            'title': dict({
+              'font': dict({
+                'family': None,
+                'size': None,
+                'style': None,
+                'weight': None,
+              }),
+              'text': 'Hidden title',
+              'visible': False,
+            }),
+          }),
+          dict({
+            'scale': dict({
+              'categories': None,
+              'inverted': False,
+              'limits': list([
+                None,
+                None,
+              ]),
+            }),
+            'spine': dict({
+              'visible': True,
+            }),
+            'ticks': dict({
+              'count': None,
+              'labels': dict({
+                'font': dict({
+                  'family': None,
+                  'size': None,
+                  'style': None,
+                  'weight': None,
+                }),
+                'text': None,
+                'visible': True,
+              }),
+              'marks': dict({
+                'visible': False,
+              }),
+              'values': None,
+            }),
+            'title': dict({
+              'font': dict({
+                'family': None,
+                'size': None,
+                'style': None,
+                'weight': None,
+              }),
+              'text': 'Values only',
+              'visible': True,
+            }),
+          }),
+          dict({
+            'scale': dict({
+              'categories': list([
+                'medium',
+                'low',
+                'high',
+              ]),
+              'inverted': False,
+              'limits': list([
+                None,
+                None,
+              ]),
+            }),
+            'spine': dict({
+              'visible': True,
+            }),
+            'ticks': dict({
+              'count': None,
+              'labels': dict({
+                'font': dict({
+                  'family': None,
+                  'size': None,
+                  'style': None,
+                  'weight': None,
+                }),
+                'text': None,
+                'visible': False,
+              }),
+              'marks': dict({
+                'visible': True,
+              }),
+              'values': None,
+            }),
+            'title': dict({
+              'font': dict({
+                'family': None,
+                'size': None,
+                'style': None,
+                'weight': None,
+              }),
+              'text': 'Marks only',
+              'visible': True,
+            }),
+          }),
+          dict({
+            'scale': dict({
+              'categories': None,
+              'inverted': False,
+              'limits': list([
+                None,
+                None,
+              ]),
+            }),
+            'spine': dict({
+              'visible': True,
+            }),
+            'ticks': dict({
+              'count': None,
+              'labels': dict({
+                'font': dict({
+                  'family': None,
+                  'size': None,
+                  'style': None,
+                  'weight': None,
+                }),
+                'text': None,
+                'visible': False,
+              }),
+              'marks': dict({
+                'visible': False,
+              }),
+              'values': None,
+            }),
+            'title': dict({
+              'font': dict({
+                'family': None,
+                'size': None,
+                'style': None,
+                'weight': None,
+              }),
+              'text': 'No ticks',
+              'visible': True,
+            }),
+          }),
+          dict({
+            'scale': dict({
+              'categories': list([
+                'medium',
+                'low',
+                'high',
+              ]),
+              'inverted': False,
+              'limits': list([
+                None,
+                None,
+              ]),
+            }),
+            'spine': dict({
+              'visible': False,
+            }),
+            'ticks': dict({
+              'count': None,
+              'labels': dict({
+                'font': dict({
+                  'family': None,
+                  'size': None,
+                  'style': None,
+                  'weight': None,
+                }),
+                'text': None,
+                'visible': False,
+              }),
+              'marks': dict({
+                'visible': False,
+              }),
+              'values': None,
+            }),
+            'title': dict({
+              'font': dict({
+                'family': None,
+                'size': None,
+                'style': None,
+                'weight': None,
+              }),
+              'text': None,
+              'visible': False,
+            }),
+          }),
+          dict({
+            'scale': dict({
+              'categories': None,
+              'inverted': False,
+              'limits': list([
+                None,
+                None,
+              ]),
+            }),
+            'spine': dict({
+              'visible': True,
+            }),
+            'ticks': dict({
+              'count': None,
+              'labels': dict({
+                'font': dict({
+                  'family': None,
+                  'size': None,
+                  'style': None,
+                  'weight': None,
+                }),
+                'text': None,
+                'visible': True,
+              }),
+              'marks': dict({
+                'visible': True,
+              }),
+              'values': list([
+              ]),
+            }),
+            'title': dict({
+              'font': dict({
+                'family': None,
+                'size': None,
+                'style': None,
+                'weight': None,
+              }),
+              'text': 'Zero numeric ticks',
+              'visible': True,
+            }),
+          }),
+          dict({
+            'scale': dict({
+              'categories': list([
+                'medium',
+                'low',
+                'high',
+              ]),
+              'inverted': False,
+              'limits': list([
+                None,
+                None,
+              ]),
+            }),
+            'spine': dict({
+              'visible': True,
+            }),
+            'ticks': dict({
+              'count': None,
+              'labels': dict({
+                'font': dict({
+                  'family': None,
+                  'size': None,
+                  'style': None,
+                  'weight': None,
+                }),
+                'text': None,
+                'visible': True,
+              }),
+              'marks': dict({
+                'visible': True,
+              }),
+              'values': list([
+              ]),
+            }),
+            'title': dict({
+              'font': dict({
+                'family': None,
+                'size': None,
+                'style': None,
+                'weight': None,
+              }),
+              'text': 'Zero category ticks',
+              'visible': True,
+            }),
+          }),
+          dict({
+            'scale': dict({
+              'categories': None,
+              'inverted': False,
+              'limits': list([
+                None,
+                None,
+              ]),
+            }),
+            'spine': dict({
+              'visible': True,
+            }),
+            'ticks': dict({
+              'count': None,
+              'labels': dict({
+                'font': dict({
+                  'family': None,
+                  'size': None,
+                  'style': None,
+                  'weight': None,
+                }),
+                'text': None,
+                'visible': True,
+              }),
+              'marks': dict({
+                'visible': True,
+              }),
+              'values': None,
+            }),
+            'title': dict({
+              'font': dict({
+                'family': list([
+                  'DejaVu Serif',
+                  'serif',
+                ]),
+                'size': 13.0,
+                'style': 'italic',
+                'weight': 'bold',
+              }),
+              'text': 'Styled title',
+              'visible': True,
+            }),
+          }),
+          dict({
+            'scale': dict({
+              'categories': None,
+              'inverted': False,
+              'limits': list([
+                None,
+                None,
+              ]),
+            }),
+            'spine': dict({
+              'visible': True,
+            }),
+            'ticks': dict({
+              'count': None,
+              'labels': dict({
+                'font': dict({
+                  'family': 'DejaVu Sans Mono',
+                  'size': 9.0,
+                  'style': None,
+                  'weight': 'semibold',
+                }),
+                'text': None,
+                'visible': True,
+              }),
+              'marks': dict({
+                'visible': True,
+              }),
+              'values': None,
+            }),
+            'title': dict({
+              'font': dict({
+                'family': None,
+                'size': None,
+                'style': None,
+                'weight': None,
+              }),
+              'text': 'Numeric font',
+              'visible': True,
+            }),
+          }),
+          dict({
+            'scale': dict({
+              'categories': list([
+                'medium',
+                'low',
+                'high',
+              ]),
+              'inverted': False,
+              'limits': list([
+                None,
+                None,
+              ]),
+            }),
+            'spine': dict({
+              'visible': True,
+            }),
+            'ticks': dict({
+              'count': None,
+              'labels': dict({
+                'font': dict({
+                  'family': 'DejaVu Serif',
+                  'size': 10.0,
+                  'style': 'italic',
+                  'weight': None,
+                }),
+                'text': None,
+                'visible': True,
+              }),
+              'marks': dict({
+                'visible': True,
+              }),
+              'values': None,
+            }),
+            'title': dict({
+              'font': dict({
+                'family': None,
+                'size': None,
+                'style': None,
+                'weight': None,
+              }),
+              'text': 'Category font',
+              'visible': True,
+            }),
+          }),
+          dict({
+            'scale': dict({
+              'categories': None,
+              'inverted': False,
+              'limits': list([
+                None,
+                None,
+              ]),
+            }),
+            'spine': dict({
+              'visible': True,
+            }),
+            'ticks': dict({
+              'count': None,
+              'labels': dict({
+                'font': dict({
+                  'family': None,
+                  'size': None,
+                  'style': None,
+                  'weight': 'bold',
+                }),
+                'text': None,
+                'visible': True,
+              }),
+              'marks': dict({
+                'visible': True,
+              }),
+              'values': None,
+            }),
+            'title': dict({
+              'font': dict({
+                'family': None,
+                'size': None,
+                'style': None,
+                'weight': 'bold',
+              }),
+              'text': 'Shared weight',
+              'visible': True,
+            }),
+          }),
+          dict({
+            'scale': dict({
+              'categories': None,
+              'inverted': False,
+              'limits': list([
+                None,
+                None,
+              ]),
+            }),
+            'spine': dict({
+              'visible': True,
+            }),
+            'ticks': dict({
+              'count': None,
+              'labels': dict({
+                'font': dict({
+                  'family': None,
+                  'size': None,
+                  'style': None,
+                  'weight': None,
+                }),
+                'text': list([
+                  '$0$',
+                  '$1$',
+                  '$2^2$',
+                ]),
+                'visible': True,
+              }),
+              'marks': dict({
+                'visible': True,
+              }),
+              'values': list([
+                0.0,
+                1.0,
+                4.0,
+              ]),
+            }),
+            'title': dict({
+              'font': dict({
+                'family': None,
+                'size': None,
+                'style': None,
+                'weight': None,
+              }),
+              'text': '$x_1$',
+              'visible': True,
+            }),
+          }),
+          dict({
+            'scale': dict({
+              'categories': list([
+                'medium',
+                'low',
+                'high',
+              ]),
+              'inverted': False,
+              'limits': list([
+                None,
+                None,
+              ]),
+            }),
+            'spine': dict({
+              'visible': True,
+            }),
+            'ticks': dict({
+              'count': None,
+              'labels': dict({
+                'font': dict({
+                  'family': None,
+                  'size': None,
+                  'style': None,
+                  'weight': None,
+                }),
+                'text': list([
+                  '$y_{\\mathrm{medium}}$',
+                  '$y_{\\mathrm{low}}$',
+                  '$y_{\\mathrm{high}}$',
+                ]),
+                'visible': True,
+              }),
+              'marks': dict({
+                'visible': True,
+              }),
+              'values': list([
+                'medium',
+                'low',
+                'high',
+              ]),
+            }),
+            'title': dict({
+              'font': dict({
+                'family': None,
+                'size': None,
+                'style': None,
+                'weight': None,
+              }),
+              'text': '$y_{\\mathrm{test}}$',
+              'visible': True,
+            }),
+          }),
+          dict({
+            'scale': dict({
+              'categories': None,
+              'inverted': False,
+              'limits': list([
+                None,
+                None,
+              ]),
+            }),
+            'spine': dict({
+              'visible': True,
+            }),
+            'ticks': dict({
+              'count': None,
+              'labels': dict({
+                'font': dict({
+                  'family': None,
+                  'size': None,
+                  'style': None,
+                  'weight': None,
+                }),
+                'text': None,
+                'visible': True,
+              }),
+              'marks': dict({
+                'visible': True,
+              }),
+              'values': None,
+            }),
+            'title': dict({
+              'font': dict({
+                'family': None,
+                'size': None,
+                'style': None,
+                'weight': None,
+              }),
+              'text': 'x_1',
+              'visible': True,
+            }),
+          }),
+        ]),
+        'lines': dict({
+          'color_encoding': dict({
+            'axis': 22,
+            'colorbar': dict({
+              'ticks': dict({
+                'labels': dict({
+                  'font': dict({
+                    'family': 'DejaVu Sans Mono',
+                    'size': 9.0,
+                    'style': 'italic',
+                    'weight': None,
+                  }),
+                  'visible': True,
+                }),
+              }),
+              'title': dict({
+                'font': dict({
+                  'family': 'DejaVu Serif',
+                  'size': 13.0,
+                  'style': None,
+                  'weight': 'bold',
+                }),
+                'text': '$x_1$',
+                'visible': True,
+              }),
+            }),
+            'lower': None,
+            'palette': 'plasma',
+            'upper': None,
+          }),
+          'default': dict({
+            'alpha': 0.7,
+            'color': None,
+            'linestyle': '-',
+            'width': 1.0,
+            'zorder': None,
+          }),
+          'overrides': dict({
+          }),
+        }),
+      }),
+    }),
+  })
+# ---
